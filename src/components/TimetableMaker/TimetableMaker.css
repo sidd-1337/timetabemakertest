@@ -1,0 +1,107 @@
+.timetable-canvas {
+    display: grid;
+    grid-template-columns: 100px repeat(16, minmax(100px, 1fr));
+    gap: 10px;
+    align-items: start;
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .time-header {
+    padding: 5px;
+    grid-column: 2 / -1; /* Time headers start from the second column */
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+
+  }
+  
+  .time-slot-header {
+    padding: 5px;
+    background-color: #e9f0f6;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  .day-row {
+    display: contents;
+  }
+  
+  .day-header {
+    grid-row: auto;
+    grid-column: 1;
+    padding: 5px;
+    background-color: #e9f0f6;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  .time-slot {
+    padding: 5px;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+
+  .subject-selection {
+    border: 1px solid #007BFF; /* Change color and thickness as needed */
+    padding: 10px;
+    margin: 10px 0;
+    margin-bottom: 20px;
+  }
+  
+  .subject-selection:before {
+    content: 'Subjects';
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .subject-selection button {
+    /* Apply language button styles */
+    padding: 0.7rem 1.2rem;
+    display: block;
+    margin: 5px 0;
+    border: 1px solid #007BFF;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: transparent;
+  }
+
+  .subject-details button {
+    display: inline;
+    padding: 10px;
+    margin-left: 5px;
+    border: 1px solid #007BFF;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: transparent;
+    gap: 1rem;
+  }
+
+  .right-section {
+    display: flex;
+    flex-direction: row; /* Change the direction to row */
+    justify-content: flex-start;
+    align-items: flex-start; /* Aligns items to the start of the flex container */
+    gap: 20px; /* Adds some space between the two sections */
+    width: 100%; /* Adjust the width as necessary */
+  }
+  
+  .subject-details {
+    border: 1px solid #007BFF; /* Change color and thickness as needed */
+    padding: 10px;
+    margin: 10px 0;
+    margin-bottom: 20px;
+  }
+
+  .subject-details:before {
+    content: 'Subjects details';
+    font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+  }
+  
