@@ -1,7 +1,7 @@
 .timetable-canvas {
     display: grid;
-    grid-template-columns: 100px repeat(16, minmax(100px, 1fr));
-    gap: 10px;
+    grid-template-columns: 100px repeat(16, minmax(60px, 1fr));
+    gap: 8px;
     align-items: start;
     background-color: #f9f9f9;
     padding: 1rem;
@@ -10,7 +10,7 @@
   }
   
   .time-header {
-    padding: 5px;
+    padding: 4px;
     grid-column: 2 / -1; /* Time headers start from the second column */
     display: grid;
     grid-template-columns: repeat(16, 1fr);
@@ -18,7 +18,8 @@
   }
   
   .time-slot-header {
-    padding: 5px;
+    font-size: small;
+    padding: 4px;
     background-color: #e9f0f6;
     text-align: center;
     border: 1px solid #ddd;
@@ -40,7 +41,8 @@
   }
   
   .time-slot {
-    padding: 5px;
+    padding: 4px;
+    font-size: small;
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 8px;

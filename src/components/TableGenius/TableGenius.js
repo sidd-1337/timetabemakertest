@@ -1,18 +1,12 @@
 import React, { useState, startTransition } from 'react';
 import './TableGenius.css';
 import { useTranslation } from 'react-i18next';
+import Header from '../Header';
 
 function TableGenius() {
   const [showForm, setShowForm] = useState(false);
-  const { t, i18n } = useTranslation();
-  const [currentLanguage, setCurrentLanguage] = useState(i18n.language);
+  const { t } = useTranslation();
 
-  const changeLanguage = (lng) => {
-  startTransition(() => {
-    i18n.changeLanguage(lng);
-    setCurrentLanguage(lng);
-  });
-};
   const handleShowForm = () => {
     startTransition(() => {
       setShowForm(!showForm);
@@ -21,13 +15,7 @@ function TableGenius() {
   
   return (
     <div className="container">
-    <header>
-        <div className="logo">TableGenius<span role="img" aria-label="lightbulb">💡</span></div>
-        <div className="language-buttons">
-          {currentLanguage === 'en' && <button onClick={() => changeLanguage('cz')}>Čeština</button>}
-          {currentLanguage === 'cz' && <button onClick={() => changeLanguage('en')}>English</button>}
-        </div>
-      </header>
+    <Header/>
       <main>
         <div className="content-left">
         <h1>{t('welcome')}</h1>
