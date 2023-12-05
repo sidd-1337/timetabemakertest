@@ -9,7 +9,7 @@ const mockSubjects = [
     name: 'Informační Systémy 1',
     lectures: [
       {
-        id: 'math-lecture-1',
+        id: 'inf-lecture-1',
         day: 'Monday',
         timeFrom: '9:10',
         timeTo: '10:45',
@@ -21,13 +21,13 @@ const mockSubjects = [
         teacher: 'Žáček',
       },
       {
-        id: 'math-lecture-2',
+        id: 'inf-tutorial-2',
         day: 'Wednesday',
         timeFrom: '10:50',
         timeTo: '11:35',
         department: 'KIP',
         shortName: '7INF1',
-        type: 'lecture',
+        type: 'tutorial',
         building: 'C',
         room: '102',
         teacher: 'Žáček',
@@ -36,31 +36,31 @@ const mockSubjects = [
   }, 
   {
     id: 2,
-    name: 'Informační Systémy 2',
+    name: 'Metody kódování, šifrování a bezpečnosti dat',
     lectures: [
       {
-        id: 'math-lecture-1',
+        id: 'kosb-lecture-1',
         day: 'Monday',
         timeFrom: '9:10',
         timeTo: '10:45',
         department: 'KIP',
-        shortName: '7INF2',
+        shortName: '7KOSB',
         type: 'lecture',
         building: 'C',
         room: '101',
-        teacher: 'Žáček',
+        teacher: 'Zuzčák',
       },
       {
-        id: 'math-lecture-2',
-        day: 'Wednesday',
+        id: 'kosb-tutorial-1',
+        day: 'Thursday',
         timeFrom: '10:50',
         timeTo: '11:35',
         department: 'KIP',
-        shortName: '7INF2',
-        type: 'lecture',
+        shortName: '7KOSB',
+        type: 'tutorial',
         building: 'C',
         room: '102',
-        teacher: 'Žáček',
+        teacher: 'Zuzčák',
       },
     ],
   },
@@ -179,14 +179,16 @@ function TimetableMaker() {
   setTimetable(updatedTimetable);
 };
   
-  // Function to handle subject selection
-  // Function to handle subject selection
 const handleSubjectSelect = subjectId => {
   const subject = mockSubjects.find(subj => subj.id === subjectId);
   setSelectedSubject(subject);
+
+  const lectures = subject.lectures.filter(item => item.type === 'lecture');
+  const tutorials = subject.lectures.filter(item => item.type === 'tutorial');
+
   setSubjectSchedule({
-    lectures: subject.lectures || [], // Make sure lectures is an array even if empty
-    tutorials: subject.tutorials || [], // Make sure tutorials is an array even if empty
+    lectures, // Only include items with type 'lecture'
+    tutorials, // Only include items with type 'tutorial'
   });
 };
 
@@ -247,7 +249,8 @@ const handleSubjectSelect = subjectId => {
 
     <h4>Tutorials</h4>
     {subjectSchedule.tutorials.map(tutorial => (
-      <button key={tutorial.id} onClick={() => addToTimetable(selectedSubject.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher)}>
+      <button className='button' 
+      key={tutorial.id} onClick={() => addToTimetable(selectedSubject.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher)}>
       {tutorial.day} {tutorial.timeFrom} - {tutorial.timeTo}
       </button>
     ))}
