@@ -3,74 +3,10 @@ import '../TableGenius/TableGenius.css'; // Reusing your existing CSS file
 import './TimetableMaker.css';
 import Header from '../Header';
 
-const mockSubjects = [
-  {
-    id: 1,
-    name: 'Informační Systémy 1',
-    lectures: [
-      {
-        id: 'inf-lecture-1',
-        day: 'Monday',
-        timeFrom: '9:10',
-        timeTo: '10:45',
-        department: 'KIP',
-        shortName: '7INF1',
-        type: 'lecture',
-        building: 'C',
-        room: '101',
-        teacher: 'Žáček',
-      },
-      {
-        id: 'inf-tutorial-2',
-        day: 'Wednesday',
-        timeFrom: '10:50',
-        timeTo: '11:35',
-        department: 'KIP',
-        shortName: '7INF1',
-        type: 'tutorial',
-        building: 'C',
-        room: '102',
-        teacher: 'Žáček',
-      },
-    ],
-  }, 
-  {
-    id: 2,
-    name: 'Metody kódování, šifrování a bezpečnosti dat',
-    lectures: [
-      {
-        id: 'kosb-lecture-1',
-        day: 'Monday',
-        timeFrom: '9:10',
-        timeTo: '10:45',
-        department: 'KIP',
-        shortName: '7KOSB',
-        type: 'lecture',
-        building: 'C',
-        room: '101',
-        teacher: 'Zuzčák',
-      },
-      {
-        id: 'kosb-tutorial-1',
-        day: 'Thursday',
-        timeFrom: '10:50',
-        timeTo: '11:35',
-        department: 'KIP',
-        shortName: '7KOSB',
-        type: 'tutorial',
-        building: 'C',
-        room: '102',
-        teacher: 'Zuzčák',
-      },
-    ],
-  },
-  // Add more subjects with their details
-];
-
 
 
 function TimetableMaker() {
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const days = ['Po', 'Út', 'St', 'Čt', 'Pá'];
   // Times can be an array of time slots, e.g., ['08:00', '09:00', ...]
   const times = [
     { from: '6:30', to: '7:15' },
@@ -96,6 +32,61 @@ function TimetableMaker() {
   const [selectedSubject, setSelectedSubject] = useState(null);
   const [subjectSchedule, setSubjectSchedule] = useState({ lectures: [], tutorials: [] });
   const [timetable, setTimetable] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+
+  const fetchSubjectData = async () => {
+    try {
+      const response = await fetch(`/api/data/getOborId?nazevCZ=Umělá inteligence&fakultaOboru=FPR&typ=Navazující magisterský&forma=Prezenční&grade=1`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+
+      const subjectsMap = new Map();
+    data.forEach(item => {
+
+      if (item.hodinaSkutOd.value === '00:00') {
+        return;
+      }
+
+      let subject = subjectsMap.get(item.nazev);
+      if (!subject) {
+        subject = {
+          id: item.id,
+          name: item.nazev,
+          details: { lectures: [], tutorials: [] }
+        };
+        subjectsMap.set(item.nazev, subject);
+      }
+      const sessionDetails = {
+        id: item.id, // or some unique identifier
+        day: days[days.indexOf(item.denZkr)], // Convert 'Po' to 'Monday', etc, if necessary
+        timeFrom: item.hodinaSkutOd.value,
+        timeTo: item.hodinaSkutDo.value,
+        department: item.katedra,
+        shortName: item.predmet,
+        type: item.typAkceZkr === 'Př' ? 'Lecture' : 'Tutorial',
+        building: item.budova,
+        room: item.mistnost,
+        teacher: item.ucitel && item.ucitel.prijmeni ? item.ucitel.prijmeni : 'Unknown',
+      };
+      if (item.typAkceZkr === 'Př') {
+        subject.details.lectures.push(sessionDetails);
+      } else if (item.typAkceZkr === 'Cv') {
+        subject.details.tutorials.push(sessionDetails);
+      }
+    });
+    setSubjects(Array.from(subjectsMap.values()));
+  } catch (error) {
+    console.error('Error fetching subject data:', error);
+  }
+};
+
+  useEffect(() => {
+    fetchSubjectData(); // Fetch subjects when component mounts
+    initializeTimetable();
+  }, []);
+
   
   const initializeTimetable = () => {
     const initialTimetable = days.map(day => ({
@@ -180,17 +171,15 @@ function TimetableMaker() {
 };
   
 const handleSubjectSelect = subjectId => {
-  const subject = mockSubjects.find(subj => subj.id === subjectId);
+  const subject = subjects.find(subj => subj.id === subjectId);
+  if (!subject) {
+    console.error('Subject not found:', subjectId);
+    return;
+  }
   setSelectedSubject(subject);
-
-  const lectures = subject.lectures.filter(item => item.type === 'lecture');
-  const tutorials = subject.lectures.filter(item => item.type === 'tutorial');
-
-  setSubjectSchedule({
-    lectures, // Only include items with type 'lecture'
-    tutorials, // Only include items with type 'tutorial'
-  });
+  setSubjectSchedule(subject.details);
 };
+
 
 
   return (
@@ -227,7 +216,7 @@ const handleSubjectSelect = subjectId => {
     </div>
     <div className="right-section">
     <div className="subject-selection">
-        {mockSubjects.map(subject => (
+        {subjects.map(subject => (
           <button className='button' key={subject.id}  onClick={() => handleSubjectSelect(subject.id)}>
             {subject.name}
           </button>
