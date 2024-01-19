@@ -131,3 +131,42 @@ footer {
   left: 2rem;
   font-size: 0.8rem;
 }
+
+.programme-group {
+  position: relative; /* Set relative positioning here */
+  margin-bottom: 1.5rem;
+}
+
+.programme-suggestions {
+  position: absolute; /* Absolutely positioned relative to the .programme-group */
+  top: 100%; /* Directly below the input field */
+  left: 0;
+  width: 55%; /* Match the width of the input field */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto; /* Allows scrolling */
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  padding-left: 0;
+  list-style-type: none; 
+}
+
+
+.programme-suggestions li {
+  padding: 10px; /* Matches your padding style */
+  font-size: small; /* Matches your font-size for time-slot-header */
+  cursor: pointer;
+  margin: 0;
+  list-style: none;
+  border-bottom: 1px solid #ddd; /* Separates items */
+}
+
+.programme-suggestions li:last-child {
+  border-bottom: none; /* No border for the last item */
+}
+
+.programme-suggestions li:hover {
+  background-color: #e9f0f6; /* Matches your header background color */
+} 

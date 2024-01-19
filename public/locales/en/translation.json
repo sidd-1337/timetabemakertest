@@ -7,6 +7,8 @@
     "faculty": "Faculty",
     "schoolYear": "School year",
     "programme": "Programme",
-    "yearOfStudies": "Year of Studies"
+    "grade": "Grade",
+    "formOfStudy": "Form of study",
+    "typeOfStudy": "Type of study"
   }
   
