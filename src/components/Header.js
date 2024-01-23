@@ -15,7 +15,8 @@ function Header() {
 
   return (
     <header>
-      <div className="logo">TableGenius<span role="img" aria-label="lightbulb">💡</span></div>
+    <div className="logo">TimetableGenius</div>
+    <div><img src="/timetable_maker_logo.png" alt="TimetableGenius Logo" className="logo-img" /></div>
       <div className="language-buttons">
         {currentLanguage === 'en' && <button onClick={() => changeLanguage('cz')}>Čeština</button>}
         {currentLanguage === 'cz' && <button onClick={() => changeLanguage('en')}>English</button>}

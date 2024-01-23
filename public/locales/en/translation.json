@@ -7,8 +7,10 @@
     "faculty": "Faculty",
     "schoolYear": "School year",
     "programme": "Programme",
-    "grade": "Grade",
+    "yearOfStudies": "The year of study",
     "formOfStudy": "Form of study",
-    "typeOfStudy": "Type of study"
-  }
+    "typeOfStudy": "Type of study",
+    "grade": "Grade",
+    "next": "Next"
+}
   
