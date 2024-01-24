@@ -39,6 +39,9 @@ function TimetableMaker() {
   const [subjects, setSubjects] = useState([]);
 
   const fetchSubjectData = async () => {
+    if(programme==="null" || faculty==="null" || typeOfStudy==="null" || formOfStudy==="null" || grade==="null" || semester==="null"){
+      return;
+    }
     try {
       const response = await fetch(`/api/data/getOborId?nazevCZ=${programme}&fakultaOboru=${faculty}&typ=${typeOfStudy}&forma=${formOfStudy}&grade=${grade}&semester=${semester}`);
       if (!response.ok) {

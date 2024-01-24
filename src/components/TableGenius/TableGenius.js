@@ -44,7 +44,18 @@ function TableGenius() {
             })
         }
     };
-
+    const handleMakeYourOwn = () => {
+        navigate('/timetable-maker', {
+            state:{
+                programme: "null",
+                faculty: "null",
+                typeOfStudy:"null",
+                formOfStudy:"null",
+                grade:"null",
+                semester:"null"
+            }
+        })
+    };
 
     // State for all filters and programme list
     const [faculty, setFaculty] = useState('');
@@ -255,7 +266,7 @@ function TableGenius() {
                     <div className="buttons">
                         <span className="btn-primary">{t('getstarted')}</span>
                         <button onClick={handleShowForm}>{t('stagload')}</button>
-                        <button>{t('ownmaking')}</button>
+                        <button onClick={handleMakeYourOwn}> {t('ownmaking')}</button>
                     </div>
                 </div>
                 <div className="content-right">
