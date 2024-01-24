@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import '../TableGenius/TableGenius.css'; // Reusing your existing CSS file
 import './TimetableMaker.css';
 import Header from '../Header';
+import { useLocation } from 'react-router-dom';
 
 
 
 function TimetableMaker() {
+  const location = useLocation();
+  const { programme, faculty, typeOfStudy, formOfStudy, grade, semester } = location.state || {};
+
   const days = ['Po', 'Út', 'St', 'Čt', 'Pá'];
   // Times can be an array of time slots, e.g., ['08:00', '09:00', ...]
   const times = [
@@ -36,7 +40,7 @@ function TimetableMaker() {
 
   const fetchSubjectData = async () => {
     try {
-      const response = await fetch(`/api/data/getOborId?nazevCZ=Umělá inteligence&fakultaOboru=FPR&typ=Navazující magisterský&forma=Prezenční&grade=1`);
+      const response = await fetch(`/api/data/getOborId?nazevCZ=${programme}&fakultaOboru=${faculty}&typ=${typeOfStudy}&forma=${formOfStudy}&grade=${grade}&semester=${semester}`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -83,9 +87,11 @@ function TimetableMaker() {
 };
 
   useEffect(() => {
-    fetchSubjectData(); // Fetch subjects when component mounts
+    if (programme && faculty && typeOfStudy && formOfStudy && grade && semester) {
+      fetchSubjectData();
+    } // Fetch subjects when component mounts
     initializeTimetable();
-  }, []);
+  }, [programme, faculty, typeOfStudy, formOfStudy, grade, semester]);
 
   
   const initializeTimetable = () => {

@@ -15,6 +15,15 @@
     "You must fill in all the boxes": "Vyplňte všechny pole prosím",
     "Import subjects": "Importovat předměty",
     "Selected program is not on the list of available programs": "Vybraný program neexistuje",
-    "Back": "Zpět"
+    "Back": "Zpět",
+    "Bachelor": "Bakalářský",
+    "Undergraduate master": "Magisterský",
+    "Postgraduate master": "Navazující magisterský",
+    "Full-time": "Prezenční",
+    "Part-time": "Kombinovaná",
+    "Distant":"Distanční",
+    "Semester": "Semestr",
+    "Summer": "Letní",
+    "Winter": "Zimní"
 }
   

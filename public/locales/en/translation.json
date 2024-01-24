@@ -11,6 +11,16 @@
     "formOfStudy": "Form of study",
     "typeOfStudy": "Type of study",
     "grade": "Grade",
-    "next": "Next"
+    "next": "Next",
+    "You must fill in all the boxes": "You must fill in all the boxes",
+    "Import subjects": "Import subjects",
+    "Selected program is not on the list of available programs": "Selected program is not on the list of available programs",
+    "Back": "Back",
+    "Bachelor": "Bachelor",
+    "Undergraduate master": "Undergraduate master",
+    "Postgraduate master": "Postgraduate master",
+    "Full-time": "Full-time",
+    "Part-time": "Part-time",
+    "Distant":"Distant"
 }
   
