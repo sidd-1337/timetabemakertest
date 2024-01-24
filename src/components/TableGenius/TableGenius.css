@@ -166,6 +166,18 @@ footer {
   transform: translateX(-50%)
 }
 
+.custom-button:hover {
+  background-color: #007BFF;
+}
+
+.custom-button:active {
+  background-color: #007BFF;
+}
+
+.custom-button.clicked {
+  background-color: #007BFF;
+}
+
 .programme-group {
   position: relative; /* Set relative positioning here */
   margin-bottom: 1.5rem;

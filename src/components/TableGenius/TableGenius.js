@@ -9,6 +9,16 @@ function TableGenius() {
     const [step, setStep] = useState(1);
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const [clickedButton, setClickedButton] = useState('');
+    const handleShowFormClick = () => {
+        handleShowForm();
+        setClickedButton(prevState => prevState === 'showForm' ? '' : 'showForm');
+    };
+
+    const handleMakeYourOwnClick = () => {
+        handleMakeYourOwn();
+        setClickedButton(prevState => prevState === 'makeYourOwn' ? '' : 'makeYourOwn');
+    };
 
     const handleShowForm = () => {
         startTransition(() => {
@@ -265,8 +275,14 @@ function TableGenius() {
                     <p>{t('description')}</p>
                     <div className="buttons">
                         <span className="btn-primary">{t('getstarted')}</span>
-                        <button onClick={handleShowForm}>{t('stagload')}</button>
-                        <button onClick={handleMakeYourOwn}> {t('ownmaking')}</button>
+                        <button
+                            className={`custom-button ${clickedButton === 'showForm' ? 'clicked' : ''}`}
+                            onClick={handleShowFormClick}
+                        >{t('stagload')}</button>
+                        <button
+                            className={`custom-button ${clickedButton === 'makeYourOwn' ? 'clicked' : ''}`}
+                            onClick={handleMakeYourOwnClick}
+                        >{t('ownmaking')}</button>
                     </div>
                 </div>
                 <div className="content-right">
