@@ -7,9 +7,10 @@ import { useNavigate } from 'react-router-dom';
 function TableGenius() {
     const [showForm, setShowForm] = useState(false);
     const [step, setStep] = useState(1);
-    const { t } = useTranslation();
+    const { t,i18n  } = useTranslation();
     const navigate = useNavigate();
     const [clickedButton, setClickedButton] = useState('');
+    const [displayedProgramName, setDisplayedProgramName] = useState('');
     const handleShowFormClick = () => {
         handleShowForm();
         setClickedButton(prevState => prevState === 'showForm' ? '' : 'showForm');
@@ -36,7 +37,7 @@ function TableGenius() {
     };
 
     const handleImportSubjects = () => {
-        if (!grade || !programme || !schoolYear || !semester || grade === 'empty' || programme === 'empty' || schoolYear === 'empty' || semester === 'empty'|| !programmesList.includes(programme)) {
+        if (!grade || !programme || !schoolYear || !semester || grade === 'empty' || programme === 'empty' || schoolYear === 'empty' || semester === 'empty'|| !programmesList.some(prog => prog.nazevCZ === programme)) {
             // If any of them is empty, display a warning message
             return; // Exit the function without proceeding to the next step
         }
@@ -144,14 +145,16 @@ function TableGenius() {
             default:
                 break;
         }
-        if (event.target.name === 'programme') {
-            setProgramme(event.target.value);
+        if (name === 'programme') {
+            setDisplayedProgramName(value);
         }
     };
 
-    const handleProgrammeSelection = (selectedProgramme) => {
-        setProgramme(selectedProgramme);
-        //setProgrammesList([]); // Clear the suggestions list after selection
+    const handleProgrammeSelection = (selectedProgram) => {
+        setProgramme(selectedProgram.nazevCZ); // Store the Czech version internally
+        // Update the displayed program name based on the current language
+        const displayName = i18n.language.startsWith('cz') ? selectedProgram.nazevCZ : selectedProgram.nazevEN;
+        setDisplayedProgramName(displayName);
     };
 
     const handleSubmit = (event) => {
@@ -159,10 +162,11 @@ function TableGenius() {
         fetchData();
     };
 
-    const filteredProgrammes = programme.length >= 2 && !programmesList.includes(programme)
-        ? programmesList.filter(prog => prog.toLowerCase().includes(programme.toLowerCase()))
+    const filteredProgrammes =  programme.length >= 2 && !programmesList.some(prog => prog.nazevCZ === programme)
+        ? programmesList.filter(prog =>
+            (prog.nazevCZ && prog.nazevCZ.toLowerCase().includes(programme.toLowerCase())) ||
+            (prog.nazevEN && prog.nazevEN.toLowerCase().includes(programme.toLowerCase())))
         : [];
-
 
     const renderLeftSection = () => (
         <form onSubmit={handleSubmit}>
@@ -238,15 +242,19 @@ function TableGenius() {
                     type="text"
                     id="programme"
                     name="programme"
-                    value={programme}
+                    value={displayedProgramName}
                     onChange={handleInputChange}
                     autoComplete="off"
                 />
                 {filteredProgrammes.length > 0 && (
                     <ul className="programme-suggestions">
-                        {filteredProgrammes.map((prog, index) => (
-                            <li key={index} onClick={() => handleProgrammeSelection(prog)}>{prog}</li>
-                        ))}
+                        {filteredProgrammes.map((prog, index) => {
+                            // Determine the display name based on the current language
+                            const displayName = i18n.language.startsWith('cz') ? prog.nazevCZ : prog.nazevEN;
+                            return (
+                                <li key={index} onClick={() => handleProgrammeSelection(prog)}>{displayName}</li>
+                            );
+                        })}
                     </ul>
                 )}
             </div>
@@ -256,7 +264,7 @@ function TableGenius() {
                     {t('You must fill in all the boxes')}
                 </div>
             )}
-            {showForm && (!programmesList.includes(programme) && programme.length>0) && (
+            {showForm && (!programmesList.some(prog => prog.nazevCZ === programme) && programme.length>0) && (
                 <div className="error-message">
                     {t('Selected program is not on the list of available programs')}
                 </div>

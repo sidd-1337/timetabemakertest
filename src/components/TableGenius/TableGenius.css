@@ -42,6 +42,8 @@ header button {
 .logo {
   font-size: 1.5rem;
   font-weight: bold;
+  display: flex;
+  align-items: center;
 }
 form input {
   width: 100%;
@@ -150,7 +152,7 @@ form select {
 }
 
 .logo-img {
-  margin-right: auto;
+
   padding-right: 50rem;
   width: 80px; /* Adjust the width to your desired size */
   height: auto; /* Maintain the aspect ratio */
