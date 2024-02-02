@@ -1,7 +1,8 @@
+body{
+  background-color: #e9f0f6;
+}
 .container {
   font-family: Arial, sans-serif;
-  width: 100vw;
-  height: 100vh;
   background-color: #e9f0f6;
   padding: 2rem;
   box-sizing: border-box;
@@ -169,15 +170,15 @@ footer {
 }
 
 .custom-button:hover {
-  background-color: #007BFF;
+  background-color: #aececf;
 }
 
 .custom-button:active {
-  background-color: #007BFF;
+  background-color: #aececf;
 }
 
 .custom-button.clicked {
-  background-color: #007BFF;
+  background-color: #aececf;
 }
 
 .programme-group {
@@ -222,4 +223,5 @@ footer {
 .programme-suggestions li:hover {
   background-color: #e9f0f6; /* Matches your header background color */
 }
+
 

@@ -41,11 +41,13 @@
   }
   
   .time-slot {
+    position: relative;
     padding: 4px;
     font-size: 10px;
     background-color: #ffffff;
     border: 1px solid #ddd;
     border-radius: 8px;
+    overflow: hidden;
   }
 
   .subject-selection {
@@ -106,4 +108,29 @@
     display: block;
     margin-bottom: 10px;
   }
-  
+
+
+.collision-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #dc3545;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.buttons-left {
+  display: flex;
+  justify-content: start; /* Aligns items to the start of the container */
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+

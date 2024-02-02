@@ -86,6 +86,7 @@ function TableGenius() {
             setProgrammesList(data);
         } catch (error) {
             console.error('Error fetching data:', error);
+            alert('Server off');
         }
     };
 
