@@ -348,7 +348,7 @@ function TimetableMaker() {
                 )}</div>
             <div className="buttons buttons-left">
                 <button className="custom-button"  onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
-                    {showSubjectLoader ? 'Hide Form' : 'Add New Subject'}
+                    {showSubjectLoader ? 'Hide Form' : 'Load subject from STAG'}
                 </button>
             </div>
         <div className="form-group">
