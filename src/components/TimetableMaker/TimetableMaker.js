@@ -11,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 function TimetableMaker() {
     const location = useLocation();
     const { programme, faculty, typeOfStudy, formOfStudy, grade, semester } = location.state || {};
-    const [showForm, setShowForm] = useState(false);
 
     const days = ['Po', 'Út', 'St', 'Čt', 'Pá'];
     // Times can be an array of time slots, e.g., ['08:00', '09:00', ...]
@@ -262,7 +261,7 @@ function TimetableMaker() {
             } else if (item.typAkceZkr === 'Cv') {
                 subject.details.tutorials.push(sessionDetails);
             }
-        });
+            });
 
         // Update the state with the new subjects list
         setSubjects(prevSubjects => {
