@@ -357,8 +357,7 @@ function TimetableMaker() {
         </div>
 </>
 
-)
-    ;
+    );
 }
 
 

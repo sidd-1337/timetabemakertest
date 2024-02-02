@@ -18,23 +18,22 @@ function SubjectLoaderForm({ onSubjectAdded }) {
     const [subjectAbbreviation, setSubjectAbbreviation] = useState('');
     const [department, setDepartment] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setError('');
 
-        try {
+
             const subjectData = await loadSubject(subjectAbbreviation, department);
             // Process the subject data here as needed before adding it
             onSubjectAdded(subjectData); // Assuming onSubjectAdded is a prop function to handle the addition
             setIsLoading(false);
-        } catch (error) {
-            console.error('Failed to load subject:', error);
-            setError('Failed to load subject');
+        if (Object.keys(subjectData).length === 0) {
+            // Handle the empty object case here
+            alert('Failed to load subject: No data returned');
             setIsLoading(false);
         }
+
     };
 
     return (
