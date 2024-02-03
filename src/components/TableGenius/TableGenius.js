@@ -27,7 +27,8 @@ function TableGenius() {
         });
     };
 
-    const handleNextStep = () => {
+    const handleNextStep = (event) => {
+        event.preventDefault();
         if (!faculty || !typeOfStudy || !formOfStudy || faculty === 'empty' || typeOfStudy === 'empty' || formOfStudy === 'empty') {
             // If any of them is empty, display a warning message
             return; // Exit the function without proceeding to the next step
@@ -89,6 +90,12 @@ function TableGenius() {
             alert('Server off');
         }
     };
+/*
+    useEffect(() => {
+        // Call fetchData on component mount and whenever faculty, typeOfStudy, or formOfStudy changes
+        fetchData();
+    }, [faculty, typeOfStudy, formOfStudy]); // Dependencies array
+*/
 
     const handleBackStep = () => {
         setStep(step - 1);
@@ -158,10 +165,13 @@ function TableGenius() {
         setDisplayedProgramName(displayName);
     };
 
+    /*
     const handleSubmit = (event) => {
         event.preventDefault();
         fetchData();
     };
+
+     */
 
     const filteredProgrammes =  programme.length >= 2 && !programmesList.some(prog => prog.nazevCZ === programme)
         ? programmesList.filter(prog =>
@@ -170,7 +180,7 @@ function TableGenius() {
         : [];
 
     const renderLeftSection = () => (
-        <form onSubmit={handleSubmit}>
+        <form>
             <div className="form-group">
                 <label htmlFor="faculty">{t('faculty')}</label>
                 <select id="faculty" name="faculty" value={faculty} onChange={handleInputChange}>
@@ -210,7 +220,7 @@ function TableGenius() {
     );
 
     const renderRightSection = () => (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleImportSubjects}>
             <div className="form-group">
                 <label htmlFor="grade">{t('grade')}</label>
                 <select id="grade" name="grade" value={grade} onChange={handleInputChange}>
@@ -271,7 +281,7 @@ function TableGenius() {
                 </div>
             )}
             <button type="button" className="btn-primary-back" onClick={handleBackStep}>{t('Back')}</button>
-            <button type="submit" className="btn-primary-next" onClick={handleImportSubjects}>{t('Import subjects')}</button>
+            <button type="submit" className="btn-primary-next">{t('Import subjects')}</button>
         </form>
     );
 

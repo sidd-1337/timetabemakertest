@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../TableGenius/TableGenius.css'; // Reusing your existing CSS file
 import './TimetableMaker.css';
 import Header from '../Header';
@@ -41,6 +41,8 @@ function TimetableMaker() {
     const [timetable, setTimetable] = useState([]);
     const [subjects, setSubjects] = useState([]);
     const [showSubjectLoader, setShowSubjectLoader] = useState(false);
+    const [isDataFetched, setIsDataFetched] = useState(false);
+    const initialized = useRef(false);
 
     const uniqueSessions = (sessions) => {
         return sessions.filter((session, index, self) =>
@@ -52,6 +54,7 @@ function TimetableMaker() {
         );
     };
     const fetchSubjectData = async () => {
+        console.log('Fetching data...');
         if(programme==="null" || faculty==="null" || typeOfStudy==="null" || formOfStudy==="null" || grade==="null" || semester==="null"){
             return;
         }
@@ -105,9 +108,11 @@ function TimetableMaker() {
     };
 
     useEffect(() => {
-        if (programme && faculty && typeOfStudy && formOfStudy && grade && semester) {
+        if (programme && faculty && typeOfStudy && formOfStudy && grade && semester && !initialized.current) {
             fetchSubjectData();
-        } // Fetch subjects when component mounts
+            console.log('Useeffect...');
+            initialized.current = true;// Set the flag so data isn't fetched again
+        }
         initializeTimetable();
     }, [programme, faculty, typeOfStudy, formOfStudy, grade, semester]);
 
@@ -138,11 +143,12 @@ function TimetableMaker() {
         setTimetable(initialTimetable);
     };
 
+    /*
     // Call initializeTimetable when the component mounts
     useEffect(() => {
         initializeTimetable();
     }, []);
-
+*/
     const timeToMinutes = (time) => {
         const [hours, minutes] = time.split(':').map(Number);
         return hours * 60 + minutes;
