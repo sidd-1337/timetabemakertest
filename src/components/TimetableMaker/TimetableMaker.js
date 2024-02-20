@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import '../TableGenius/TableGenius.css'; // Reusing your existing CSS file
 import './TimetableMaker.css';
 import Header from '../Header';
-import { useLocation } from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import SubjectLoaderForm from './SubjectLoaderForm';
-import { useTranslation } from 'react-i18next';
-
 
 
 function TimetableMaker() {
@@ -49,7 +47,7 @@ function TimetableMaker() {
                 index === self.findIndex((t) =>
                     t.day === session.day && t.timeFrom === session.timeFrom && t.timeTo === session.timeTo &&
                     t.type === session.type && t.department === session.department && t.shortName === session.shortName &&
-                    t.building === session.building && t.room === session.room && t.teacher === session.teacher
+                    t.building === session.building && t.room === session.room && t.teacher === session.teacher && t.weekType === session.weekType
                 )
         );
     };
@@ -93,6 +91,7 @@ function TimetableMaker() {
                     building: item.budova,
                     room: item.mistnost,
                     teacher: item.ucitel && item.ucitel.prijmeni ? item.ucitel.prijmeni : 'Unknown',
+                    weekType: item.tydenZkr,
                 };
                 if (item.typAkceZkr === 'Př') {
                     subject.details.lectures.push(sessionDetails);
@@ -116,21 +115,31 @@ function TimetableMaker() {
         initializeTimetable();
     }, [programme, faculty, typeOfStudy, formOfStudy, grade, semester]);
 
-    const checkForCollisions = (newSubject, day, timeFrom, timeTo) => {
+    const checkForCollisions = (newSubject, day, timeFrom, timeTo, weekType) => {
         const startMinutesNew = timeToMinutes(timeFrom);
         const endMinutesNew = timeToMinutes(timeTo);
 
+
         const collisions = subjects
-            .filter(subject => subject.id !== newSubject.id) // Filtrujeme, aby se nezahrnul stejný předmět
-            .flatMap(subject => subject.details.lectures.concat(subject.details.tutorials)) // Spojení přednášek a cvičení
+            .filter(subject => subject.id !== newSubject.id)
+            .flatMap(subject => subject.details.lectures.concat(subject.details.tutorials))
             .filter(session => {
+                // Zkontrolujte, že session není pro stejný předmět
+                if (session.id === newSubject.id) return false;
+
+                // Zkontrolujte, že se jedná o stejný den
                 if (session.day !== day) return false;
+
+                // Zkontrolujte, že se jedná o stejný nebo "J" weekType
+                const isWeekTypeCompatible = (weekType === "J" || session.weekType === "J" || weekType === session.weekType);
+                if (!isWeekTypeCompatible) return false;
+
+                // Zkontrolujte, že se jedná o časový překryv
                 const startMinutesSession = timeToMinutes(session.timeFrom);
                 const endMinutesSession = timeToMinutes(session.timeTo);
-                return (startMinutesSession < endMinutesNew && endMinutesSession > startMinutesNew); // Kontrola překrytí
+                return (startMinutesSession < endMinutesNew && endMinutesSession > startMinutesNew);
             })
             .map(session => session.name);
-
         return collisions;
     };
 
@@ -138,10 +147,17 @@ function TimetableMaker() {
     const initializeTimetable = () => {
         const initialTimetable = days.map(day => ({
             day,
-            slots: times.map(time => ({ timeFrom: time.from, timeTo: time.to, subject: null }))
+            slots: times.map(time => ({
+                timeFrom: time.from,
+                timeTo: time.to,
+                subjectEvenWeek: null,
+                subjectOddWeek: null,
+                subjectBothWeeks: null,
+            }))
         }));
         setTimetable(initialTimetable);
     };
+
 
     /*
     // Call initializeTimetable when the component mounts
@@ -155,14 +171,14 @@ function TimetableMaker() {
     };
 
     // Function to add a lecture/tutorial to the timetable
-    const addToTimetable = (subjectName, day, timeFrom, timeTo, type, department, shortName, building, room, teacher) => {
+    const addToTimetable = (subjectName, day, timeFrom, timeTo, type, department, shortName, building, room, teacher, weekType) => {
         const daySchedule = timetable.find(d => d.day === day);
         if (!daySchedule) {
             console.error(`Day not found in timetable: ${day}`);
             return;
         }
 
-        const collisions = checkForCollisions(selectedSubject, day, timeFrom, timeTo);
+        const collisions = checkForCollisions(selectedSubject, day, timeFrom, timeTo, weekType);
 
         const subject = {
             name: subjectName,
@@ -171,7 +187,8 @@ function TimetableMaker() {
             shortName,
             building,
             room,
-            teacher
+            teacher,
+            weekType
         };
 
 
@@ -189,13 +206,13 @@ function TimetableMaker() {
         // Check if any of the slots in the range are already occupied
         let isOverwriting = false;
         for (let i = startIndex; i <= endIndex; i++) {
-            if (daySchedule.slots[i].subject) {
+            if (daySchedule.slots[i].subjectBothWeeks || daySchedule.slots[i].subjectEvenWeek && daySchedule.slots[i].subjectOddWeek ) {
                 isOverwriting = true;
                 break;
             }
         }
 
-        // Confirm before overwriting
+
         if (isOverwriting) {
             const confirmOverwrite = window.confirm('This time slot is already occupied. Do you want to overwrite it?');
             if (!confirmOverwrite) {
@@ -203,22 +220,40 @@ function TimetableMaker() {
             }
         }
 
-        // Update the timetable
-        const updatedTimetable = timetable.map(d =>
-            d.day === day
-                ? {
-                    ...d,
-                    slots: d.slots.map((slot, index) =>
-                        index >= startIndex && index <= endIndex
-                            ? { ...slot, subject, collisions } // přidáme kolize do slotu
-                            : slot
-                    ),
-                }
-                : d
-        );
+        const updatedTimetable = timetable.map(daySchedule => {
+            if (daySchedule.day !== day) return daySchedule;
+
+            return {
+                ...daySchedule,
+                slots: daySchedule.slots.map((slot, index) => {
+                    if (index < startIndex || index > endIndex) return slot;
+
+                    let updatedSlot = {...slot, collisions};
+
+                    if (weekType === 'J') {
+                        updatedSlot.subjectEvenWeek = null; // Odstranění, pokud byly dříve přidány
+                        updatedSlot.subjectOddWeek = null;
+                        updatedSlot.subjectBothWeeks = subject;
+                    } else {
+                        if (weekType === 'S') {
+                            updatedSlot.subjectEvenWeek = subject;
+                            // Pokud je "L" již obsazeno, "J" je odstraněno
+                            updatedSlot.subjectBothWeeks = null;
+                        } else if (weekType === 'L') {
+                            updatedSlot.subjectOddWeek = subject;
+                            // Pokud je "S" již obsazeno, "J" je odstraněno
+                            updatedSlot.subjectBothWeeks = null;
+                        }
+                    }
+
+                    return updatedSlot;
+                }),
+            };
+        });
 
         setTimetable(updatedTimetable);
     };
+
 
     const handleSubjectSelect = subjectId => {
         const subject = subjects.find(subj => subj.id === subjectId);
@@ -260,6 +295,7 @@ function TimetableMaker() {
                 building: item.budova,
                 room: item.mistnost,
                 teacher: item.ucitel && item.ucitel.prijmeni ? item.ucitel.prijmeni : 'Unknown',
+                weekType: item.tydenZkr,
             };
 
             if (item.typAkceZkr === 'Př') {
@@ -267,7 +303,7 @@ function TimetableMaker() {
             } else if (item.typAkceZkr === 'Cv') {
                 subject.details.tutorials.push(sessionDetails);
             }
-            });
+        });
 
         // Update the state with the new subjects list
         setSubjects(prevSubjects => {
@@ -287,81 +323,109 @@ function TimetableMaker() {
 
     return (
         <>
-        <div className="container">
-            <Header/>
-            <div className="timetable-canvas">
-                <div className="time-header">
-                    {times.slice(1).map((time, index) => (
-                        <div key={index} className="time-slot-header">{time.from} - {time.to}</div>
-                    ))}
-                </div>
-                {timetable.map((daySchedule, dayIndex) => (
-                    <React.Fragment key={dayIndex}>
-                        <div className="day-header">{daySchedule.day}</div>
-                        {daySchedule.slots.slice(1).map((slot, timeIndex) => (
-                            <div key={timeIndex} className="time-slot"
-                                 title={slot.collisions?.length > 0 ? `Kolize s: ${[...new Set(slot.collisions)].join(', ')}` : ''}>
-                                {slot.subject && (
-                                    <>
-                                        <div className="department-shortname">
-                                            {slot.subject.department} / {slot.subject.shortName}
-                                        </div>
-                                        <div className="building-room">
-                                            {slot.subject.building} - {slot.subject.room}
-                                        </div>
-                                        <div className="teacher-name">
-                                            {slot.subject.teacher}
-                                        </div>
-                                        {slot.collisions?.length > 0 &&
-                                            <div className="collision-indicator">!</div>}
-                                    </>
+            <div className="container">
+                <Header/>
+                <div className="timetable-canvas">
+                    <div className="time-header">
+                        {times.slice(1).map((time, index) => (
+                            <div key={index} className="time-slot-header">{time.from} - {time.to}</div>
+                        ))}
+                    </div>
+                    {timetable.map((daySchedule, dayIndex) => (
+                        <React.Fragment key={dayIndex}>
+                            <div className="day-header">{daySchedule.day}</div>
+                            {daySchedule.slots.slice(1).map((slot, timeIndex) => (
+                                <div key={timeIndex} className="time-slot"
+                                     title={slot.collisions?.length > 0 ? `Kolize s: ${[...new Set(slot.collisions)].join(', ')}` : ''}>
+                                    {slot.collisions?.length > 0 &&
+                                        <div className="collision-indicator">!</div>}
+                                    {slot.subjectEvenWeek && (
+                                        <>
+                                            <div className="department-shortname">
+                                                {slot.subjectEvenWeek.department} / {slot.subjectEvenWeek.shortName}
+                                            </div>
+                                            <div className="building-room">
+                                                {slot.subjectEvenWeek.building} - {slot.subjectEvenWeek.room}
+                                            </div>
+                                            <div className="teacher-name">
+                                                {slot.subjectEvenWeek.teacher}
+                                            </div>
+                                            <div className="even-week">Týden:Sudý</div>
+                                            <div className="even-week">-----</div>
+                                            </>
+                                    )}{slot.subjectOddWeek && (
+                                        <>
+                                            <div className="department-shortname">
+                                                {slot.subjectOddWeek.department} / {slot.subjectOddWeek.shortName}
+                                            </div>
+                                            <div className="building-room">
+                                                {slot.subjectOddWeek.building} - {slot.subjectOddWeek.room}
+                                            </div>
+                                            <div className="teacher-name">
+                                                {slot.subjectOddWeek.teacher}
+                                            </div>
+                                            <div className="odd-week">Týden:Lichý</div>
+                                        </>
+                                )}{slot.subjectBothWeeks && (
+                                        <>
+                                            <div className="department-shortname">
+                                                {slot.subjectBothWeeks.department} / {slot.subjectBothWeeks.shortName}
+                                            </div>
+                                            <div className="building-room">
+                                                {slot.subjectBothWeeks.building} - {slot.subjectBothWeeks.room}
+                                            </div>
+                                            <div className="teacher-name">
+                                                {slot.subjectBothWeeks.teacher}
+                                            </div>
+                                        </>
                                 )}
-                            </div>
-                        ))}
-                    </React.Fragment>
-                ))}
-            </div>
-            <div className="right-section">
-                <div className="subject-selection">
-                    {subjects.map(subject => (
-                        <button className='button' key={subject.id} onClick={() => handleSubjectSelect(subject.id)}>
-                            {subject.name}
-                        </button>
+
+                                </div>
+                            ))}
+                        </React.Fragment>
                     ))}
                 </div>
-
-
-                {selectedSubject && (
-                    <div className="subject-details">
-                        <h4>Lectures</h4>
-                        {uniqueSessions(subjectSchedule.lectures).map(lecture => (
-                            <button className='button'
-                                    key={lecture.id}
-                                    onClick={() => addToTimetable(selectedSubject.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher)}>
-                                {lecture.day} {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
-                            </button>
-                        ))}
-
-                        <h4>Tutorials</h4>
-                        {uniqueSessions(subjectSchedule.tutorials).map(tutorial => (
-                            <button className='button'
-                                    key={tutorial.id}
-                                    onClick={() => addToTimetable(selectedSubject.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher)}>
-                                {tutorial.day} {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}
+                <div className="right-section">
+                <div className="subject-selection">
+                        {subjects.map(subject => (
+                            <button className='button' key={subject.id} onClick={() => handleSubjectSelect(subject.id)}>
+                                {subject.name}
                             </button>
                         ))}
                     </div>
-                )}</div>
-            <div className="buttons buttons-left">
-                <button className="custom-button"  onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
-                    {showSubjectLoader ? 'Hide Form' : 'Load subject from STAG'}
-                </button>
+
+
+                    {selectedSubject && (
+                        <div className="subject-details">
+                            <h4>Lectures</h4>
+                            {uniqueSessions(subjectSchedule.lectures).map(lecture => (
+                                <button className='button'
+                                        key={lecture.id}
+                                        onClick={() => addToTimetable(selectedSubject.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType)}>
+                                    {lecture.day} {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher} <br/> Week: {lecture.weekType}
+                                </button>
+                            ))}
+
+                            <h4>Tutorials</h4>
+                            {uniqueSessions(subjectSchedule.tutorials).map(tutorial => (
+                                <button className='button'
+                                        key={tutorial.id}
+                                        onClick={() => addToTimetable(selectedSubject.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType)}>
+                                    {tutorial.day} {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher} <br/> Week: {tutorial.weekType}
+                                </button>
+                            ))}
+                        </div>
+                    )}</div>
+                <div className="buttons buttons-left">
+                    <button className="custom-button"  onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
+                        {showSubjectLoader ? 'Hide Form' : 'Load subject from STAG'}
+                    </button>
+                </div>
+                <div className="form-group">
+                    {showSubjectLoader && <SubjectLoaderForm onSubjectAdded={handleSubjectAdded}/>}
+                </div>
             </div>
-        <div className="form-group">
-            {showSubjectLoader && <SubjectLoaderForm onSubjectAdded={handleSubjectAdded}/>}
-        </div>
-        </div>
-</>
+        </>
 
     );
 }
