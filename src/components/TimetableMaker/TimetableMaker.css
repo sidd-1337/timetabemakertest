@@ -16,7 +16,7 @@
     grid-template-columns: repeat(16, 1fr);
 
   }
-  
+
   .time-slot-header {
     font-size: small;
     padding: 4px;
@@ -133,4 +133,27 @@
   margin-bottom: 2rem;
 }
 
+.subject-item {
+  position: relative; /* Make this a positioning context */
+}
+
+
+.subject-item .button {
+  width: 100%; /* Adjust size as needed */
+  /* Additional styling */
+}
+
+.subject-item .delete-button {
+  position: absolute;
+  top: 0; /* Adjust as needed for exact positioning */
+  left: 0; /* Adjust as needed */
+  z-index: 1; /* Ensure it's above the subject button */
+  padding: 0; /* Adjust padding as needed */
+  margin: 0;
+  border: none;
+  font-size: 12px;
+  padding-left: 2px;
+  padding-right: 2px;
+  /* Adjust size, padding, and margins as needed */
+}
 

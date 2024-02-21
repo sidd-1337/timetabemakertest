@@ -134,6 +134,29 @@ function TimetableMaker() {
         return collisions;
     };
 
+    const deleteSubjectFromTimetable = (subject) => {
+        // Remove the subject from the timetable
+        const updatedTimetable = timetable.map(daySchedule => ({
+            ...daySchedule,
+            slots: daySchedule.slots.map(slot => {
+                if (slot.subject && slot.subject.id === subject.id) {
+                    return { ...slot, subject: null };
+                }
+                return slot;
+            })
+        }));
+        setTimetable(updatedTimetable);
+
+        // Remove the subject from the subjects list
+        const updatedSubjects = subjects.filter(sub => sub.id !== subject.id);
+        setSubjects(updatedSubjects);
+
+        // Close the subject details window if the deleted subject was selected
+        if (selectedSubject && selectedSubject.id === subject.id) {
+            setSelectedSubject(null); // Deselect the subject
+            setSubjectSchedule({ lectures: [], tutorials: [] }); // Reset the subject schedule
+        }
+    };
 
     const initializeTimetable = () => {
         const initialTimetable = days.map(day => ({
@@ -221,13 +244,20 @@ function TimetableMaker() {
     };
 
     const handleSubjectSelect = subjectId => {
-        const subject = subjects.find(subj => subj.id === subjectId);
-        if (!subject) {
-            console.error('Subject not found:', subjectId);
-            return;
+        // If the selected subject is clicked again, deselect it
+        if (selectedSubject && selectedSubject.id === subjectId) {
+            setSelectedSubject(null);
+            setSubjectSchedule({ lectures: [], tutorials: [] }); // Reset subject schedule
+        } else {
+            // Find and select the new subject
+            const subject = subjects.find(subj => subj.id === subjectId);
+            if (!subject) {
+                console.error('Subject not found:', subjectId);
+                return;
+            }
+            setSelectedSubject(subject);
+            setSubjectSchedule(subject.details);
         }
-        setSelectedSubject(subject);
-        setSubjectSchedule(subject.details);
     };
 
     const handleSubjectAdded = (subjectData) => {
@@ -324,9 +354,12 @@ function TimetableMaker() {
             <div className="right-section">
                 <div className="subject-selection">
                     {subjects.map(subject => (
-                        <button className='button' key={subject.id} onClick={() => handleSubjectSelect(subject.id)}>
-                            {subject.name}
-                        </button>
+                        <div key={subject.id} className="subject-item">
+                                <button className='button' key={subject.id} onClick={() => handleSubjectSelect(subject.id)}>
+                                    {subject.name}
+                                </button>
+                            <button className="delete-button" onClick={() => deleteSubjectFromTimetable(subject)}>❌</button>
+                        </div>
                     ))}
                 </div>
 
