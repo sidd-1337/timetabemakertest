@@ -4,6 +4,8 @@ import './TimetableMaker.css';
 import Header from '../Header';
 import { useLocation } from 'react-router-dom';
 import SubjectLoaderForm from './SubjectLoaderForm';
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 import { useTranslation } from 'react-i18next';
 
 
@@ -53,6 +55,67 @@ function TimetableMaker() {
                 )
         );
     };
+    const exportPDF = () => {
+        const input = document.querySelector('.timetable-canvas'); // The element to capture
+        if (!input) return;
+
+        html2canvas(input, { scale: 1 }).then(originalCanvas => {
+            const originalWidth = originalCanvas.width;
+            const originalHeight = originalCanvas.height;
+            const padding = 40; // Define the padding value (px)
+            // Calculate rotated canvas dimensions, adding padding
+            const rotatedWidth = originalHeight + (padding * 2);
+            const rotatedHeight = originalWidth + (padding * 2);
+
+            // Create a new canvas for rotation
+            const rotatedCanvas = document.createElement('canvas');
+            rotatedCanvas.width = rotatedWidth;
+            rotatedCanvas.height = rotatedHeight;
+            const context = rotatedCanvas.getContext('2d');
+
+            // Set the whole background to white
+            context.fillStyle = '#FFFFFF'; // Set fill color to white
+            context.fillRect(0, 0, rotatedWidth, rotatedHeight); // Fill the background
+
+            // Rotate and draw the original canvas onto the new canvas, considering padding
+            context.translate(rotatedWidth / 2, rotatedHeight / 2); // Center the rotation point
+            context.rotate(90 * Math.PI / 180); // Rotate 90 degrees
+            context.drawImage(originalCanvas, -originalWidth / 2, -originalHeight / 2); // Draw the image centered
+
+            // Prepare for A4 size output
+            const a4Width = 595; // A4 width in points (pt)
+            const a4Height = 842; // A4 height in points (pt), for portrait orientation
+
+            // Use jsPDF to create a PDF in A4 size
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'pt',
+                format: [a4Width, a4Height]
+            });
+
+            // Calculate scale to fit the rotated canvas within A4 dimensions
+            const scaleX = a4Width / rotatedWidth;
+            const scaleY = a4Height / rotatedHeight;
+            const scale = Math.min(scaleX, scaleY); // Use the smallest scale to fit the entire canvas
+
+            // Calculate the scaled dimensions
+            const scaledWidth = rotatedWidth * scale;
+            const scaledHeight = rotatedHeight * scale;
+
+            // Calculate centered position on A4 page
+            const xPosition = (a4Width - scaledWidth) / 2;
+            const yPosition = (a4Height - scaledHeight) / 2;
+
+            // Convert canvas to image and add to PDF
+            const imgData = rotatedCanvas.toDataURL('image/png');
+            pdf.addImage(imgData, 'PNG', xPosition, yPosition, scaledWidth, scaledHeight);
+            pdf.save('timetable.pdf');
+        }).catch(err => console.error('Error exporting PDF:', err));
+    };
+
+
+
+
     const fetchSubjectData = async () => {
         console.log('Fetching data...');
         if(programme==="null" || faculty==="null" || typeOfStudy==="null" || formOfStudy==="null" || grade==="null" || semester==="null"){
@@ -135,11 +198,16 @@ function TimetableMaker() {
     };
 
     const deleteSubjectFromTimetable = (subject) => {
-        // Remove the subject from the timetable
+        // Remove the subject from the subjects list
+        const updatedSubjects = subjects.filter(sub => sub.id !== subject.id);
+        setSubjects(updatedSubjects);
+
+        // Go through the timetable to remove any slots associated with this subject's name
         const updatedTimetable = timetable.map(daySchedule => ({
             ...daySchedule,
             slots: daySchedule.slots.map(slot => {
-                if (slot.subject && slot.subject.id === subject.id) {
+                // Clear the slot if its subject's name matches the deleted subject's name
+                if (slot.subject && slot.subject.name === subject.name) {
                     return { ...slot, subject: null };
                 }
                 return slot;
@@ -147,16 +215,13 @@ function TimetableMaker() {
         }));
         setTimetable(updatedTimetable);
 
-        // Remove the subject from the subjects list
-        const updatedSubjects = subjects.filter(sub => sub.id !== subject.id);
-        setSubjects(updatedSubjects);
-
-        // Close the subject details window if the deleted subject was selected
+        // If the deleted subject was the selected subject, reset the selection and subject schedule
         if (selectedSubject && selectedSubject.id === subject.id) {
-            setSelectedSubject(null); // Deselect the subject
-            setSubjectSchedule({ lectures: [], tutorials: [] }); // Reset the subject schedule
+            setSelectedSubject(null);
+            setSubjectSchedule({ lectures: [], tutorials: [] });
         }
     };
+
 
     const initializeTimetable = () => {
         const initialTimetable = days.map(day => ({
@@ -389,6 +454,7 @@ function TimetableMaker() {
                 <button className="custom-button"  onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
                     {showSubjectLoader ? 'Hide Form' : 'Load subject from STAG'}
                 </button>
+                <button onClick={exportPDF} className="custom-button">Export as PDF</button>
             </div>
         <div className="form-group">
             {showSubjectLoader && <SubjectLoaderForm onSubjectAdded={handleSubjectAdded}/>}
