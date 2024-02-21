@@ -4,6 +4,11 @@ import './TimetableMaker.css';
 import Header from '../Header';
 import {useLocation} from 'react-router-dom';
 import SubjectLoaderForm from './SubjectLoaderForm';
+import RestrictedTimeForm from "./RestrictedTimeForm";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
+import { useTranslation } from 'react-i18next';
+
 
 
 function TimetableMaker() {
@@ -13,8 +18,9 @@ function TimetableMaker() {
     const days = ['Po', 'Út', 'St', 'Čt', 'Pá'];
     // Times can be an array of time slots, e.g., ['08:00', '09:00', ...]
     const times = [
-        { from: '6:30', to: '7:15' },
-        { from: '7:30', to: '08:15' },
+        { from: '', to: '' },
+        { from: '06:30', to: '07:15' },
+        { from: '07:30', to: '08:15' },
         { from: '08:20', to: '09:05' },
         { from: '09:10', to: '09:55' },
         { from: '10:00', to: '10:45' },
@@ -35,10 +41,12 @@ function TimetableMaker() {
 
 
     const [selectedSubject, setSelectedSubject] = useState(null);
-    const [subjectSchedule, setSubjectSchedule] = useState({ lectures: [], tutorials: [] });
+    const [subjectSchedule, setSubjectSchedule] = useState({ lectures: [], tutorials: [], });
     const [timetable, setTimetable] = useState([]);
     const [subjects, setSubjects] = useState([]);
     const [showSubjectLoader, setShowSubjectLoader] = useState(false);
+    const [showRestrictedLoader, setShowRestrictedLoader] = useState(false);
+    const [restrictedTimes, setRestrictedTimes] = useState([]);
     const [isDataFetched, setIsDataFetched] = useState(false);
     const initialized = useRef(false);
 
@@ -51,6 +59,67 @@ function TimetableMaker() {
                 )
         );
     };
+    const exportPDF = () => {
+        const input = document.querySelector('.timetable-canvas'); // The element to capture
+        if (!input) return;
+
+        html2canvas(input, { scale: 1 }).then(originalCanvas => {
+            const originalWidth = originalCanvas.width;
+            const originalHeight = originalCanvas.height;
+            const padding = 40; // Define the padding value (px)
+            // Calculate rotated canvas dimensions, adding padding
+            const rotatedWidth = originalHeight + (padding * 2);
+            const rotatedHeight = originalWidth + (padding * 2);
+
+            // Create a new canvas for rotation
+            const rotatedCanvas = document.createElement('canvas');
+            rotatedCanvas.width = rotatedWidth;
+            rotatedCanvas.height = rotatedHeight;
+            const context = rotatedCanvas.getContext('2d');
+
+            // Set the whole background to white
+            context.fillStyle = '#FFFFFF'; // Set fill color to white
+            context.fillRect(0, 0, rotatedWidth, rotatedHeight); // Fill the background
+
+            // Rotate and draw the original canvas onto the new canvas, considering padding
+            context.translate(rotatedWidth / 2, rotatedHeight / 2); // Center the rotation point
+            context.rotate(90 * Math.PI / 180); // Rotate 90 degrees
+            context.drawImage(originalCanvas, -originalWidth / 2, -originalHeight / 2); // Draw the image centered
+
+            // Prepare for A4 size output
+            const a4Width = 595; // A4 width in points (pt)
+            const a4Height = 842; // A4 height in points (pt), for portrait orientation
+
+            // Use jsPDF to create a PDF in A4 size
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'pt',
+                format: [a4Width, a4Height]
+            });
+
+            // Calculate scale to fit the rotated canvas within A4 dimensions
+            const scaleX = a4Width / rotatedWidth;
+            const scaleY = a4Height / rotatedHeight;
+            const scale = Math.min(scaleX, scaleY); // Use the smallest scale to fit the entire canvas
+
+            // Calculate the scaled dimensions
+            const scaledWidth = rotatedWidth * scale;
+            const scaledHeight = rotatedHeight * scale;
+
+            // Calculate centered position on A4 page
+            const xPosition = (a4Width - scaledWidth) / 2;
+            const yPosition = (a4Height - scaledHeight) / 2;
+
+            // Convert canvas to image and add to PDF
+            const imgData = rotatedCanvas.toDataURL('image/png');
+            pdf.addImage(imgData, 'PNG', xPosition, yPosition, scaledWidth, scaledHeight);
+            pdf.save('timetable.pdf');
+        }).catch(err => console.error('Error exporting PDF:', err));
+    };
+
+
+
+
     const fetchSubjectData = async () => {
         console.log('Fetching data...');
         if(programme==="null" || faculty==="null" || typeOfStudy==="null" || formOfStudy==="null" || grade==="null" || semester==="null"){
@@ -144,6 +213,32 @@ function TimetableMaker() {
     };
 
 
+    const deleteSubjectFromTimetable = (subject) => {
+        // Remove the subject from the subjects list
+        const updatedSubjects = subjects.filter(sub => sub.id !== subject.id);
+        setSubjects(updatedSubjects);
+
+        // Go through the timetable to remove any slots associated with this subject's name
+        const updatedTimetable = timetable.map(daySchedule => ({
+            ...daySchedule,
+            slots: daySchedule.slots.map(slot => {
+                // Clear the slot if its subject's name matches the deleted subject's name
+                if (slot.subject && slot.subject.name === subject.name) {
+                    return { ...slot, subject: null };
+                }
+                return slot;
+            })
+        }));
+        setTimetable(updatedTimetable);
+
+        // If the deleted subject was the selected subject, reset the selection and subject schedule
+        if (selectedSubject && selectedSubject.id === subject.id) {
+            setSelectedSubject(null);
+            setSubjectSchedule({ lectures: [], tutorials: [] });
+        }
+    };
+
+
     const initializeTimetable = () => {
         const initialTimetable = days.map(day => ({
             day,
@@ -153,6 +248,7 @@ function TimetableMaker() {
                 subjectEvenWeek: null,
                 subjectOddWeek: null,
                 subjectBothWeeks: null,
+                restricted:null,
             }))
         }));
         setTimetable(initialTimetable);
@@ -206,7 +302,7 @@ function TimetableMaker() {
         // Check if any of the slots in the range are already occupied
         let isOverwriting = false;
         for (let i = startIndex; i <= endIndex; i++) {
-            if (daySchedule.slots[i].subjectBothWeeks || daySchedule.slots[i].subjectEvenWeek && daySchedule.slots[i].subjectOddWeek ) {
+            if (daySchedule.slots[i].subjectBothWeeks || daySchedule.slots[i].subjectEvenWeek && daySchedule.slots[i].subjectOddWeek || daySchedule.slots[i].restricted) {
                 isOverwriting = true;
                 break;
             }
@@ -230,20 +326,29 @@ function TimetableMaker() {
 
                     let updatedSlot = {...slot, collisions};
 
+
+
                     if (weekType === 'J') {
                         updatedSlot.subjectEvenWeek = null; // Odstranění, pokud byly dříve přidány
                         updatedSlot.subjectOddWeek = null;
+                        updatedSlot.restricted = null;
                         updatedSlot.subjectBothWeeks = subject;
                     } else {
                         if (weekType === 'S') {
                             updatedSlot.subjectEvenWeek = subject;
                             // Pokud je "L" již obsazeno, "J" je odstraněno
                             updatedSlot.subjectBothWeeks = null;
+                            updatedSlot.restricted = null;
                         } else if (weekType === 'L') {
                             updatedSlot.subjectOddWeek = subject;
                             // Pokud je "S" již obsazeno, "J" je odstraněno
                             updatedSlot.subjectBothWeeks = null;
+                            updatedSlot.restricted = null;
                         }
+                        updatedSlot.restricted = subject;
+                        updatedSlot.subjectEvenWeek = null;
+                        updatedSlot.subjectOddWeek = null;
+                        updatedSlot.subjectBothWeeks = null;
                     }
 
                     return updatedSlot;
@@ -252,17 +357,29 @@ function TimetableMaker() {
         });
 
         setTimetable(updatedTimetable);
+
+
+
     };
 
 
+
+
     const handleSubjectSelect = subjectId => {
-        const subject = subjects.find(subj => subj.id === subjectId);
-        if (!subject) {
-            console.error('Subject not found:', subjectId);
-            return;
+        // If the selected subject is clicked again, deselect it
+        if (selectedSubject && selectedSubject.id === subjectId) {
+            setSelectedSubject(null);
+            setSubjectSchedule({ lectures: [], tutorials: [] }); // Reset subject schedule
+        } else {
+            // Find and select the new subject
+            const subject = subjects.find(subj => subj.id === subjectId);
+            if (!subject) {
+                console.error('Subject not found:', subjectId);
+                return;
+            }
+            setSelectedSubject(subject);
+            setSubjectSchedule(subject.details);
         }
-        setSelectedSubject(subject);
-        setSubjectSchedule(subject.details);
     };
 
     const handleSubjectAdded = (subjectData) => {
@@ -317,6 +434,15 @@ function TimetableMaker() {
             return Array.from(updatedSubjectsMap.values());
         });
     };
+    const handleAddSubject = (subjectData) => {
+        // Přidání do seznamu omezených časů
+        setRestrictedTimes(currentTimes => [
+            ...currentTimes,
+            { ...subjectData, id: currentTimes.length + 1 } // Přidávání ID pro jedinečnost
+        ]);
+
+    };
+
 
 
 
@@ -352,32 +478,39 @@ function TimetableMaker() {
                                             </div>
                                             <div className="even-week">Týden:Sudý</div>
                                             <div className="even-week">-----</div>
-                                            </>
+                                        </>
                                     )}{slot.subjectOddWeek && (
-                                        <>
-                                            <div className="department-shortname">
-                                                {slot.subjectOddWeek.department} / {slot.subjectOddWeek.shortName}
-                                            </div>
-                                            <div className="building-room">
-                                                {slot.subjectOddWeek.building} - {slot.subjectOddWeek.room}
-                                            </div>
-                                            <div className="teacher-name">
-                                                {slot.subjectOddWeek.teacher}
-                                            </div>
-                                            <div className="odd-week">Týden:Lichý</div>
-                                        </>
+                                    <>
+                                        <div className="department-shortname">
+                                            {slot.subjectOddWeek.department} / {slot.subjectOddWeek.shortName}
+                                        </div>
+                                        <div className="building-room">
+                                            {slot.subjectOddWeek.building} - {slot.subjectOddWeek.room}
+                                        </div>
+                                        <div className="teacher-name">
+                                            {slot.subjectOddWeek.teacher}
+                                        </div>
+                                        <div className="odd-week">Týden:Lichý</div>
+                                    </>
                                 )}{slot.subjectBothWeeks && (
-                                        <>
-                                            <div className="department-shortname">
-                                                {slot.subjectBothWeeks.department} / {slot.subjectBothWeeks.shortName}
-                                            </div>
-                                            <div className="building-room">
-                                                {slot.subjectBothWeeks.building} - {slot.subjectBothWeeks.room}
-                                            </div>
-                                            <div className="teacher-name">
-                                                {slot.subjectBothWeeks.teacher}
-                                            </div>
-                                        </>
+                                    <>
+                                        <div className="department-shortname">
+                                            {slot.subjectBothWeeks.department} / {slot.subjectBothWeeks.shortName}
+                                        </div>
+                                        <div className="building-room">
+                                            {slot.subjectBothWeeks.building} - {slot.subjectBothWeeks.room}
+                                        </div>
+                                        <div className="teacher-name">
+                                            {slot.subjectBothWeeks.teacher}
+                                        </div>
+                                    </>
+                                )}
+                                    {slot.restricted && (
+                                    <>
+                                        <div className="department-shortname">
+                                            {slot.restricted.name}
+                                        </div>
+                                    </>
                                 )}
 
                                 </div>
@@ -386,12 +519,31 @@ function TimetableMaker() {
                     ))}
                 </div>
                 <div className="right-section">
-                <div className="subject-selection">
+                    <div className="subject-selection">
                         {subjects.map(subject => (
-                            <button className='button' key={subject.id} onClick={() => handleSubjectSelect(subject.id)}>
-                                {subject.name}
-                            </button>
+                            <div key={subject.id} className="subject-item">
+                                <button className='button' key={subject.id}
+                                        onClick={() => handleSubjectSelect(subject.id)}>
+                                    {subject.name}
+                                </button>
+                                <button className="delete-button"
+                                        onClick={() => deleteSubjectFromTimetable(subject)}>❌
+                                </button>
+
+                            </div>
                         ))}
+
+                        <div className="restricted-times-section">
+                            <h3>Restricted Times</h3>
+                            {uniqueSessions(restrictedTimes).map(restricted => (
+                                <button className='button'
+                                        key={restricted.id}
+                                        onClick={() => addToTimetable(restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo)}>
+                                    {restricted.name} {restricted.day} {restricted.timeFrom} - {restricted.timeTo}
+                                </button>
+                            ))}
+                        </div>
+
                     </div>
 
 
@@ -401,8 +553,9 @@ function TimetableMaker() {
                             {uniqueSessions(subjectSchedule.lectures).map(lecture => (
                                 <button className='button'
                                         key={lecture.id}
-                                        onClick={() => addToTimetable(selectedSubject.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType)}>
-                                    {lecture.day} {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher} <br/> Week: {lecture.weekType}
+                                        onClick={() => addToTimetable(lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType)}>
+                                    {lecture.day} {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
+                                    <br/> Week: {lecture.weekType}
                                 </button>
                             ))}
 
@@ -410,19 +563,29 @@ function TimetableMaker() {
                             {uniqueSessions(subjectSchedule.tutorials).map(tutorial => (
                                 <button className='button'
                                         key={tutorial.id}
-                                        onClick={() => addToTimetable(selectedSubject.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType)}>
-                                    {tutorial.day} {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher} <br/> Week: {tutorial.weekType}
+                                        onClick={() => addToTimetable(tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType)}>
+                                    {tutorial.day} {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}
+                                    <br/> Week: {tutorial.weekType}
                                 </button>
                             ))}
+
                         </div>
                     )}</div>
                 <div className="buttons buttons-left">
-                    <button className="custom-button"  onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
+                    <button className="custom-button" onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
                         {showSubjectLoader ? 'Hide Form' : 'Load subject from STAG'}
                     </button>
                 </div>
                 <div className="form-group">
                     {showSubjectLoader && <SubjectLoaderForm onSubjectAdded={handleSubjectAdded}/>}
+                </div>
+                <div className="buttons buttons-left">
+                    <button className="custom-button" onClick={() => setShowRestrictedLoader(!showRestrictedLoader)}>
+                        {showRestrictedLoader ? 'Hide Form' : 'Add restricted time'}
+                    </button>
+                </div>
+                <div className="form-group">
+                    {showRestrictedLoader &&<RestrictedTimeForm days={days} times={times} onAddSubject={handleAddSubject}/>}
                 </div>
             </div>
         </>
