@@ -120,6 +120,7 @@ function TimetableMaker() {
 
 
 
+
     const fetchSubjectData = async () => {
         console.log('Fetching data...');
         if(programme==="null" || faculty==="null" || typeOfStudy==="null" || formOfStudy==="null" || grade==="null" || semester==="null"){
@@ -188,28 +189,32 @@ function TimetableMaker() {
         const startMinutesNew = timeToMinutes(timeFrom);
         const endMinutesNew = timeToMinutes(timeTo);
 
-
-        const collisions = subjects
-            .filter(subject => subject.id !== newSubject.id)
+        // Kontrola kolizí mezi předměty
+        const subjectCollisions = subjects
+            .filter(subject => subject.name !== newSubject)
             .flatMap(subject => subject.details.lectures.concat(subject.details.tutorials))
             .filter(session => {
-                // Zkontrolujte, že session není pro stejný předmět
-                if (session.id === newSubject.id) return false;
-
-                // Zkontrolujte, že se jedná o stejný den
+                if (session.name === newSubject) return false;
                 if (session.day !== day) return false;
-
-                // Zkontrolujte, že se jedná o stejný nebo "J" weekType
-                const isWeekTypeCompatible = (weekType === "J" || session.weekType === "J" || weekType === session.weekType);
-                if (!isWeekTypeCompatible) return false;
-
-                // Zkontrolujte, že se jedná o časový překryv
                 const startMinutesSession = timeToMinutes(session.timeFrom);
                 const endMinutesSession = timeToMinutes(session.timeTo);
                 return (startMinutesSession < endMinutesNew && endMinutesSession > startMinutesNew);
             })
             .map(session => session.name);
-        return collisions;
+
+        // Kontrola kolizí s restricted times
+        const restrictedTimeCollisions = restrictedTimes
+            .filter(restrictedTime => {
+                if (restrictedTime.name === newSubject) return false;
+                if (restrictedTime.day !== day) return false;
+                const startMinutesRestricted = timeToMinutes(restrictedTime.timeFrom);
+                const endMinutesRestricted = timeToMinutes(restrictedTime.timeTo);
+                return (startMinutesRestricted < endMinutesNew && endMinutesRestricted > startMinutesNew);
+            })
+            .map(restrictedTime => restrictedTime.name);
+
+        // Sloučení kolizí z obou zdrojů
+        return [...subjectCollisions, ...restrictedTimeCollisions];
     };
 
 
@@ -218,25 +223,38 @@ function TimetableMaker() {
         const updatedSubjects = subjects.filter(sub => sub.id !== subject.id);
         setSubjects(updatedSubjects);
 
-        // Go through the timetable to remove any slots associated with this subject's name
+        // Remove the subject from the restricted times list if it is a restricted time
+        const updatedRestrictedTimes = restrictedTimes.filter(rt => rt.id !== subject.id);
+        setRestrictedTimes(updatedRestrictedTimes);
+
+        // Update the timetable slots
         const updatedTimetable = timetable.map(daySchedule => ({
             ...daySchedule,
             slots: daySchedule.slots.map(slot => {
-                // Clear the slot if its subject's name matches the deleted subject's name
-                if (slot.subject && slot.subject.name === subject.name) {
-                    return { ...slot, subject: null };
+                const isSubjectBothWeeksSlot = slot.subjectBothWeeks && slot.subjectBothWeeks.name === subject.name;
+                const isSubjectOddWeeksSlot = slot.subjectOddWeek && slot.subjectOddWeek.name === subject.name;
+                const isSubjectEvenWeeksSlot = slot.subjectEvenWeek && slot.subjectEvenWeek.name === subject.name;
+                const isRestrictedSlot = slot.restricted && slot.restricted.name === subject.name;
+                if (isSubjectBothWeeksSlot || isSubjectOddWeeksSlot || isSubjectEvenWeeksSlot || isRestrictedSlot) {
+                    const clearedSlot = { ...slot };
+                    if (isSubjectBothWeeksSlot) clearedSlot.subjectBothWeeks = null;
+                    if (isSubjectOddWeeksSlot) clearedSlot.subjectOddWeek = null;
+                    if (isSubjectEvenWeeksSlot) clearedSlot.subjectEvenWeek = null;
+                    if (isRestrictedSlot) clearedSlot.restricted = null;
+                    return clearedSlot;
                 }
                 return slot;
             })
         }));
         setTimetable(updatedTimetable);
 
-        // If the deleted subject was the selected subject, reset the selection and subject schedule
+        // Reset the selected subject and its schedule if the deleted subject was the selected one
         if (selectedSubject && selectedSubject.id === subject.id) {
             setSelectedSubject(null);
             setSubjectSchedule({ lectures: [], tutorials: [] });
         }
     };
+
 
 
     const initializeTimetable = () => {
@@ -274,7 +292,7 @@ function TimetableMaker() {
             return;
         }
 
-        const collisions = checkForCollisions(selectedSubject, day, timeFrom, timeTo, weekType);
+       const collisions = checkForCollisions(subjectName, day, timeFrom, timeTo, weekType);
 
         const subject = {
             name: subjectName,
@@ -326,8 +344,6 @@ function TimetableMaker() {
 
                     let updatedSlot = {...slot, collisions};
 
-
-
                     if (weekType === 'J') {
                         updatedSlot.subjectEvenWeek = null; // Odstranění, pokud byly dříve přidány
                         updatedSlot.subjectOddWeek = null;
@@ -344,11 +360,13 @@ function TimetableMaker() {
                             // Pokud je "S" již obsazeno, "J" je odstraněno
                             updatedSlot.subjectBothWeeks = null;
                             updatedSlot.restricted = null;
+                        } else if (restrictedTimes){
+                            updatedSlot.restricted = subject;
+                            updatedSlot.subjectEvenWeek = null;
+                            updatedSlot.subjectOddWeek = null;
+                            updatedSlot.subjectBothWeeks = null;
                         }
-                        updatedSlot.restricted = subject;
-                        updatedSlot.subjectEvenWeek = null;
-                        updatedSlot.subjectOddWeek = null;
-                        updatedSlot.subjectBothWeeks = null;
+
                     }
 
                     return updatedSlot;
@@ -369,7 +387,7 @@ function TimetableMaker() {
         // If the selected subject is clicked again, deselect it
         if (selectedSubject && selectedSubject.id === subjectId) {
             setSelectedSubject(null);
-            setSubjectSchedule({ lectures: [], tutorials: [] }); // Reset subject schedule
+            setSubjectSchedule({ lectures: [], tutorials: [], }); // Reset subject schedule
         } else {
             // Find and select the new subject
             const subject = subjects.find(subj => subj.id === subjectId);
@@ -395,7 +413,7 @@ function TimetableMaker() {
                 subject = {
                     id: item.id,
                     name: item.nazev,
-                    details: { lectures: [], tutorials: [] }
+                    details: { lectures: [], tutorials: [], }
                 };
                 subjectsMap.set(item.nazev, subject);
             }
@@ -435,13 +453,15 @@ function TimetableMaker() {
         });
     };
     const handleAddSubject = (subjectData) => {
-        // Přidání do seznamu omezených časů
+        const id = Date.now();
+        console.log("Adding restricted time with ID:", id);
+        console.log("Adding restricted time with ID:", subjectData.name);
         setRestrictedTimes(currentTimes => [
             ...currentTimes,
-            { ...subjectData, id: currentTimes.length + 1 } // Přidávání ID pro jedinečnost
+            { ...subjectData, id }// Adding an ID for uniqueness
         ]);
-
     };
+
 
 
 
@@ -504,8 +524,7 @@ function TimetableMaker() {
                                             {slot.subjectBothWeeks.teacher}
                                         </div>
                                     </>
-                                )}
-                                    {slot.restricted && (
+                                )}{slot.restricted && (
                                     <>
                                         <div className="department-shortname">
                                             {slot.restricted.name}
@@ -532,25 +551,28 @@ function TimetableMaker() {
 
                             </div>
                         ))}
+                        <h3>Restricted Times</h3>
+                        {uniqueSessions(restrictedTimes).map(restricted => (
+                            <div key={restricted.id} className="subject-item">
+                            <button className='button'
+                                    key={restricted.id}
+                                    onClick={() => addToTimetable(restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo)}>
+                                {restricted.name} {restricted.day} {restricted.timeFrom} - {restricted.timeTo}
 
-                        <div className="restricted-times-section">
-                            <h3>Restricted Times</h3>
-                            {uniqueSessions(restrictedTimes).map(restricted => (
-                                <button className='button'
-                                        key={restricted.id}
-                                        onClick={() => addToTimetable(restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo)}>
-                                    {restricted.name} {restricted.day} {restricted.timeFrom} - {restricted.timeTo}
-                                </button>
-                            ))}
-                        </div>
-
-                    </div>
+                            </button>
 
 
-                    {selectedSubject && (
-                        <div className="subject-details">
-                            <h4>Lectures</h4>
-                            {uniqueSessions(subjectSchedule.lectures).map(lecture => (
+                    <button className="delete-button"
+                            onClick={() => deleteSubjectFromTimetable(restricted)}>❌
+                    </button>
+                            </div>))}
+                </div>
+
+
+                {selectedSubject && (
+                    <div className="subject-details">
+                        <h4>Lectures</h4>
+                        {uniqueSessions(subjectSchedule.lectures).map(lecture => (
                                 <button className='button'
                                         key={lecture.id}
                                         onClick={() => addToTimetable(lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType)}>
@@ -569,6 +591,7 @@ function TimetableMaker() {
                                 </button>
                             ))}
 
+
                         </div>
                     )}</div>
                 <div className="buttons buttons-left">
@@ -583,6 +606,7 @@ function TimetableMaker() {
                     <button className="custom-button" onClick={() => setShowRestrictedLoader(!showRestrictedLoader)}>
                         {showRestrictedLoader ? 'Hide Form' : 'Add restricted time'}
                     </button>
+                    <button onClick={exportPDF} className="custom-button">Export as PDF</button>
                 </div>
                 <div className="form-group">
                     {showRestrictedLoader &&<RestrictedTimeForm days={days} times={times} onAddSubject={handleAddSubject}/>}
