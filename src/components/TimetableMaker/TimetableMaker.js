@@ -49,6 +49,11 @@ function TimetableMaker() {
     const [restrictedTimes, setRestrictedTimes] = useState([]);
     const [isDataFetched, setIsDataFetched] = useState(false);
     const initialized = useRef(false);
+    const [toConfirmSubject, setToConfirmSubject] = useState(null);
+    const [doneSubjects, setDoneSubjects] = useState([]);
+    const [selectedLecture, setSelectedLecture] = useState(null);
+    const [selectedTutorial, setSelectedTutorial] = useState(null);
+
 
     const uniqueSessions = (sessions) => {
         return sessions.filter((session, index, self) =>
@@ -217,36 +222,85 @@ function TimetableMaker() {
         return [...subjectCollisions, ...restrictedTimeCollisions];
     };
 
+    const selectSessionForConfirmation = (session) => {
+        if (session.type === 'Lecture') {
+            setSelectedLecture((prevSelectedLecture) =>
+                prevSelectedLecture && prevSelectedLecture.id === session.id ? null : session
+            );
+        } else if (session.type === 'Tutorial') {
+            setSelectedTutorial((prevSelectedTutorial) =>
+                prevSelectedTutorial && prevSelectedTutorial.id === session.id ? null : session
+            );
+        }
+    };
+
+
+    // Function to select a lecture/tutorial for confirmation
+    const confirmSubjectSelection = (subject, sessionType) => {
+        setToConfirmSubject({ ...subject, sessionType });
+    };
+
+
+
+    const handleSubjectSelect = subjectId => {
+        // If the selected subject is clicked again, deselect it
+        if (selectedSubject && selectedSubject.id === subjectId) {
+            setSelectedSubject(null);
+            setSubjectSchedule({ lectures: [], tutorials: [] }); // Reset subject schedule
+        } else {
+            // Find and select the new subject
+            const subject = subjects.find(subj => subj.id === subjectId);
+            if (!subject) {
+                console.error('Subject not found:', subjectId);
+                return;
+            }
+            setSelectedSubject(subject);
+            setSubjectSchedule(subject.details);
+            setSelectedLecture(null);
+            setSelectedTutorial(null);
+            confirmSubjectSelection(subject);
+        }
+    };
+
+
+    const handleConfirm = () => {
+        // Make sure we have a selected lecture and/or tutorial if they are required
+        if (
+            (subjectSchedule.lectures.length > 0 && !selectedLecture) ||
+            (subjectSchedule.tutorials.length > 0 && !selectedTutorial)
+        ) {
+            alert("You must select both a lecture and a tutorial if they are available.");
+            return;
+        }
+        // Confirm the selection and add to doneSubjects
+        setDoneSubjects([...doneSubjects, selectedSubject]);
+        // Remove from current subjects list
+        setSubjects(subjects.filter((subj) => subj.id !== selectedSubject.id));
+        // Reset the selected subject and the selected sessions for confirmation
+        setSelectedSubject(null);
+        setSelectedLecture(null);
+        setSelectedTutorial(null);
+        // Reset the confirmation subject
+        setToConfirmSubject(null);
+    };
+
+
+    const handleReject = () => {
+        if (selectedSubject) {
+            setTimetable(clearTimetable(selectedSubject));
+            setSelectedLecture(null);
+            setSelectedTutorial(null);
+        }
+
+    };
 
     const deleteSubjectFromTimetable = (subject) => {
-        // Remove the subject from the subjects list
-        const updatedSubjects = subjects.filter(sub => sub.id !== subject.id);
-        setSubjects(updatedSubjects);
+        // Directly filter subjects and restricted times without intermediate constants
+        setSubjects(subjects.filter(sub => sub.id !== subject.id));
+        setRestrictedTimes(restrictedTimes.filter(rt => rt.id !== subject.id));
 
-        // Remove the subject from the restricted times list if it is a restricted time
-        const updatedRestrictedTimes = restrictedTimes.filter(rt => rt.id !== subject.id);
-        setRestrictedTimes(updatedRestrictedTimes);
-
-        // Update the timetable slots
-        const updatedTimetable = timetable.map(daySchedule => ({
-            ...daySchedule,
-            slots: daySchedule.slots.map(slot => {
-                const isSubjectBothWeeksSlot = slot.subjectBothWeeks && slot.subjectBothWeeks.name === subject.name;
-                const isSubjectOddWeeksSlot = slot.subjectOddWeek && slot.subjectOddWeek.name === subject.name;
-                const isSubjectEvenWeeksSlot = slot.subjectEvenWeek && slot.subjectEvenWeek.name === subject.name;
-                const isRestrictedSlot = slot.restricted && slot.restricted.name === subject.name;
-                if (isSubjectBothWeeksSlot || isSubjectOddWeeksSlot || isSubjectEvenWeeksSlot || isRestrictedSlot) {
-                    const clearedSlot = { ...slot };
-                    if (isSubjectBothWeeksSlot) clearedSlot.subjectBothWeeks = null;
-                    if (isSubjectOddWeeksSlot) clearedSlot.subjectOddWeek = null;
-                    if (isSubjectEvenWeeksSlot) clearedSlot.subjectEvenWeek = null;
-                    if (isRestrictedSlot) clearedSlot.restricted = null;
-                    return clearedSlot;
-                }
-                return slot;
-            })
-        }));
-        setTimetable(updatedTimetable);
+        // Use a single loop to clear slots, improving readability and performance
+        setTimetable(clearTimetable(subject));
 
         // Reset the selected subject and its schedule if the deleted subject was the selected one
         if (selectedSubject && selectedSubject.id === subject.id) {
@@ -292,7 +346,7 @@ function TimetableMaker() {
             return;
         }
 
-       const collisions = checkForCollisions(subjectName, day, timeFrom, timeTo, weekType);
+        const collisions = checkForCollisions(subjectName, day, timeFrom, timeTo, weekType);
 
         const subject = {
             name: subjectName,
@@ -325,6 +379,7 @@ function TimetableMaker() {
                 break;
             }
         }
+
 
 
         if (isOverwriting) {
@@ -381,24 +436,6 @@ function TimetableMaker() {
     };
 
 
-
-
-    const handleSubjectSelect = subjectId => {
-        // If the selected subject is clicked again, deselect it
-        if (selectedSubject && selectedSubject.id === subjectId) {
-            setSelectedSubject(null);
-            setSubjectSchedule({ lectures: [], tutorials: [], }); // Reset subject schedule
-        } else {
-            // Find and select the new subject
-            const subject = subjects.find(subj => subj.id === subjectId);
-            if (!subject) {
-                console.error('Subject not found:', subjectId);
-                return;
-            }
-            setSelectedSubject(subject);
-            setSubjectSchedule(subject.details);
-        }
-    };
 
     const handleSubjectAdded = (subjectData) => {
         // Transform the received subject data to match the existing subjects structure
@@ -462,6 +499,38 @@ function TimetableMaker() {
         ]);
     };
 
+
+    const ConfirmSubjectSelection = ({ onConfirm, onReject, subject }) => (
+        <div>
+            <h3>Confirm selection for {subject.name}</h3>
+            <button onClick={() => onConfirm(subject)}>YES ✅</button>
+            <button onClick={() => onReject()}>NO ❌</button>
+        </div>
+    );
+    const undoSubject = (subject) => {
+        // Remove from doneSubjects and add back to subjects
+        setDoneSubjects(doneSubjects.filter(sub => sub.id !== subject.id));
+        setSubjects([...subjects, subject]);
+        setTimetable(clearTimetable(subject));
+    };
+
+    const clearTimetable= (subject) => {
+        return timetable.map(daySchedule => ({
+            ...daySchedule,
+            slots: daySchedule.slots.map(slot => {
+                // Check if slot contains the subject to be deleted
+                const isSlotRelatedToSubject = [slot.subjectBothWeeks, slot.subjectOddWeek, slot.subjectEvenWeek, slot.restricted]
+                    .some(s => s && s.name === subject.name);
+
+                // Clear the slot if related to the subject being deleted
+                if (isSlotRelatedToSubject) {
+                    return { ...slot, subjectBothWeeks: null, subjectOddWeek: null, subjectEvenWeek: null, restricted: null };
+                }
+
+                return slot; // Return the slot unchanged if not related to the subject
+            })
+        }));
+    };
 
 
 
@@ -554,28 +623,32 @@ function TimetableMaker() {
                         <h3>Restricted Times</h3>
                         {uniqueSessions(restrictedTimes).map(restricted => (
                             <div key={restricted.id} className="subject-item">
-                            <button className='button'
-                                    key={restricted.id}
-                                    onClick={() => addToTimetable(restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo)}>
-                                {restricted.name} {restricted.day} {restricted.timeFrom} - {restricted.timeTo}
-
-                            </button>
-
-
-                    <button className="delete-button"
-                            onClick={() => deleteSubjectFromTimetable(restricted)}>❌
-                    </button>
-                            </div>))}
-                </div>
-
-
-                {selectedSubject && (
-                    <div className="subject-details">
-                        <h4>Lectures</h4>
-                        {uniqueSessions(subjectSchedule.lectures).map(lecture => (
                                 <button className='button'
-                                        key={lecture.id}
-                                        onClick={() => addToTimetable(lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType)}>
+                                        key={restricted.id}
+                                        onClick={() => addToTimetable(restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo)}>
+                                    {restricted.name} {restricted.day} {restricted.timeFrom} - {restricted.timeTo}
+
+                                </button>
+
+
+                                <button className="delete-button"
+                                        onClick={() => deleteSubjectFromTimetable(restricted)}>❌
+                                </button>
+                            </div>))}
+                    </div>
+
+                    {selectedSubject && (
+                        <div className="subject-details">
+                            <h4>Lectures</h4>
+                            {uniqueSessions(subjectSchedule.lectures).map(lecture => (
+                                <button
+                                    className={`button ${selectedLecture && selectedLecture.id === lecture.id ? 'selected' : ''}`}
+                                    key={lecture.id}
+                                    onClick={() => {
+                                        selectSessionForConfirmation(lecture);
+                                        addToTimetable(lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType);
+                                    }}
+                                >
                                     {lecture.day} {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
                                     <br/> Week: {lecture.weekType}
                                 </button>
@@ -583,17 +656,47 @@ function TimetableMaker() {
 
                             <h4>Tutorials</h4>
                             {uniqueSessions(subjectSchedule.tutorials).map(tutorial => (
-                                <button className='button'
-                                        key={tutorial.id}
-                                        onClick={() => addToTimetable(tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType)}>
+                                <button
+                                    className={`button ${selectedTutorial && selectedTutorial.id === tutorial.id ? 'selected' : ''}`}
+                                    key={tutorial.id}
+                                    onClick={() => {
+                                        selectSessionForConfirmation(tutorial);
+                                        addToTimetable(tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType);
+                                    }}
+                                >
                                     {tutorial.day} {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}
                                     <br/> Week: {tutorial.weekType}
                                 </button>
                             ))}
 
+                            {toConfirmSubject && (
+                                <ConfirmSubjectSelection
+                                    subject={toConfirmSubject}
+                                    onConfirm={handleConfirm}
+                                    onReject={handleReject}
+                                />
+                            )}
+
 
                         </div>
-                    )}</div>
+
+                    )}
+
+                    <div className="done-subjects">
+                        {doneSubjects.map(subject => (
+                            <div key={subject.id} className="subject-item">
+                                <button className="button">
+                                    {subject.name}
+                                </button>
+                                <button className="undo-button" onClick={() => undoSubject(subject)}>
+                                    ↩️
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+
                 <div className="buttons buttons-left">
                     <button className="custom-button" onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
                         {showSubjectLoader ? 'Hide Form' : 'Load subject from STAG'}
@@ -609,7 +712,8 @@ function TimetableMaker() {
                     <button onClick={exportPDF} className="custom-button">Export as PDF</button>
                 </div>
                 <div className="form-group">
-                    {showRestrictedLoader &&<RestrictedTimeForm days={days} times={times} onAddSubject={handleAddSubject}/>}
+                    {showRestrictedLoader &&
+                        <RestrictedTimeForm days={days} times={times} onAddSubject={handleAddSubject}/>}
                 </div>
             </div>
         </>

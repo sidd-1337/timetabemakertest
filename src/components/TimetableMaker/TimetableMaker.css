@@ -39,8 +39,14 @@
     border: 1px solid #ddd;
     border-radius: 8px;
   }
-  
-  .time-slot {
+
+.button.selected {
+  background:#055388;
+  color: white;
+}
+
+
+.time-slot {
     position: relative;
     padding: 4px;
     font-size: 10px;
@@ -109,6 +115,20 @@
     margin-bottom: 10px;
   }
 
+  .done-subjects {
+    border: 1px solid #007BFF; /* Change color and thickness as needed */
+    padding: 10px;
+    margin: 10px 0;
+    margin-left: auto;
+  }
+
+.done-subjects:before {
+  content: 'Done Subjects';
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10px;
+}
+
 
 .collision-indicator {
   position: absolute;
@@ -143,6 +163,28 @@
 .subject-item .button {
   width: 100%; /* Adjust size as needed */
   /* Additional styling */
+}
+
+.done-subjects button{
+  padding: 0.7rem 1.2rem;
+  display: block;
+  margin: 5px 0;
+  border: 1px solid #007BFF;
+  border-radius: 4px;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.done-subjects .undo-button {
+  position: absolute;
+  top: 0; /* Adjust as needed for exact positioning */
+  right: 0; /* Adjust as needed */
+  z-index: 1; /* Ensure it's above the subject button */
+  padding: 0; /* Adjust padding as needed */
+  margin: 0;
+  border: none;
+  font-size: 12px;
+  /* Adjust size, padding, and margins as needed */
 }
 
 .subject-item .delete-button {
