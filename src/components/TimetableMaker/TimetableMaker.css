@@ -201,3 +201,7 @@
   /* Adjust size, padding, and margins as needed */
 }
 
+.pdf-export .collision-indicator {
+  display: none;
+}
+

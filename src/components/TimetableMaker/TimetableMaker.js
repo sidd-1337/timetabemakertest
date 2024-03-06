@@ -65,66 +65,52 @@ function TimetableMaker() {
         );
     };
     const exportPDF = () => {
+        const body = document.body;
+        body.classList.add('pdf-export'); // Add class to hide collision indicators
+
         const input = document.querySelector('.timetable-canvas'); // The element to capture
         if (!input) return;
 
-        html2canvas(input, { scale: 1 }).then(originalCanvas => {
+        html2canvas(input, { scale: 2 }).then(originalCanvas => {
+            body.classList.remove('pdf-export'); // Remove class after capturing
+
+            // Your existing PDF generation logic...
             const originalWidth = originalCanvas.width;
             const originalHeight = originalCanvas.height;
-            const padding = 40; // Define the padding value (px)
-            // Calculate rotated canvas dimensions, adding padding
+            const padding = 40;
             const rotatedWidth = originalHeight + (padding * 2);
             const rotatedHeight = originalWidth + (padding * 2);
-
-            // Create a new canvas for rotation
             const rotatedCanvas = document.createElement('canvas');
             rotatedCanvas.width = rotatedWidth;
             rotatedCanvas.height = rotatedHeight;
             const context = rotatedCanvas.getContext('2d');
-
-            // Set the whole background to white
-            context.fillStyle = '#FFFFFF'; // Set fill color to white
-            context.fillRect(0, 0, rotatedWidth, rotatedHeight); // Fill the background
-
-            // Rotate and draw the original canvas onto the new canvas, considering padding
-            context.translate(rotatedWidth / 2, rotatedHeight / 2); // Center the rotation point
-            context.rotate(90 * Math.PI / 180); // Rotate 90 degrees
-            context.drawImage(originalCanvas, -originalWidth / 2, -originalHeight / 2); // Draw the image centered
-
-            // Prepare for A4 size output
-            const a4Width = 595; // A4 width in points (pt)
-            const a4Height = 842; // A4 height in points (pt), for portrait orientation
-
-            // Use jsPDF to create a PDF in A4 size
+            context.fillStyle = '#FFFFFF';
+            context.fillRect(0, 0, rotatedWidth, rotatedHeight);
+            context.translate(rotatedWidth / 2, rotatedHeight / 2);
+            context.rotate(90 * Math.PI / 180);
+            context.drawImage(originalCanvas, -originalWidth / 2, -originalHeight / 2);
+            const a4Width = 595;
+            const a4Height = 842;
             const pdf = new jsPDF({
                 orientation: 'portrait',
                 unit: 'pt',
                 format: [a4Width, a4Height]
             });
-
-            // Calculate scale to fit the rotated canvas within A4 dimensions
             const scaleX = a4Width / rotatedWidth;
             const scaleY = a4Height / rotatedHeight;
-            const scale = Math.min(scaleX, scaleY); // Use the smallest scale to fit the entire canvas
-
-            // Calculate the scaled dimensions
+            const scale = Math.min(scaleX, scaleY);
             const scaledWidth = rotatedWidth * scale;
             const scaledHeight = rotatedHeight * scale;
-
-            // Calculate centered position on A4 page
             const xPosition = (a4Width - scaledWidth) / 2;
             const yPosition = (a4Height - scaledHeight) / 2;
-
-            // Convert canvas to image and add to PDF
             const imgData = rotatedCanvas.toDataURL('image/png');
             pdf.addImage(imgData, 'PNG', xPosition, yPosition, scaledWidth, scaledHeight);
             pdf.save('timetable.pdf');
-        }).catch(err => console.error('Error exporting PDF:', err));
+        }).catch(err => {
+            console.error('Error exporting PDF:', err);
+            body.classList.remove('pdf-export'); // Ensure the class is removed even if there's an error
+        });
     };
-
-
-
-
 
     const fetchSubjectData = async () => {
         console.log('Fetching data...');
