@@ -547,13 +547,6 @@ function TimetableMaker() {
         <>
             <div className="container">
                 <Header/>
-                {showLoadingClock  && (
-                    <div className="loading-container"> {/* Container to center-align the clock and text */}
-
-                        <div className="loading-clock"></div>
-                        <div className="loading-text">{t('Loading ..')}</div> {/* Text displayed under the clock */}
-                    </div>
-                )}
                 <div className="timetable-canvas">
                     <div className="time-header">
                         {times.slice(1).map((time, index) => (
@@ -634,6 +627,13 @@ function TimetableMaker() {
 
                             </div>
                         ))}
+                        {showLoadingClock  && (
+                            <div className="loading-container"> {/* Container to center-align the clock and text */}
+
+                                <div className="loading-clock"></div>
+                                <div className="loading-text">{t('Loading ..')}</div> {/* Text displayed under the clock */}
+                            </div>
+                        )}
                         <h3>Restricted Times</h3>
                         {uniqueSessions(restrictedTimes).map(restricted => (
                             <div key={restricted.id} className="subject-item">
