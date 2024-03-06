@@ -277,8 +277,8 @@ const renderRightSection = () => (
             </div>
 
             {showForm && (!grade || !programme || !schoolYear || !semester || grade === 'empty' || programme === 'empty' || schoolYear === 'empty' || semester === 'empty') && (
-                <div class="alert-simple">
-                    <div class="icon-simple"></div>
+                <div className="alert-simple">
+                    <div className="icon-simple"></div>
                     {t('You must fill in all the boxes')}
                 </div>
             )}
