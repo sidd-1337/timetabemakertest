@@ -631,7 +631,7 @@ function TimetableMaker() {
                             <div className="loading-container"> {/* Container to center-align the clock and text */}
 
                                 <div className="loading-clock"></div>
-                                <div className="loading-text">{t('Loading ..')}</div> {/* Text displayed under the clock */}
+                                <div className="loading-text">{t('Loading ...')}</div> {/* Text displayed under the clock */}
                             </div>
                         )}
                         <h3>Restricted Times</h3>

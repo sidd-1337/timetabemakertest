@@ -1,5 +1,6 @@
 import React, { useState, useEffect, startTransition } from 'react';
 import './TableGenius.css';
+import './TableGeniusNew.css';
 import { useTranslation } from 'react-i18next';
 import Header from '../Header';
 import { useNavigate } from 'react-router-dom';
@@ -212,14 +213,19 @@ function TableGenius() {
                 </select>
             </div>
             {showForm && (!faculty || !typeOfStudy || !formOfStudy || faculty === 'empty' || typeOfStudy === 'empty' || formOfStudy === 'empty') && (
-                <div className="error-message">{t('You must fill in all the boxes')}</div>
+                <div className="alert-simple">
+                    <div className="icon-simple"></div>
+                    {t('You must fill in all the boxes')}
+                </div>
             )}
-
-            <button type="submit" className="btn-primary-next" onClick={handleNextStep}>{t('next')}</button>
+            <div className="front-page-buttons">
+            <button type="submit" className="front-btn-primary-next"
+                        onClick={handleNextStep}>{t('next')}</button>
+            </div>
         </form>
-    );
+);
 
-    const renderRightSection = () => (
+const renderRightSection = () => (
         <form onSubmit={handleImportSubjects}>
             <div className="form-group">
                 <label htmlFor="grade">{t('grade')}</label>
@@ -271,17 +277,19 @@ function TableGenius() {
             </div>
 
             {showForm && (!grade || !programme || !schoolYear || !semester || grade === 'empty' || programme === 'empty' || schoolYear === 'empty' || semester === 'empty') && (
-                <div className="error-message">
+                <div class="alert-simple">
+                    <div class="icon-simple"></div>
                     {t('You must fill in all the boxes')}
                 </div>
             )}
             {showForm && (!programmesList.some(prog => prog.nazevCZ === programme) && programme.length>0) && (
-                <div className="error-message">
+                <div className="alert-simple">
+                    <div className="icon-simple"></div>
                     {t('Selected program is not on the list of available programs')}
                 </div>
             )}
-            <button type="button" className="btn-primary-back" onClick={handleBackStep}>{t('Back')}</button>
-            <button type="submit" className="btn-primary-next">{t('Import subjects')}</button>
+            <button type="button" className="front-btn-primary-back" onClick={handleBackStep}>{t('Back')}</button>
+            <button type="submit" className="front-btn-primary-next">{t('Import subjects')}</button>
         </form>
     );
 
@@ -292,14 +300,14 @@ function TableGenius() {
                 <div className="content-left">
                     <h1>{t('welcome')}</h1>
                     <p>{t('description')}</p>
-                    <div className="buttons">
-                        <span className="btn-primary">{t('getstarted')}</span>
+                    <div className="front-page-buttons-align">
+                        <button className="front-btn-black">{t('getstarted')}</button>
                         <button
-                            className={`custom-button ${clickedButton === 'showForm' ? 'clicked' : ''}`}
+                            className={`front-btn ${clickedButton === 'showForm' ? 'clicked' : ''}`}
                             onClick={handleShowFormClick}
                         >{t('stagload')}</button>
                         <button
-                            className={`custom-button ${clickedButton === 'makeYourOwn' ? 'clicked' : ''}`}
+                            className={`front-btn ${clickedButton === 'makeYourOwn' ? 'clicked' : ''}`}
                             onClick={handleMakeYourOwnClick}
                         >{t('ownmaking')}</button>
                     </div>

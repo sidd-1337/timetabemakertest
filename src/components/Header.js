@@ -16,11 +16,16 @@ function Header() {
   return (
     <header>
     <div className="logo">TimetableGenius<img src="/images/timetable_maker_logo.png" alt="TimetableGenius Logo" className="logo-img" /></div>
-      <div className="language-buttons">
-        {currentLanguage === 'en' && <button onClick={() => changeLanguage('cz')}>Čeština</button>}
-        {currentLanguage === 'cz' && <button onClick={() => changeLanguage('en')}>English</button>}
+      <div className="switch">
+        <input id="language-toggle" className="check-toggle check-toggle-round-flat" type="checkbox"
+               checked={currentLanguage === 'cz'}
+               onChange={() => changeLanguage(currentLanguage === 'en' ? 'cz' : 'en')}/>
+        <label htmlFor="language-toggle"></label>
+        <span className="on">EN</span>
+        <span className="off">CZ</span>
       </div>
     </header>
   );
 }
+
 export default Header;
