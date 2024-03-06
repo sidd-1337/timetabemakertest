@@ -90,12 +90,12 @@ function TableGenius() {
             alert('Server off');
         }
     };
-/*
-    useEffect(() => {
-        // Call fetchData on component mount and whenever faculty, typeOfStudy, or formOfStudy changes
-        fetchData();
-    }, [faculty, typeOfStudy, formOfStudy]); // Dependencies array
-*/
+    /*
+        useEffect(() => {
+            // Call fetchData on component mount and whenever faculty, typeOfStudy, or formOfStudy changes
+            fetchData();
+        }, [faculty, typeOfStudy, formOfStudy]); // Dependencies array
+    */
 
     const handleBackStep = () => {
         setStep(step - 1);

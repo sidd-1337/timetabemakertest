@@ -205,3 +205,52 @@
   display: none;
 }
 
+
+/* Pure CSS Loading Clock Using a Single Div */
+.loading-clock {
+  margin: 10px auto;
+  width: 40px;
+  height: 40px;
+  border: 3px solid black;
+  border-radius: 100%;
+  position: relative;
+}
+.loading-clock:before,
+.loading-clock:after {
+  position: absolute;
+  display: block;
+  content: "";
+  width: 2px;
+  left: 19px; /* half width of clock - half width of hand */
+  background: black;
+  box-shadow: 0 0 2px rgba(0,0,0,0.1);
+}
+/* Animations */
+@keyframes rotate {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+/* Big hand */
+.loading-clock:before {
+  top: 5px;
+  height: 20px; /* half the width/height of the clock */
+  transform-origin: 1px 15px;
+  animation: rotate .35s infinite linear;
+}
+/* Little hand */
+.loading-clock:after {
+  top: 11px;
+  height: 14px; /* top + height for little hand must = top + height for big hand */
+  transform-origin: 1px 9px;
+  animation: rotate 4.2s infinite linear; /* time should be big-hand time * 12 */
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.loading-text {
+  margin-bottom: 5px; /* Adjust this value as needed to move the text closer or further from the clock */
+}

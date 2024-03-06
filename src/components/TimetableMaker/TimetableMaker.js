@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 
 function TimetableMaker() {
     const location = useLocation();
+    const { t,i18n  } = useTranslation();
     const { programme, faculty, typeOfStudy, formOfStudy, grade, semester } = location.state || {};
 
     const days = ['Po', 'Út', 'St', 'Čt', 'Pá'];
@@ -53,6 +54,7 @@ function TimetableMaker() {
     const [doneSubjects, setDoneSubjects] = useState([]);
     const [selectedLecture, setSelectedLecture] = useState(null);
     const [selectedTutorial, setSelectedTutorial] = useState(null);
+    const [showLoadingClock, setShowLoadingClock] = useState(false); // New state for clock symbol visibility
 
 
     const uniqueSessions = (sessions) => {
@@ -113,8 +115,21 @@ function TimetableMaker() {
     };
 
     const fetchSubjectData = async () => {
+        let timer; // Declare a variable to hold the timeout
+        setIsDataFetched(false); // Set to false when starting to fetch data
+        setShowLoadingClock(false); // Initially, do not show the clock
+
+        // Set a timer to show the clock symbol after 0.3 seconds
+        timer = setTimeout(() => {
+            setShowLoadingClock(true);
+        }, 100); // 0.3 seconds delay
+
+
         console.log('Fetching data...');
         if(programme==="null" || faculty==="null" || typeOfStudy==="null" || formOfStudy==="null" || grade==="null" || semester==="null"){
+            setIsDataFetched(true);
+            setShowLoadingClock(false);
+            clearTimeout(timer);
             return;
         }
         try {
@@ -161,7 +176,13 @@ function TimetableMaker() {
                 }
             });
             setSubjects(Array.from(subjectsMap.values()));
+            clearTimeout(timer);
+            setIsDataFetched(true);
+            setShowLoadingClock(false);
         } catch (error) {
+            clearTimeout(timer);
+            setIsDataFetched(true);
+            setShowLoadingClock(false);
             console.error('Error fetching subject data:', error);
             alert("Server Off");
         }
@@ -526,6 +547,13 @@ function TimetableMaker() {
         <>
             <div className="container">
                 <Header/>
+                {showLoadingClock  && (
+                    <div className="loading-container"> {/* Container to center-align the clock and text */}
+
+                        <div className="loading-clock"></div>
+                        <div className="loading-text">{t('Loading ..')}</div> {/* Text displayed under the clock */}
+                    </div>
+                )}
                 <div className="timetable-canvas">
                     <div className="time-header">
                         {times.slice(1).map((time, index) => (
