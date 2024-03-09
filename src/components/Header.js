@@ -14,17 +14,18 @@ function Header() {
   };
 
   return (
-    <header>
-    <div className="logo">TimetableGenius<img src="/images/timetable_maker_logo.png" alt="TimetableGenius Logo" className="logo-img" /></div>
-      <div className="switch">
-        <input id="language-toggle" className="check-toggle check-toggle-round-flat" type="checkbox"
-               checked={currentLanguage === 'cz'}
-               onChange={() => changeLanguage(currentLanguage === 'en' ? 'cz' : 'en')}/>
-        <label htmlFor="language-toggle"></label>
-        <span className="on">EN</span>
-        <span className="off">CZ</span>
-      </div>
-    </header>
+      <header>
+        <a href="/" className="logo">TimetableGenius
+          <img src="/images/timetable_maker_logo.png" alt="TimetableGenius Logo" className="logo-img"/></a>
+        <div className="switch">
+          <input id="language-toggle" className="check-toggle check-toggle-round-flat" type="checkbox"
+                 checked={currentLanguage === 'cz'}
+                 onChange={() => changeLanguage(currentLanguage === 'en' ? 'cz' : 'en')}/>
+          <label htmlFor="language-toggle"></label>
+          <span className="on">EN</span>
+          <span className="off">CZ</span>
+        </div>
+      </header>
   );
 }
 

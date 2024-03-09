@@ -20,6 +20,8 @@ main {
     font-weight: bold;
     display: flex;
     align-items: center;
+    text-decoration: none;
+    color: black;
 }
 
 .logo-img {
