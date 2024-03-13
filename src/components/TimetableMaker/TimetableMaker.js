@@ -184,7 +184,10 @@ function TimetableMaker() {
             setIsDataFetched(true);
             setShowLoadingClock(false);
             console.error('Error fetching subject data:', error);
-            alert("Server Off");
+            const retry = window.confirm("Server Off. Would you like to retry?");
+            if (retry) {
+                fetchSubjectData();
+            }
         }
     };
 

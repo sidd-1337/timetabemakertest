@@ -12,6 +12,9 @@ function TableGenius() {
     const navigate = useNavigate();
     const [clickedButton, setClickedButton] = useState('');
     const [displayedProgramName, setDisplayedProgramName] = useState('');
+    const [showFormValidationAlert, setShowFormValidationAlert] = useState(false);
+    const [showImportSubjectsAlert, setShowImportSubjectsAlert] = useState(false);
+
     const handleShowFormClick = () => {
         handleShowForm();
         setClickedButton(prevState => prevState === 'showForm' ? '' : 'showForm');
@@ -32,18 +35,24 @@ function TableGenius() {
         event.preventDefault();
         if (!faculty || !typeOfStudy || !formOfStudy || faculty === 'empty' || typeOfStudy === 'empty' || formOfStudy === 'empty') {
             // If any of them is empty, display a warning message
+            setShowFormValidationAlert(true);
             return; // Exit the function without proceeding to the next step
         }
+        setShowFormValidationAlert(false);
         setStep(step + 1);
         fetchData();
     };
 
     const handleImportSubjects = () => {
+
         if (!grade || !programme || !schoolYear || !semester || grade === 'empty' || programme === 'empty' || schoolYear === 'empty' || semester === 'empty'|| !programmesList.some(prog => prog.nazevCZ === programme)) {
             // If any of them is empty, display a warning message
+            setShowImportSubjectsAlert(true);
             return; // Exit the function without proceeding to the next step
         }
+
         setStep(step + 1);
+        setShowImportSubjectsAlert(false);
         if (step === 2) {
             navigate('/timetable-maker', {
                 state:{
@@ -212,20 +221,21 @@ function TableGenius() {
                     <option value="Distanční">{t('Distant')}</option>
                 </select>
             </div>
-            {showForm && (!faculty || !typeOfStudy || !formOfStudy || faculty === 'empty' || typeOfStudy === 'empty' || formOfStudy === 'empty') && (
+
+            <div className="front-page-buttons">
+                <button type="submit" className="front-btn-primary-next"
+                        onClick={handleNextStep}>{t('next')}</button>
+            </div>
+            {showFormValidationAlert && (
                 <div className="alert-simple">
                     <div className="icon-simple"></div>
                     {t('You must fill in all the boxes')}
                 </div>
             )}
-            <div className="front-page-buttons">
-            <button type="submit" className="front-btn-primary-next"
-                        onClick={handleNextStep}>{t('next')}</button>
-            </div>
         </form>
-);
+    );
 
-const renderRightSection = () => (
+    const renderRightSection = () => (
         <form onSubmit={handleImportSubjects}>
             <div className="form-group">
                 <label htmlFor="grade">{t('grade')}</label>
@@ -276,20 +286,23 @@ const renderRightSection = () => (
                 )}
             </div>
 
-            {showForm && (!grade || !programme || !schoolYear || !semester || grade === 'empty' || programme === 'empty' || schoolYear === 'empty' || semester === 'empty') && (
-                <div className="alert-simple">
-                    <div className="icon-simple"></div>
-                    {t('You must fill in all the boxes')}
-                </div>
-            )}
+
+
+            <button type="button" className="front-btn-primary-back" onClick={handleBackStep}>{t('Back')}</button>
+            <button type="button" className="front-btn-primary-next" onClick={handleImportSubjects}>{t('Import subjects')}</button>
             {showForm && (!programmesList.some(prog => prog.nazevCZ === programme) && programme.length>0) && (
                 <div className="alert-simple">
                     <div className="icon-simple"></div>
                     {t('Selected program is not on the list of available programs')}
                 </div>
             )}
-            <button type="button" className="front-btn-primary-back" onClick={handleBackStep}>{t('Back')}</button>
-            <button type="submit" className="front-btn-primary-next">{t('Import subjects')}</button>
+            {showImportSubjectsAlert  && (
+                <div className="alert-simple">
+                    <div className="icon-simple"></div>
+                    {t('You must fill in all the boxes')}
+                </div>
+            )}
+
         </form>
     );
 
