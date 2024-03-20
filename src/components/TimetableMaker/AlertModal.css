@@ -1,0 +1,63 @@
+.overlay {
+    background-color: rgba(0, 0, 0, 0.5);
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.content {
+    background-color: white;
+    border-radius: 4px;
+    padding: 10px 20px;
+    margin: 20px;
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+
+.btn-modal {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    padding: 0 15px;
+    font-size: 15px;
+    line-height: 1;
+    font-weight: 500;
+    height: 35px;
+    margin: 2px;
+}
+
+@keyframes overlayShow {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes contentShow {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.IconButton {
+    font-family: inherit;
+    position: absolute;
+    border: none;
+    border-radius: 100%;
+    color: #000000;
+    height: 25px;
+    width: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    top: 10px;
+    right: 10px;
+}
+
+.IconButton:hover {
+
+}
+.IconButton:focus {
+
+}

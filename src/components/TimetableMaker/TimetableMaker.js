@@ -8,6 +8,8 @@ import RestrictedTimeForm from "./RestrictedTimeForm";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { useTranslation } from 'react-i18next';
+import AlertModal from "./AlertModal";
+import './AlertModal.css';
 
 
 
@@ -55,6 +57,105 @@ function TimetableMaker() {
     const [selectedLecture, setSelectedLecture] = useState(null);
     const [selectedTutorial, setSelectedTutorial] = useState(null);
     const [showLoadingClock, setShowLoadingClock] = useState(false); // New state for clock symbol visibility
+    const [isAlertOpen, setIsAlertOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    // Add state for the alert modal control
+    const [alertInfo, setAlertInfo] = useState({
+        isOpen: false,
+        message: '',
+        onKeepBoth: () => {},
+        onOverwrite: () => {},
+        onCancel: () => {}
+    });
+
+
+    const onCancelExample = () => {
+        console.log("Cancel action");
+        // Just close the modal:
+        setAlertInfo(prev => ({ ...prev, isOpen: false }));
+    };
+
+
+
+    const handleKeepBoth = (subject, day, startIndex, endIndex, weekType) => {
+
+        const updatedTimetable = timetable.map(daySchedule => {
+            if (daySchedule.day !== day) return daySchedule;
+
+            const updatedSlots = daySchedule.slots.map(((slot, index) => {
+
+                // Check if the slot overlaps with the subject's time
+                if (index >= startIndex && index <= endIndex) {
+                    // Logic to combine or add the subject to this slot
+                    let updatedSlot = { ...slot };
+                    if (slot.primarySubject && (slot.primarySubject.weekType === 'S' || slot.primarySubject.weekType === 'L') && (weekType === 'S' || weekType === 'L')) {
+                        updatedSlot.primarySubject = {
+                            ...slot.primarySubject,
+                            weekType: 'SL' // Combine week types
+                        };
+                    } else if (slot.secondarySubject && (slot.secondarySubject.weekType === 'S' || slot.secondarySubject.weekType === 'L')){
+                        updatedSlot.secondarySubject = {
+                            ...slot.secondarySubject,
+                            weekType: 'SL' // Combine week types
+                        };
+                    }
+                    else if (!slot.primarySubject) {
+                        updatedSlot.primarySubject = subject; // Add as primary if empty
+                    } else if (!slot.secondarySubject) {
+                        updatedSlot.secondarySubject = subject; // Add as secondary if primary is filled
+                    }
+                    return updatedSlot;
+                }
+                return slot;
+            }));
+
+            return { ...daySchedule, slots: updatedSlots };
+        });
+
+        setTimetable(updatedTimetable);
+        setAlertInfo({ ...alertInfo, isOpen: false }); // Close the modal
+    };
+
+
+
+
+    const handleOverwrite = (newSubject, day, startIndex, endIndex) => {
+        // Assuming `newSubject` has a unique identifier like `newSubject.id`
+        // Step 1: Remove all instances of the subject from the timetable
+        const cleanedTimetable = timetable.map(daySchedule => ({
+            ...daySchedule,
+            slots: daySchedule.slots.map(slot => {
+
+                if (slot.primarySubject && slot.primarySubject.id === newSubject.id) {
+                    // If the current slot's primarySubject is the one to be overwritten, clear it
+                    return { ...slot, primarySubject: null };
+                } else if (slot.secondarySubject && slot.secondarySubject.id === newSubject.id) {
+                    // Same for secondarySubject
+                    return { ...slot, secondarySubject: null};
+                }
+                return slot; // Return slot unchanged if it does not contain the subject to be overwritten
+            })
+        }));
+
+        // Step 2: Insert the new subject into the specific day and slot range
+        const updatedTimetable = cleanedTimetable.map(daySchedule => {
+            if (daySchedule.day !== day) return daySchedule; // Skip days not affected
+
+            const updatedSlots = daySchedule.slots.map((slot, index) => {
+                if (index >= startIndex && index <= endIndex) {
+                    // Only update slots within the specified range
+                    return { ...slot, primarySubject: newSubject }; // Assign new subject to primarySubject
+                }
+                return slot;
+            });
+
+            return { ...daySchedule, slots: updatedSlots };
+        });
+
+        setTimetable(updatedTimetable);
+        setAlertInfo({ isOpen: false }); // Assuming you want to close a modal or alert
+    };
+
 
 
     const uniqueSessions = (sessions) => {
@@ -331,6 +432,8 @@ function TimetableMaker() {
                 subjectOddWeek: null,
                 subjectBothWeeks: null,
                 restricted:null,
+                primarySubject: null, // Initialize as null instead of an array
+                secondarySubject: null, // Initialize as null instead of an array
             }))
         }));
         setTimetable(initialTimetable);
@@ -344,9 +447,15 @@ function TimetableMaker() {
     }, []);
 */
     const timeToMinutes = (time) => {
+        if (typeof time !== 'string' || !time.match(/^\d{2}:\d{2}$/)) {
+            console.error(`Invalid time format: ${time}`);
+            return 0; // Return a default value or consider throwing an error
+        }
+
         const [hours, minutes] = time.split(':').map(Number);
         return hours * 60 + minutes;
     };
+
 
     // Function to add a lecture/tutorial to the timetable
     const addToTimetable = (subjectName, day, timeFrom, timeTo, type, department, shortName, building, room, teacher, weekType) => {
@@ -382,61 +491,65 @@ function TimetableMaker() {
         }
 
         // Check if any of the slots in the range are already occupied
-        let isOverwriting = false;
-        for (let i = startIndex; i <= endIndex; i++) {
-            if (daySchedule.slots[i].subjectBothWeeks || daySchedule.slots[i].subjectEvenWeek && daySchedule.slots[i].subjectOddWeek || daySchedule.slots[i].restricted) {
-                isOverwriting = true;
-                break;
-            }
+        const slotIsOccupied = daySchedule.slots.some(slot => {
+            const slotStart = timeToMinutes(slot.timeFrom);
+            const slotEnd = timeToMinutes(slot.timeTo);
+            return startMinutes < slotEnd && endMinutes > slotStart && (slot.primarySubject !== null);
+        });
+
+        // Inside addToTimetable function
+        // Inside addToTimetable function
+        if (slotIsOccupied) {
+            // Assuming slotIsOccupied is a boolean indicating if the slot is already taken
+            setAlertInfo({
+                isOpen: true,
+                message: "This time slot is already occupied. What would you like to do?",
+                onKeepBoth: () => handleKeepBoth(subject, day, startIndex, endIndex, weekType),
+                onOverwrite: () => handleOverwrite(subject, day, startIndex, endIndex),
+                onCancel: onCancelExample,
+            });
+            return; // Stop the function to wait for user input from the modal
         }
 
 
-
-        if (isOverwriting) {
-            const confirmOverwrite = window.confirm('This time slot is already occupied. Do you want to overwrite it?');
-            if (!confirmOverwrite) {
-                return; // Exit the function if the user chooses not to overwrite
-            }
-        }
 
         const updatedTimetable = timetable.map(daySchedule => {
             if (daySchedule.day !== day) return daySchedule;
 
-            return {
-                ...daySchedule,
-                slots: daySchedule.slots.map((slot, index) => {
-                    if (index < startIndex || index > endIndex) return slot;
+            const updatedSlots = daySchedule.slots.map((slot, index) => {
+                if (index < startIndex || index > endIndex) return slot;
 
-                    let updatedSlot = {...slot, collisions};
+                // Find if there's an existing subject in the slot for 'S' or 'L' week types
+                let existingSLSubject = null;
+                if (slot.primarySubject && (slot.primarySubject.weekType === 'S' || slot.primarySubject.weekType === 'L')) {
+                    existingSLSubject = slot.primarySubject;
+                } else if (slot.secondarySubject && (slot.secondarySubject.weekType === 'S' || slot.secondarySubject.weekType === 'L')) {
+                    existingSLSubject = slot.secondarySubject;
+                }
 
-                    if (weekType === 'J') {
-                        updatedSlot.subjectEvenWeek = null; // Odstranění, pokud byly dříve přidány
-                        updatedSlot.subjectOddWeek = null;
-                        updatedSlot.restricted = null;
-                        updatedSlot.subjectBothWeeks = subject;
+                // If adding 'S' or 'L' and the opposite week type is already present, combine them
+                if ((weekType === 'S' || weekType === 'L') && existingSLSubject) {
+                    const newWeekType = 'SL';
+                    const updatedSubject = { ...existingSLSubject, weekType: newWeekType };
+                    if (slot.primarySubject === existingSLSubject) {
+                        return { ...slot, primarySubject: updatedSubject, collisions };
                     } else {
-                        if (weekType === 'S') {
-                            updatedSlot.subjectEvenWeek = subject;
-                            // Pokud je "L" již obsazeno, "J" je odstraněno
-                            updatedSlot.subjectBothWeeks = null;
-                            updatedSlot.restricted = null;
-                        } else if (weekType === 'L') {
-                            updatedSlot.subjectOddWeek = subject;
-                            // Pokud je "S" již obsazeno, "J" je odstraněno
-                            updatedSlot.subjectBothWeeks = null;
-                            updatedSlot.restricted = null;
-                        } else if (restrictedTimes){
-                            updatedSlot.restricted = subject;
-                            updatedSlot.subjectEvenWeek = null;
-                            updatedSlot.subjectOddWeek = null;
-                            updatedSlot.subjectBothWeeks = null;
-                        }
-
+                        return { ...slot, secondarySubject: updatedSubject, collisions };
                     }
+                }
 
-                    return updatedSlot;
-                }),
-            };
+                // For adding any new subject, the existing logic applies
+                if (!slot.primarySubject) {
+                    return { ...slot, primarySubject: subject, collisions };
+                } else if (!slot.secondarySubject) {
+                    return { ...slot, secondarySubject: subject, collisions };
+                } else {
+                    alert('Both primary and secondary subjects are already set for this time slot.');
+                    return slot; // No changes, the slot is full
+                }
+            });
+
+            return { ...daySchedule, slots: updatedSlots };
         });
 
         setTimetable(updatedTimetable);
@@ -529,12 +642,12 @@ function TimetableMaker() {
             ...daySchedule,
             slots: daySchedule.slots.map(slot => {
                 // Check if slot contains the subject to be deleted
-                const isSlotRelatedToSubject = [slot.subjectBothWeeks, slot.subjectOddWeek, slot.subjectEvenWeek, slot.restricted]
+                const isSlotRelatedToSubject = [slot.primarySubject, slot.secondarySubject, slot.subjectEvenWeek, slot.restricted]
                     .some(s => s && s.name === subject.name);
 
                 // Clear the slot if related to the subject being deleted
                 if (isSlotRelatedToSubject) {
-                    return { ...slot, subjectBothWeeks: null, subjectOddWeek: null, subjectEvenWeek: null, restricted: null };
+                    return { ...slot, primarySubject: null, secondarySubject: null, subjectEvenWeek: null, restricted: null};
                 }
 
                 return slot; // Return the slot unchanged if not related to the subject
@@ -562,55 +675,37 @@ function TimetableMaker() {
                             {daySchedule.slots.slice(1).map((slot, timeIndex) => (
                                 <div key={timeIndex} className="time-slot"
                                      title={slot.collisions?.length > 0 ? `Kolize s: ${[...new Set(slot.collisions)].join(', ')}` : ''}>
-                                    {slot.collisions?.length > 0 &&
-                                        <div className="collision-indicator">!</div>}
-                                    {slot.subjectEvenWeek && (
+                                    {slot.collisions?.length > 0 && <div className="collision-indicator">!</div>}
+                                    {slot.primarySubject && (
                                         <>
                                             <div className="department-shortname">
-                                                {slot.subjectEvenWeek.department} / {slot.subjectEvenWeek.shortName}
+                                                {slot.primarySubject.department} / {slot.primarySubject.shortName}
                                             </div>
                                             <div className="building-room">
-                                                {slot.subjectEvenWeek.building} - {slot.subjectEvenWeek.room}
+                                                {slot.primarySubject.building} - {slot.primarySubject.room}
                                             </div>
                                             <div className="teacher-name">
-                                                {slot.subjectEvenWeek.teacher}
+                                                {slot.primarySubject.teacher}
                                             </div>
-                                            <div className="even-week">Týden:Sudý</div>
-                                            <div className="even-week">-----</div>
+                                            {slot.primarySubject.weekType && <div className="week-type">Week: {slot.primarySubject.weekType}</div>}
+                                            <div className="">---</div>
                                         </>
-                                    )}{slot.subjectOddWeek && (
-                                    <>
-                                        <div className="department-shortname">
-                                            {slot.subjectOddWeek.department} / {slot.subjectOddWeek.shortName}
-                                        </div>
-                                        <div className="building-room">
-                                            {slot.subjectOddWeek.building} - {slot.subjectOddWeek.room}
-                                        </div>
-                                        <div className="teacher-name">
-                                            {slot.subjectOddWeek.teacher}
-                                        </div>
-                                        <div className="odd-week">Týden:Lichý</div>
-                                    </>
-                                )}{slot.subjectBothWeeks && (
-                                    <>
-                                        <div className="department-shortname">
-                                            {slot.subjectBothWeeks.department} / {slot.subjectBothWeeks.shortName}
-                                        </div>
-                                        <div className="building-room">
-                                            {slot.subjectBothWeeks.building} - {slot.subjectBothWeeks.room}
-                                        </div>
-                                        <div className="teacher-name">
-                                            {slot.subjectBothWeeks.teacher}
-                                        </div>
-                                    </>
-                                )}{slot.restricted && (
-                                    <>
-                                        <div className="department-shortname">
-                                            {slot.restricted.name}
-                                        </div>
-                                    </>
-                                )}
 
+                                    )}
+                                    {slot.secondarySubject && (
+                                        <>
+                                            <div className="department-shortname">
+                                                {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
+                                            </div>
+                                            <div className="building-room">
+                                                {slot.secondarySubject.building} - {slot.secondarySubject.room}
+                                            </div>
+                                            <div className="teacher-name">
+                                                {slot.secondarySubject.teacher}
+                                            </div>
+                                            {slot.secondarySubject.weekType && <div className="week-type">Week: {slot.secondarySubject.weekType}</div>}
+                                        </>
+                                    )}
                                 </div>
                             ))}
                         </React.Fragment>
@@ -733,6 +828,13 @@ function TimetableMaker() {
                         <RestrictedTimeForm days={days} times={times} onAddSubject={handleAddSubject}/>}
                 </div>
             </div>
+            <AlertModal
+                isOpen={alertInfo.isOpen}
+                message={alertInfo.message}
+                onKeepBoth={alertInfo.onKeepBoth}
+                onOverwrite={alertInfo.onOverwrite}
+                onCancel={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+            />
         </>
 
     );
