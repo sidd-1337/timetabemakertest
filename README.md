@@ -1,6 +1,6 @@
-# Getting Started with Create React App
+# Getting Started
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This repository is a frontend of our project "timetable-maker". For backend repository click here - [backend](https://github.com/sidd-1337/rocnikovy-projekt). For more information about the project check out our [wiki page](https://github.com/sidd-1337/rocnikovy-projekt/wiki). 
 
 ## Available Scripts
 
