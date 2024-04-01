@@ -254,3 +254,22 @@
 .loading-text {
   margin-bottom: 5px; /* Adjust this value as needed to move the text closer or further from the clock */
 }
+
+.color-selection {
+  display: flex;
+  align-items: center; /* Aligns the title and color wheel vertically */
+  margin-bottom: 20px; /* Adds some space below each section */
+}
+
+.color-wheel-container {
+  margin-left: 10px; /* Adds some space between the title and the wheel */
+}
+.lecture-section, .tutorial-section {
+  display: flex;
+  align-items: center; /* Center items vertically */
+  gap: 20px; /* Add some space between the title and the color wheel */
+}
+
+.wheel-container {
+  flex-shrink: 0; /* Prevent the wheel from shrinking */
+}

@@ -10,7 +10,9 @@ import html2canvas from "html2canvas";
 import { useTranslation } from 'react-i18next';
 import AlertModal from "./AlertModal";
 import './AlertModal.css';
-
+import { SketchPicker } from 'react-color';
+import { Wheel } from '@uiw/react-color';
+import { hsvaToHex } from '@uiw/color-convert';
 
 
 function TimetableMaker() {
@@ -59,6 +61,50 @@ function TimetableMaker() {
     const [showLoadingClock, setShowLoadingClock] = useState(false); // New state for clock symbol visibility
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
+    const [lectureColor, setLectureColor] = useState({ h: 0, s: 0, v: 100, a: 1 }); // Initial color for lectures
+    const [tutorialColor, setTutorialColor] = useState({ h: 0, s: 0, v: 100, a: 1 }); // Initial color for tutorials
+
+
+    const determineSlotColor = (slot) => {
+        console.log(`Determining color for type: ${slot.type}`); // Debugging log
+        if (!slot.subjectEvenWeek && !slot.subjectOddWeek && !slot.subjectBothWeeks && !slot.primarySubject && !slot.secondarySubject) return 'transparent';
+
+        const subject = subjects.find(subj => subj.name === slot.subjectEvenWeek?.name || subj.name === slot.subjectOddWeek?.name || subj.name === slot.subjectBothWeeks?.name || subj.name === slot.primarySubject?.name || subj.name === slot.secondarySubject?.name );
+
+        if (!subject) return 'transparent';
+        const color = slot.type === 'Lecture' ? subject.colors.lectureColor : subject.colors.tutorialColor;
+        console.log(`Applied color: ${color}`); // Debugging log
+        return color;
+    };
+    const handleLectureColorChange = (subjectId, color) => {
+        const hexColor = color.hex;
+        updateSubjectColor(subjectId, hexColor, 'Lecture');
+    };
+
+    const handleTutorialColorChange = (subjectId, color) => {
+        const hexColor = color.hex;
+        updateSubjectColor(subjectId, color, 'Tutorial');
+    };
+    const updateSubjectColorHSV = (subjectId, hsvColor, type) => {
+        const hexColor = hsvaToHex(hsvColor);
+        updateSubjectColor(subjectId, hexColor, type);
+    };
+    const updateSubjectColor = (subjectId, color, type) => {
+        console.log(`Changing ${type} color: ${color}`);
+        setSubjects(subjects => subjects.map(subj => {
+            if (subj.id === subjectId) {
+                const updatedColors = { ...subj.colors };
+                if (type === 'Lecture') {
+                    updatedColors.lectureColor = color;
+                } else if (type === 'Tutorial') {
+                    updatedColors.tutorialColor = color;
+                }
+                return { ...subj, colors: updatedColors };
+            }
+            return subj;
+        }));
+    };
+
     // Add state for the alert modal control
     const [alertInfo, setAlertInfo] = useState({
         isOpen: false,
@@ -252,7 +298,8 @@ function TimetableMaker() {
                     subject = {
                         id: item.id,
                         name: item.nazev,
-                        details: { lectures: [], tutorials: [] }
+                        details: { lectures: [], tutorials: [] },
+                        colors: { lectureColor: "#FFFFFF", tutorialColor: "#FFFFFF" }
                     };
                     subjectsMap.set(item.nazev, subject);
                 }
@@ -514,13 +561,15 @@ function TimetableMaker() {
 
 
         const updatedTimetable = timetable.map(daySchedule => {
+
             if (daySchedule.day !== day) return daySchedule;
 
             const updatedSlots = daySchedule.slots.map((slot, index) => {
                 if (index < startIndex || index > endIndex) return slot;
-
+                slot.type=type;
                 // Find if there's an existing subject in the slot for 'S' or 'L' week types
                 let existingSLSubject = null;
+
                 if (slot.primarySubject && (slot.primarySubject.weekType === 'S' || slot.primarySubject.weekType === 'L')) {
                     existingSLSubject = slot.primarySubject;
                 } else if (slot.secondarySubject && (slot.secondarySubject.weekType === 'S' || slot.secondarySubject.weekType === 'L')) {
@@ -548,7 +597,7 @@ function TimetableMaker() {
                     return slot; // No changes, the slot is full
                 }
             });
-
+            //updatedSlots.type=type;
             return { ...daySchedule, slots: updatedSlots };
         });
 
@@ -573,7 +622,8 @@ function TimetableMaker() {
                 subject = {
                     id: item.id,
                     name: item.nazev,
-                    details: { lectures: [], tutorials: [], }
+                    details: { lectures: [], tutorials: [], },
+                    colors: { lectureColor: "#FFFFFF", tutorialColor: "#FFFFFF" }
                 };
                 subjectsMap.set(item.nazev, subject);
             }
@@ -674,7 +724,10 @@ function TimetableMaker() {
                             <div className="day-header">{daySchedule.day}</div>
                             {daySchedule.slots.slice(1).map((slot, timeIndex) => (
                                 <div key={timeIndex} className="time-slot"
-                                     title={slot.collisions?.length > 0 ? `Kolize s: ${[...new Set(slot.collisions)].join(', ')}` : ''}>
+                                     title={slot.collisions?.length > 0 ? `Kolize s: ${[...new Set(slot.collisions)].join(', ')}` : ''}
+                                     style={{
+                                     backgroundColor: determineSlotColor(slot)
+                                     }}>
                                     {slot.collisions?.length > 0 && <div className="collision-indicator">!</div>}
                                     {slot.primarySubject && (
                                         <>
@@ -751,7 +804,26 @@ function TimetableMaker() {
 
                     {selectedSubject && (
                         <div className="subject-details">
-                            <h4>Lectures</h4>
+                            {subjectSchedule.lectures.length > 0 && (
+                                <div className="lecture-section">
+                                    <h4>Lectures</h4>
+                                    <div className="wheel-container">
+                                        <Wheel
+                                            color={lectureColor}
+                                            onChange={(color) => {
+                                                setLectureColor(color.hsva);
+                                                if(selectedSubject) {
+                                                    updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Lecture');
+                                                }
+                                            }}
+                                            width={50} // Adjusting the size
+                                            height={50}
+                                        />
+                                        {/*<div style={{ width: '10px', height: '10px', marginTop: '-3px',background: hsvaToHex(lectureColor) }}></div>*/}
+                                    </div>
+                                </div>
+                            )}
+
                             {uniqueSessions(subjectSchedule.lectures).map(lecture => (
                                 <button
                                     className={`button ${selectedLecture && selectedLecture.id === lecture.id ? 'selected' : ''}`}
@@ -765,8 +837,25 @@ function TimetableMaker() {
                                     <br/> Week: {lecture.weekType}
                                 </button>
                             ))}
-
-                            <h4>Tutorials</h4>
+                            {subjectSchedule.tutorials.length > 0 && (
+                                <div className="tutorial-section">
+                                    <h4>Tutorials</h4>
+                                    <div className="wheel-container">
+                                        <Wheel
+                                            color={tutorialColor}
+                                            onChange={(color) => {
+                                                setTutorialColor(color.hsva);
+                                                if(selectedSubject) {
+                                                    updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Tutorial');
+                                                }
+                                            }}
+                                            width={50} // Adjusting the size
+                                            height={50}
+                                        />
+                                        {/* <div style={{ width: '10px', height: '10px', marginTop: '1px', background: hsvaToHex(tutorialColor) }}></div>*/}
+                                    </div>
+                                </div>
+                            )}
                             {uniqueSessions(subjectSchedule.tutorials).map(tutorial => (
                                 <button
                                     className={`button ${selectedTutorial && selectedTutorial.id === tutorial.id ? 'selected' : ''}`}
