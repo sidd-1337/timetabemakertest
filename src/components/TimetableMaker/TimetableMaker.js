@@ -13,7 +13,8 @@ import './AlertModal.css';
 import { SketchPicker } from 'react-color';
 import { Wheel } from '@uiw/react-color';
 import { hsvaToHex } from '@uiw/color-convert';
-
+import { IoColorPalette } from "react-icons/io5";
+import { Compact } from '@uiw/react-color';
 
 function TimetableMaker() {
     const location = useLocation();
@@ -63,7 +64,8 @@ function TimetableMaker() {
     const [alertMessage, setAlertMessage] = useState('');
     const [lectureColor, setLectureColor] = useState({ h: 0, s: 0, v: 100, a: 1 }); // Initial color for lectures
     const [tutorialColor, setTutorialColor] = useState({ h: 0, s: 0, v: 100, a: 1 }); // Initial color for tutorials
-
+    const [showLectureColorPicker, setShowLectureColorPicker] = useState(false);
+    const [showTutorialColorPicker, setShowTutorialColorPicker] = useState(false);
 
     const determineSlotColor = (slot) => {
         console.log(`Determining color for type: ${slot.type}`); // Debugging log
@@ -806,21 +808,21 @@ function TimetableMaker() {
                         <div className="subject-details">
                             {subjectSchedule.lectures.length > 0 && (
                                 <div className="lecture-section">
-                                    <h4>Lectures</h4>
-                                    <div className="wheel-container">
-                                        <Wheel
+                                    <h4>Lectures <IoColorPalette onClick={() => setShowLectureColorPicker(!showLectureColorPicker)} style={{ cursor: 'pointer' }} /></h4>
+
+                                    {showLectureColorPicker && (
+                                        <div className="compact-color-picker-wrapper" style={{ transform: 'scale(0.8)', transformOrigin: 'top left' }}>
+                                        <Compact
                                             color={lectureColor}
+                                            colors={['#FFFFFF', '#CCCCCC', '#ff7373','#ff4040', '#ffff66', '#fcea17', '#B8E986', '#96c961', '#b6fafc', '#73D8FF', '#FDA1FF','#f768e9', '#AEA1FF', '#7B64FF','#e6b795','#947259']}
                                             onChange={(color) => {
-                                                setLectureColor(color.hsva);
-                                                if(selectedSubject) {
-                                                    updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Lecture');
-                                                }
+                                                const hexColor = hsvaToHex(color.hsva); // Convert HSV to Hex
+                                                setLectureColor(hexColor); // Update state with Hex color
+                                                updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Lecture')
                                             }}
-                                            width={50} // Adjusting the size
-                                            height={50}
                                         />
-                                        {/*<div style={{ width: '10px', height: '10px', marginTop: '-3px',background: hsvaToHex(lectureColor) }}></div>*/}
-                                    </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
@@ -839,21 +841,22 @@ function TimetableMaker() {
                             ))}
                             {subjectSchedule.tutorials.length > 0 && (
                                 <div className="tutorial-section">
-                                    <h4>Tutorials</h4>
-                                    <div className="wheel-container">
-                                        <Wheel
-                                            color={tutorialColor}
-                                            onChange={(color) => {
-                                                setTutorialColor(color.hsva);
-                                                if(selectedSubject) {
-                                                    updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Tutorial');
-                                                }
-                                            }}
-                                            width={50} // Adjusting the size
-                                            height={50}
-                                        />
-                                        {/* <div style={{ width: '10px', height: '10px', marginTop: '1px', background: hsvaToHex(tutorialColor) }}></div>*/}
-                                    </div>
+                                    <h4>Tutorials <IoColorPalette onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)} style={{ cursor: 'pointer' }} /></h4>
+
+                                    {showTutorialColorPicker && (
+                                        <div className="compact-color-picker-wrapper" style={{ transform: 'scale(0.8)', transformOrigin: 'top left' }}>
+                                            <Compact
+                                                color={tutorialColor}
+                                                colors={['#FFFFFF', '#CCCCCC', '#ff7373','#ff4040', '#ffff66', '#fcea17', '#B8E986', '#96c961', '#b6fafc', '#73D8FF', '#FDA1FF','#f768e9', '#AEA1FF', '#7B64FF','#e6b795','#947259']}
+
+                                                onChange={(color) => {
+                                                    const hexColor = hsvaToHex(color.hsva); // Convert HSV to Hex
+                                                    setTutorialColor(hexColor); // Update state with Hex color
+                                                    updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Tutorial')
+                                                }}
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             )}
                             {uniqueSessions(subjectSchedule.tutorials).map(tutorial => (
