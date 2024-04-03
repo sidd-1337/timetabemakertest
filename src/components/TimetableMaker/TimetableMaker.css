@@ -56,6 +56,13 @@
     overflow: hidden;
   }
 
+.time-slot .department-shortname,
+.time-slot .building-room,
+.time-slot .teacher-name,
+.time-slot .week-type {
+  text-align: center;
+}
+
   .subject-selection {
     border: 1px solid #007BFF; /* Change color and thickness as needed */
     padding: 10px;
@@ -92,7 +99,21 @@
     gap: 1rem;
   }
 
-  .right-section {
+.remove-subject-button {
+  color: #000000; /* White text for contrast */
+  background: none;
+  border: none; /* Remove default border */
+  border-radius: 50%; /* Circular shape */
+  cursor: pointer;
+}
+
+/* Optional: Change appearance on hover for better user feedback */
+.remove-subject-button:hover {
+  background-color: #868484; /* Slightly darker shade of red on hover */
+}
+
+
+.right-section {
     display: flex;
     flex-direction: row; /* Change the direction to row */
     justify-content: flex-start;
@@ -146,6 +167,11 @@
   font-weight: bold;
   cursor: pointer;
 }
+
+.collision-indicator.full-occupancy {
+  background-color: #ff4d4d; /* Red color for full occupancy */
+}
+
 
 
 .buttons-left {
@@ -253,6 +279,14 @@
 }
 .loading-text {
   margin-bottom: 5px; /* Adjust this value as needed to move the text closer or further from the clock */
+}
+
+.slot-divider {
+  height: 2px; /* Thickness of the divider */
+  background-color: #888888; /* Color of the divider */
+  width: 90%; /* Width relative to its parent */
+  margin: 5px auto; /* Center the divider and add some space above and below */
+  border-radius: 1px; /* Optional: slightly round the edges of the divider */
 }
 
 .color-selection {

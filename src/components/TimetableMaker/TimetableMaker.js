@@ -136,12 +136,6 @@ function TimetableMaker() {
         }
     }, [alertInfo.isOpen]);
 
-    const onCancelExample = () => {
-        console.log("Cancel action");
-        // Just close the modal:
-        setAlertInfo(prev => ({ ...prev, isOpen: false }));
-    };
-
 
 
     const handleKeepBoth = (subject, day, startIndex, endIndex, weekType) => {
@@ -503,7 +497,9 @@ function TimetableMaker() {
         // Reset the selected subject and its schedule if the deleted subject was the selected one
         if (selectedSubject && selectedSubject.id === subject.id) {
             setSelectedSubject(null);
-            setSubjectSchedule({ lectures: [], tutorials: [] });
+            setSelectedLecture(null);
+            setSelectedTutorial(null);
+            setDoneSubjects(null);
         }
     };
 
@@ -593,7 +589,6 @@ function TimetableMaker() {
                 message: "This time slot is already occupied. What would you like to do?",
                 onKeepBoth: () => handleKeepBoth(subject, day, startIndex, endIndex, weekType),
                 onOverwrite: () => handleOverwrite(subject, day, startIndex, endIndex),
-                onCancel: onCancelExample,
             });
             return; // Stop the function to wait for user input from the modal
         }
@@ -727,20 +722,24 @@ function TimetableMaker() {
         setTimetable(clearTimetable(subject));
     };
 
-    const clearTimetable= (subject) => {
+    const clearTimetable = (subject) => {
         return timetable.map(daySchedule => ({
             ...daySchedule,
             slots: daySchedule.slots.map(slot => {
-                // Check if slot contains the subject to be deleted
-                const isSlotRelatedToSubject = [slot.primarySubject, slot.secondarySubject, slot.subjectEvenWeek, slot.restricted]
-                    .some(s => s && s.name === subject.name);
+                // Remove the subject from the slot if it matches the one being cleared
+                let updatedSlot = {
+                    ...slot,
+                    primarySubject: slot.primarySubject && slot.primarySubject.name === subject.name ? null : slot.primarySubject,
+                    secondarySubject: slot.secondarySubject && slot.secondarySubject.name === subject.name ? null : slot.secondarySubject,
+                };
 
-                // Clear the slot if related to the subject being deleted
-                if (isSlotRelatedToSubject) {
-                    return { ...slot, primarySubject: null, secondarySubject: null, subjectEvenWeek: null, restricted: null};
+                // Recalculate collisions after removing the subject
+                if (slot.collisions && slot.collisions.includes(subject.name)) {
+                    // Remove the subject from collisions
+                    updatedSlot.collisions = slot.collisions.filter(collidingSubject => collidingSubject !== subject.name);
                 }
 
-                return slot; // Return the slot unchanged if not related to the subject
+                return updatedSlot;
             })
         }));
     };
@@ -768,9 +767,16 @@ function TimetableMaker() {
                                      style={{
                                          backgroundColor: determineSlotColor(slot)
                                      }}>
-                                    {slot.collisions?.length > 0 && <div className="collision-indicator">!</div>}
+                                    {slot.collisions?.length > 0 && (
+                                        <div className={`collision-indicator ${slot.primarySubject && slot.secondarySubject && slot.primarySubject !== slot.secondarySubject ? 'full-occupancy' : ''}`}>
+                                            !
+                                        </div>
+                                    )}
                                     {slot.primarySubject && (
                                         <>
+                                            <button className="remove-subject-button" title={'Remove subject'}
+                                                    onClick={() => deleteSubjectFromTimetable(slot.primarySubject)}>x
+                                            </button>
                                             <div className="department-shortname">
                                                 {slot.primarySubject.department} / {slot.primarySubject.shortName}
                                             </div>
@@ -781,12 +787,15 @@ function TimetableMaker() {
                                                 {slot.primarySubject.teacher}
                                             </div>
                                             {slot.primarySubject.weekType && <div className="week-type">Week: {slot.primarySubject.weekType}</div>}
-                                            <div className="">---</div>
                                         </>
 
                                     )}
                                     {slot.secondarySubject && (
                                         <>
+                                            <div className="slot-divider"></div>
+                                            <button className="remove-subject-button" title={'Remove subject'}
+                                                    onClick={() => deleteSubjectFromTimetable(slot.secondarySubject)}>x
+                                            </button>
                                             <div className="department-shortname">
                                                 {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
                                             </div>
