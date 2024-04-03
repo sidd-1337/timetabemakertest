@@ -272,7 +272,10 @@
 }
 
 .wheel-container {
-  flex-shrink: 0; /* Prevent the wheel from shrinking */
+  display: inline-block;
+  vertical-align: top;
+  flex-shrink: 0;
+  margin-left: 0px; /* Space between the Compact picker and the Wheel */
 }
 .compact-color-picker-wrapper {
   display: inline-block; /* Allows the transform to apply correctly */
