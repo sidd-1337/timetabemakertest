@@ -71,7 +71,6 @@
   }
   
   .subject-selection:before {
-    content: 'Subjects';
     font-weight: bold;
     display: block;
     margin-bottom: 10px;
@@ -130,7 +129,6 @@
   }
 
   .subject-details:before {
-    content: 'Subjects details';
     font-weight: bold;
     display: block;
     margin-bottom: 10px;
@@ -144,7 +142,6 @@
   }
 
 .done-subjects:before {
-  content: 'Done Subjects';
   font-weight: bold;
   display: block;
   margin-bottom: 10px;

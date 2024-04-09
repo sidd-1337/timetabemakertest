@@ -44,8 +44,6 @@ function TimetableMaker() {
         { from: '20:00', to: '20:45' },
     ];
 
-
-
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [subjectSchedule, setSubjectSchedule] = useState({ lectures: [], tutorials: [], });
     const [timetable, setTimetable] = useState([]);
@@ -452,7 +450,7 @@ function TimetableMaker() {
             (subjectSchedule.lectures.length > 0 && !selectedLecture) ||
             (subjectSchedule.tutorials.length > 0 && !selectedTutorial)
         ) {
-            alert("You must select both a lecture and a tutorial if they are available.");
+            alert(t('SelectBoth'));
             return;
         }
         // Add subject to doneSubjects with its current color settings
@@ -628,7 +626,7 @@ function TimetableMaker() {
                 } else if (!slot.secondarySubject) {
                     return { ...slot, secondarySubject: subject, collisions };
                 } else {
-                    alert('Both primary and secondary subjects are already set for this time slot.');
+                    alert(t('BothSelected'));
                     return slot; // No changes, the slot is full
                 }
             });
@@ -710,9 +708,9 @@ function TimetableMaker() {
 
     const ConfirmSubjectSelection = ({ onConfirm, onReject, subject }) => (
         <div>
-            <h3>Confirm selection for {subject.name}</h3>
-            <button onClick={() => onConfirm(subject)}>YES ✅</button>
-            <button onClick={() => onReject()}>NO ❌</button>
+            <h3>{t('ConfirmSelectionFor')} {subject.name}</h3>
+            <button onClick={() => onConfirm(subject)}>{t('Yes')}✅</button>
+            <button onClick={() => onReject()}>{t('No')}❌</button>
         </div>
     );
     const undoSubject = (subject) => {
@@ -763,7 +761,7 @@ function TimetableMaker() {
                             <div className="day-header">{daySchedule.day}</div>
                             {daySchedule.slots.slice(1).map((slot, timeIndex) => (
                                 <div key={timeIndex} className="time-slot"
-                                     title={slot.collisions?.length > 0 ? `Kolize s: ${[...new Set(slot.collisions)].join(', ')}` : ''}
+                                     title={slot.collisions?.length > 0 ? `{t('CollisionWith')} ${[...new Set(slot.collisions)].join(', ')}` : ''}
                                      style={{
                                          backgroundColor: determineSlotColor(slot)
                                      }}>
@@ -774,7 +772,7 @@ function TimetableMaker() {
                                     )}
                                     {slot.primarySubject && (
                                         <>
-                                            <button className="remove-subject-button" title={'Remove subject'}
+                                            <button className="remove-subject-button" title={t('RemoveSubject')}
                                                     onClick={() => deleteSubjectFromTimetable(slot.primarySubject)}>x
                                             </button>
                                             <div className="department-shortname">
@@ -793,7 +791,7 @@ function TimetableMaker() {
                                     {slot.secondarySubject && (
                                         <>
                                             <div className="slot-divider"></div>
-                                            <button className="remove-subject-button" title={'Remove subject'}
+                                            <button className="remove-subject-button" title={t('RemoveSubject')}
                                                     onClick={() => deleteSubjectFromTimetable(slot.secondarySubject)}>x
                                             </button>
                                             <div className="department-shortname">
@@ -815,6 +813,7 @@ function TimetableMaker() {
                 </div>
                 <div className="right-section">
                     <div className="subject-selection">
+                        <h4>{t('Subjects')}</h4>
                         {subjects.map(subject => (
                             <div key={subject.id} className="subject-item">
                                 <button className='button' key={subject.id}
@@ -827,14 +826,15 @@ function TimetableMaker() {
 
                             </div>
                         ))}
-                        {showLoadingClock  && (
+                        {showLoadingClock && (
                             <div className="loading-container"> {/* Container to center-align the clock and text */}
 
                                 <div className="loading-clock"></div>
-                                <div className="loading-text">{t('Loading ...')}</div> {/* Text displayed under the clock */}
+                                <div className="loading-text">{t('Loading .. ')}</div>
+                                {/* Text displayed under the clock */}
                             </div>
                         )}
-                        <h3>Restricted Times</h3>
+                        <h3>{t('RestrictedTimes')}</h3>
                         {uniqueSessions(restrictedTimes).map(restricted => (
                             <div key={restricted.id} className="subject-item">
                                 <button className='button'
@@ -853,9 +853,10 @@ function TimetableMaker() {
 
                     {selectedSubject && !isAlertOpen &&(
                         <div className="subject-details">
+                            <h4>{t('SubjectDetails')}</h4>
                             {subjectSchedule.lectures.length > 0 && (
                                 <div className="lecture-section">
-                                    <h4>Lectures <IoColorPalette onClick={() => setShowLectureColorPicker(!showLectureColorPicker)} style={{ cursor: 'pointer' }} /></h4>
+                                    <h4>{t('Lectures')}<IoColorPalette onClick={() => setShowLectureColorPicker(!showLectureColorPicker)} style={{ cursor: 'pointer' }} /></h4>
                                     {showLectureColorPicker && (
                                         <div className="color-picker-combined-wrapper">
                                             <div className="compact-color-picker-wrapper" style={{ display: 'inline-block', transform: 'scale(0.8)', transformOrigin: 'top left' }}>
@@ -906,7 +907,7 @@ function TimetableMaker() {
 
                             {subjectSchedule.tutorials.length > 0 && (
                                 <div className="tutorial-section">
-                                    <h4>Tutorials <IoColorPalette onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)} style={{ cursor: 'pointer' }} /></h4>
+                                    <h4>{t('Tutorials')}<IoColorPalette onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)} style={{ cursor: 'pointer' }} /></h4>
                                     {showTutorialColorPicker && (
                                         <div className="color-picker-combined-wrapper">
                                             <div className="compact-color-picker-wrapper" style={{ display: 'inline-block', transform: 'scale(0.8)', transformOrigin: 'top left' }}>
@@ -969,6 +970,7 @@ function TimetableMaker() {
                     )}
 
                     <div className="done-subjects">
+                        <h4>{t('DoneSubjects')}</h4>
                         {doneSubjects.map(subject => (
                             <div key={subject.id} className="subject-item">
                                 <button className="button">
@@ -985,7 +987,7 @@ function TimetableMaker() {
 
                 <div className="buttons buttons-left">
                     <button className="custom-button" onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
-                        {showSubjectLoader ? 'Hide Form' : 'Load subject from STAG'}
+                        {showSubjectLoader ? t('HideForm') : t('LoadSubjectStag')}
                     </button>
                 </div>
                 <div className="form-group">
@@ -993,7 +995,7 @@ function TimetableMaker() {
                 </div>
                 <div className="buttons buttons-left">
                     <button className="custom-button" onClick={() => setShowRestrictedLoader(!showRestrictedLoader)}>
-                        {showRestrictedLoader ? 'Hide Form' : 'Add restricted time'}
+                        {showRestrictedLoader ? t('HideForm') : t('AddRestrictedTime')}
                     </button>
                     <button onClick={exportPDF} className="custom-button">Export as PDF</button>
                 </div>
