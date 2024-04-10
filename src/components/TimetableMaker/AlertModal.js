@@ -36,3 +36,4 @@ class AlertModal extends Component {
 }
 
 export default AlertModal;
+

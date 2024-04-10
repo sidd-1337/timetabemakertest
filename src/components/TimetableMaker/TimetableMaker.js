@@ -997,7 +997,7 @@ function TimetableMaker() {
                     <button className="custom-button" onClick={() => setShowRestrictedLoader(!showRestrictedLoader)}>
                         {showRestrictedLoader ? t('HideForm') : t('AddRestrictedTime')}
                     </button>
-                    <button onClick={exportPDF} className="custom-button">Export as PDF</button>
+                    <button onClick={exportPDF} className="custom-button">{t('ExportAsPDF')}</button>
                 </div>
                 <div className="form-group">
                     {showRestrictedLoader &&

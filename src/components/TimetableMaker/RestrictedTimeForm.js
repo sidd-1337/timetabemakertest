@@ -60,4 +60,3 @@ function RestrictedTimeForm({ days, times, onAddSubject }) {
 }
 
 export default RestrictedTimeForm;
-

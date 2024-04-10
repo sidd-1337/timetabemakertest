@@ -26,16 +26,16 @@
     "Summer": "Letní",
     "Winter": "Zimní",
     "Loading .. " : "Načítá se ..",
-    "TimeSlotOccupied": "Omezená doba",
-    "AddRestrictedTime": "Přidat omezený čas",
-    "Name": "Jméno ",
+    "TimeSlotOccupied": "Časový úsek je obsazený",
+    "AddRestrictedTime": "Přidat vlastní vyhrazený úsek",
+    "Name": "Název ",
     "TimeTo": "Čas do",
     "TimeFrom": "Čas od",
     "Day": "Den",
     "ChooseDay": "Vyber den",
-    "KeepBoth": "Ponechat obojí",
-    "Overwrite": "Přepsat",
-    "Cancel": "Zrušit",
+    "KeepBoth": "Ponechat obě",
+    "Overwrite": "Nahradit vše",
+    "Cancel": "Zavřít",
     "SubjectAbbreviation": "Zkratka předmětu: ",
     "Department": "Katedra: ",
     "LoadSubject": "Načíst předmět",
@@ -47,15 +47,16 @@
     "RemoveSubject": "Odebrat předmět",
     "DoneSubjects": "Hotové předměty",
     "ConfirmSelectionFor":"Potvrdit volbu pro",
-    "RestrictedTimes": "Omezené časy",
+    "RestrictedTimes": "Vyhrazené úseky",
     "Subjects": "Předměty",
     "SubjectDetails": "Detaily předmětu",
     "Lectures": "Přednášky",
     "Tutorials": "Cvičení",
     "HideForm": "Skrýt Formulář",
     "LoadSubjectStag": "Načíst předmět ze STAGU",
-    "TimeSlotOccupiedMessage": "Tento časový úsek je již omezen. Co byste chtěli dělat?",
-    "ExportAsPDF": "Předělat na PDF"
+    "TimeSlotOccupiedMessage": "Tento úsek je již obsazen. Jakou akce si přejete provést?",
+    "ExportAsPDF": "Vygenerovat PDF"
 }
+
 
   
