@@ -720,21 +720,25 @@ function TimetableMaker() {
         setTimetable(clearTimetable(subject));
     };
 
-    const clearTimetable = (subject) => {
+    const clearTimetable = (subject, collisions) => {
         return timetable.map(daySchedule => ({
             ...daySchedule,
             slots: daySchedule.slots.map(slot => {
                 // Remove the subject from the slot if it matches the one being cleared
-                let updatedSlot = {
-                    ...slot,
+                const updatedSlot = {
+                    ...slot, collisions,
                     primarySubject: slot.primarySubject && slot.primarySubject.name === subject.name ? null : slot.primarySubject,
                     secondarySubject: slot.secondarySubject && slot.secondarySubject.name === subject.name ? null : slot.secondarySubject,
                 };
 
                 // Recalculate collisions after removing the subject
-                if (slot.collisions && slot.collisions.includes(subject.name)) {
-                    // Remove the subject from collisions
-                    updatedSlot.collisions = slot.collisions.filter(collidingSubject => collidingSubject !== subject.name);
+                if (updatedSlot.collisions && updatedSlot.collisions.includes(subject.name)) {
+                    updatedSlot.collisions = updatedSlot.collisions.filter(collidingSubject => collidingSubject !== subject.name);
+                }
+
+                // If there are no more collisions, remove the collisions array entirely
+                if (updatedSlot.collisions && updatedSlot.collisions.length === 0) {
+                    delete updatedSlot.collisions;
                 }
 
                 return updatedSlot;
@@ -742,7 +746,9 @@ function TimetableMaker() {
         }));
     };
 
-
+    const isSubjectDone = (subjectName) => {
+        return doneSubjects.some(subject => subject.name === subjectName);
+    };
 
 
 
@@ -772,9 +778,11 @@ function TimetableMaker() {
                                     )}
                                     {slot.primarySubject && (
                                         <>
-                                            <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                    onClick={() => deleteSubjectFromTimetable(slot.primarySubject)}>x
-                                            </button>
+                                            {!isSubjectDone(slot.primarySubject.name) && (
+                                                <button className="remove-subject-button" title={t('RemoveSubject')}
+                                                        onClick={() => deleteSubjectFromTimetable(slot.primarySubject)}>x
+                                                </button>
+                                            )}
                                             <div className="department-shortname">
                                                 {slot.primarySubject.department} / {slot.primarySubject.shortName}
                                             </div>
@@ -786,14 +794,15 @@ function TimetableMaker() {
                                             </div>
                                             {slot.primarySubject.weekType && <div className="week-type">Week: {slot.primarySubject.weekType}</div>}
                                         </>
-
                                     )}
                                     {slot.secondarySubject && (
                                         <>
                                             <div className="slot-divider"></div>
-                                            <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                    onClick={() => deleteSubjectFromTimetable(slot.secondarySubject)}>x
-                                            </button>
+                                            {!isSubjectDone(slot.secondarySubject.name) && (
+                                                <button className="remove-subject-button" title={t('RemoveSubject')}
+                                                        onClick={() => deleteSubjectFromTimetable(slot.secondarySubject)}>x
+                                                </button>
+                                            )}
                                             <div className="department-shortname">
                                                 {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
                                             </div>
