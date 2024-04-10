@@ -54,7 +54,8 @@
     "Tutorials": "Cvičení",
     "HideForm": "Skrýt Formulář",
     "LoadSubjectStag": "Načíst předmět ze STAGU",
-    "TimeSlotOccupiedMessage": "Tento časový úsek je již omezen. Co byste chtěli dělat?"
+    "TimeSlotOccupiedMessage": "Tento časový úsek je již omezen. Co byste chtěli dělat?",
+    "ExportAsPDF": "Předělat na PDF"
 }
 
   
