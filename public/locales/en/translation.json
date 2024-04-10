@@ -53,7 +53,8 @@
     "Lectures": "Lectures",
     "Tutorials": "Tutorials",
     "HideForm": "Hide Form",
-    "LoadSubjectStag": "Load subject from STAG"
+    "LoadSubjectStag": "Load subject from STAG",
+    "TimeSlotOccupiedMessage": "This time slot is already occupied. What would you like to do?"
 }
 
   

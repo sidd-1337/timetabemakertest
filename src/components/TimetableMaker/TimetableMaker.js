@@ -584,7 +584,7 @@ function TimetableMaker() {
             // Assuming slotIsOccupied is a boolean indicating if the slot is already taken
             setAlertInfo({
                 isOpen: true,
-                message: "This time slot is already occupied. What would you like to do?",
+                message: t('TimeSlotOccupiedMessage'),
                 onKeepBoth: () => handleKeepBoth(subject, day, startIndex, endIndex, weekType),
                 onOverwrite: () => handleOverwrite(subject, day, startIndex, endIndex),
             });

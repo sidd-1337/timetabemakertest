@@ -53,7 +53,8 @@
     "Lectures": "Přednášky",
     "Tutorials": "Cvičení",
     "HideForm": "Skrýt Formulář",
-    "LoadSubjectStag": "Načíst předmět ze STAGU"
+    "LoadSubjectStag": "Načíst předmět ze STAGU",
+    "TimeSlotOccupiedMessage": "Tento časový úsek je již omezen. Co byste chtěli dělat?"
 }
 
   
