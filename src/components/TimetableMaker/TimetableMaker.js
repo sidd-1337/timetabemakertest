@@ -66,7 +66,7 @@ function TimetableMaker() {
     const [showTutorialColorPicker, setShowTutorialColorPicker] = useState(false);
     const [showColorWheel, setShowColorWheel] = useState(false); // New state to toggle color wheel display
 
-    const determineSlotColor = (slot) => {
+    const determineSlotColor = (slot, order) => {
         console.log(`Determining color for type: ${slot.type}`); // Debugging log
         if (!slot.subjectEvenWeek && !slot.subjectOddWeek && !slot.subjectBothWeeks && !slot.primarySubject && !slot.secondarySubject) return 'transparent';
 
@@ -74,17 +74,20 @@ function TimetableMaker() {
         const combinedSubjects = [...subjects, ...doneSubjects];
 
         const subject = combinedSubjects.find(subj =>
-            subj.name === slot.subjectEvenWeek?.name ||
-            subj.name === slot.subjectOddWeek?.name ||
-            subj.name === slot.subjectBothWeeks?.name ||
-            subj.name === slot.primarySubject?.name ||
-            subj.name === slot.secondarySubject?.name
+            //subj.name === slot.subjectEvenWeek?.name ||
+            //subj.name === slot.subjectOddWeek?.name ||
+            //subj.name === slot.subjectBothWeeks?.name ||
+            (subj.name === slot.primarySubject?.name && order === "Primary") ||
+            (subj.name === slot.secondarySubject?.name && order === "Secondary")
         );
 
         if (!subject) return 'transparent'; // Return transparent if no subject is found
-
+        var color="#FFFFFF";
         // Determine color based on the slot type (Lecture/Tutorial)
-        const color = slot.type === 'Lecture' ? subject.colors.lectureColor : subject.colors.tutorialColor;
+        if (order === "Primary")
+            color = slot.primarySubject.type === 'Lecture' ? subject.colors.lectureColor : subject.colors.tutorialColor;
+        else if(order === "Secondary")
+            color = slot.secondarySubject.type === 'Lecture' ? subject.colors.lectureColor : subject.colors.tutorialColor;
         console.log(`Applied color: ${color}`); // Debugging log
         return color;
     };
@@ -720,21 +723,25 @@ function TimetableMaker() {
         setTimetable(clearTimetable(subject));
     };
 
-    const clearTimetable = (subject) => {
+    const clearTimetable = (subject, collisions) => {
         return timetable.map(daySchedule => ({
             ...daySchedule,
             slots: daySchedule.slots.map(slot => {
                 // Remove the subject from the slot if it matches the one being cleared
-                let updatedSlot = {
-                    ...slot,
+                const updatedSlot = {
+                    ...slot, collisions,
                     primarySubject: slot.primarySubject && slot.primarySubject.name === subject.name ? null : slot.primarySubject,
                     secondarySubject: slot.secondarySubject && slot.secondarySubject.name === subject.name ? null : slot.secondarySubject,
                 };
 
                 // Recalculate collisions after removing the subject
-                if (slot.collisions && slot.collisions.includes(subject.name)) {
-                    // Remove the subject from collisions
-                    updatedSlot.collisions = slot.collisions.filter(collidingSubject => collidingSubject !== subject.name);
+                if (updatedSlot.collisions && updatedSlot.collisions.includes(subject.name)) {
+                    updatedSlot.collisions = updatedSlot.collisions.filter(collidingSubject => collidingSubject !== subject.name);
+                }
+
+                // If there are no more collisions, remove the collisions array entirely
+                if (updatedSlot.collisions && updatedSlot.collisions.length === 0) {
+                    delete updatedSlot.collisions;
                 }
 
                 return updatedSlot;
@@ -742,7 +749,9 @@ function TimetableMaker() {
         }));
     };
 
-
+    const isSubjectDone = (subjectName) => {
+        return doneSubjects.some(subject => subject.name === subjectName);
+    };
 
 
 
@@ -762,9 +771,7 @@ function TimetableMaker() {
                             {daySchedule.slots.slice(1).map((slot, timeIndex) => (
                                 <div key={timeIndex} className="time-slot"
                                      title={slot.collisions?.length > 0 ? `{t('CollisionWith')} ${[...new Set(slot.collisions)].join(', ')}` : ''}
-                                     style={{
-                                         backgroundColor: determineSlotColor(slot)
-                                     }}>
+                                     >
                                     {slot.collisions?.length > 0 && (
                                         <div className={`collision-indicator ${slot.primarySubject && slot.secondarySubject && slot.primarySubject !== slot.secondarySubject ? 'full-occupancy' : ''}`}>
                                             !
@@ -772,9 +779,16 @@ function TimetableMaker() {
                                     )}
                                     {slot.primarySubject && (
                                         <>
-                                            <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                    onClick={() => deleteSubjectFromTimetable(slot.primarySubject)}>x
-                                            </button>
+                                        <div
+                                            style={{
+                                                backgroundColor: determineSlotColor(slot, "Primary"),
+                                                borderRadius: "3px"
+                                            }}>
+                                            {!isSubjectDone(slot.primarySubject.name) && (
+                                                <button className="remove-subject-button" title={t('RemoveSubject')}
+                                                        onClick={() => deleteSubjectFromTimetable(slot.primarySubject)}>x
+                                                </button>
+                                            )}
                                             <div className="department-shortname">
                                                 {slot.primarySubject.department} / {slot.primarySubject.shortName}
                                             </div>
@@ -785,15 +799,22 @@ function TimetableMaker() {
                                                 {slot.primarySubject.teacher}
                                             </div>
                                             {slot.primarySubject.weekType && <div className="week-type">Week: {slot.primarySubject.weekType}</div>}
+                                        </div>
                                         </>
-
                                     )}
                                     {slot.secondarySubject && (
                                         <>
+                                        <div
+                                            style={{
+                                                backgroundColor: determineSlotColor(slot, "Secondary"),
+                                                borderRadius: "3px"
+                                            }}>
                                             <div className="slot-divider"></div>
-                                            <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                    onClick={() => deleteSubjectFromTimetable(slot.secondarySubject)}>x
-                                            </button>
+                                            {!isSubjectDone(slot.secondarySubject.name) && (
+                                                <button className="remove-subject-button" title={t('RemoveSubject')}
+                                                        onClick={() => deleteSubjectFromTimetable(slot.secondarySubject)}>x
+                                                </button>
+                                            )}
                                             <div className="department-shortname">
                                                 {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
                                             </div>
@@ -804,6 +825,7 @@ function TimetableMaker() {
                                                 {slot.secondarySubject.teacher}
                                             </div>
                                             {slot.secondarySubject.weekType && <div className="week-type">Week: {slot.secondarySubject.weekType}</div>}
+                                        </div>
                                         </>
                                     )}
                                 </div>
