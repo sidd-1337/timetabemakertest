@@ -25,7 +25,7 @@
     "Semester": "Semester",
     "Summer": "Summer",
     "Winter": "Winter",
-    "Loading .. " : "Loading ..",
+    "Loading" : "Loading ...",
     "TimeSlotOccupied": "Time Slot Occupied",
     "AddRestrictedTime": "Add restricted time",
     "Name": "Name",
@@ -55,7 +55,17 @@
     "HideForm": "Hide Form",
     "LoadSubjectStag": "Load subject from STAG",
     "TimeSlotOccupiedMessage": "This time slot is already occupied. What would you like to do?",
-    "ExportAsPDF": "Export as PDF"
+    "ExportAsPDF": "Export as PDF",
+    "day_Po": "Monday",
+    "day_Út": "Tuesday",
+    "day_St": "Wednesday",
+    "day_Čt": "Thursday",
+    "day_Pá": "Friday",
+    "Week": "Week: ",
+    "weekType_S": "Even",
+    "weekType_L": "Odd",
+    "weekType_J": "Every",
+    "weekType_SL": "Even/Odd"
 }
 
 

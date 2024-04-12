@@ -25,7 +25,7 @@
     "Semester": "Semestr",
     "Summer": "Letní",
     "Winter": "Zimní",
-    "Loading .. " : "Načítá se ..",
+    "Loading" : "Načítá se ...",
     "TimeSlotOccupied": "Časový úsek je obsazený",
     "AddRestrictedTime": "Přidat vlastní vyhrazený úsek",
     "Name": "Název ",
@@ -55,7 +55,17 @@
     "HideForm": "Skrýt Formulář",
     "LoadSubjectStag": "Načíst předmět ze STAGU",
     "TimeSlotOccupiedMessage": "Tento úsek je již obsazen. Jakou akce si přejete provést?",
-    "ExportAsPDF": "Vygenerovat PDF"
+    "ExportAsPDF": "Vygenerovat PDF",
+    "day_Po": "Pondělí",
+    "day_Út": "Úterý",
+    "day_St": "Středa",
+    "day_Čt": "Čtvrtek",
+    "day_Pá": "Pátek",
+    "Week": "Týden: ",
+    "weekType_S": "Sudý",
+    "weekType_L": "Lichý",
+    "weekType_J": "Každý",
+    "weekType_SL": "Sudý/Lichý"
 }
 
 

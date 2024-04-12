@@ -20,8 +20,11 @@ function TimetableMaker() {
     const location = useLocation();
     const { t,i18n  } = useTranslation();
     const { programme, faculty, typeOfStudy, formOfStudy, grade, semester } = location.state || {};
+    const weekTypes = ['S', 'L', 'J', 'SL'];
+    const weekTypeKeys = weekTypes.map(type => `weekType_${type}`);
 
     const days = ['Po', 'Út', 'St', 'Čt', 'Pá'];
+    const dayKeys = days.map(day => `day_${day}`); // Translation keys
     // Times can be an array of time slots, e.g., ['08:00', '09:00', ...]
     const times = [
         { from: '', to: '' },
@@ -767,10 +770,10 @@ function TimetableMaker() {
                     </div>
                     {timetable.map((daySchedule, dayIndex) => (
                         <React.Fragment key={dayIndex}>
-                            <div className="day-header">{daySchedule.day}</div>
+                            <div className="day-header">{t(dayKeys[dayIndex])}</div>
                             {daySchedule.slots.slice(1).map((slot, timeIndex) => (
                                 <div key={timeIndex} className="time-slot"
-                                     title={slot.collisions?.length > 0 ? `{t('CollisionWith')} ${[...new Set(slot.collisions)].join(', ')}` : ''}
+                                     title={slot.collisions?.length > 0 ? `${t('CollisionWith')} ${[...new Set(slot.collisions)].join(', ')}` : ''}
                                      >
                                     {slot.collisions?.length > 0 && (
                                         <div className={`collision-indicator ${slot.primarySubject && slot.secondarySubject && slot.primarySubject !== slot.secondarySubject ? 'full-occupancy' : ''}`}>
@@ -798,7 +801,7 @@ function TimetableMaker() {
                                             <div className="teacher-name">
                                                 {slot.primarySubject.teacher}
                                             </div>
-                                            {slot.primarySubject.weekType && <div className="week-type">Week: {slot.primarySubject.weekType}</div>}
+                                            {slot.primarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.primarySubject.weekType)))}</div>}
                                         </div>
                                         </>
                                     )}
@@ -824,7 +827,7 @@ function TimetableMaker() {
                                             <div className="teacher-name">
                                                 {slot.secondarySubject.teacher}
                                             </div>
-                                            {slot.secondarySubject.weekType && <div className="week-type">Week: {slot.secondarySubject.weekType}</div>}
+                                            {slot.secondarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.secondarySubject.weekType)))}</div>}
                                         </div>
                                         </>
                                     )}
@@ -852,7 +855,7 @@ function TimetableMaker() {
                             <div className="loading-container"> {/* Container to center-align the clock and text */}
 
                                 <div className="loading-clock"></div>
-                                <div className="loading-text">{t('Loading .. ')}</div>
+                                <div className="loading-text">{t('Loading')}</div>
                                 {/* Text displayed under the clock */}
                             </div>
                         )}
@@ -922,8 +925,8 @@ function TimetableMaker() {
                                         addToTimetable(lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType);
                                     }}
                                 >
-                                    {lecture.day} {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
-                                    <br/> Week: {lecture.weekType}
+                                    {t(dayKeys.find(key => key.includes(lecture.day)))} <br/>  {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
+                                    <br/> {t('Week')} {t(weekTypeKeys.find(key => key.includes(lecture.weekType)))}
                                 </button>
                             ))}
 
@@ -973,8 +976,8 @@ function TimetableMaker() {
                                         addToTimetable(tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType);
                                     }}
                                 >
-                                    {tutorial.day} {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}
-                                    <br/> Week: {tutorial.weekType}
+                                    {t(dayKeys.find(key => key.includes(tutorial.day)))} <br/> {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}
+                                    <br/> {t('Week')} {t(weekTypeKeys.find(key => key.includes(tutorial.weekType)))}
                                 </button>
                             ))}
 
