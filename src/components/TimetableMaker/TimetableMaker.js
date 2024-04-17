@@ -184,7 +184,7 @@ function TimetableMaker() {
 
 
 
-    const handleOverwrite = (newSubject, day, startIndex, endIndex) => {
+    const handleOverwrite = (newSubject, day, startIndex, endIndex, collisions) => {
         // Assuming `newSubject` has a unique identifier like `newSubject.id`
         // Step 1: Remove all instances of the subject from the timetable
         const cleanedTimetable = timetable.map(daySchedule => ({
@@ -193,10 +193,10 @@ function TimetableMaker() {
 
                 if (slot.primarySubject && slot.primarySubject.id === newSubject.id) {
                     // If the current slot's primarySubject is the one to be overwritten, clear it
-                    return { ...slot, primarySubject: null };
+                    return { ...slot, collisions, primarySubject: null };
                 } else if (slot.secondarySubject && slot.secondarySubject.id === newSubject.id) {
                     // Same for secondarySubject
-                    return { ...slot, secondarySubject: null};
+                    return { ...slot, collisions, secondarySubject: null};
                 }
                 return slot; // Return slot unchanged if it does not contain the subject to be overwritten
             })
@@ -209,12 +209,12 @@ function TimetableMaker() {
             const updatedSlots = daySchedule.slots.map((slot, index) => {
                 if (index >= startIndex && index <= endIndex) {
                     // Only update slots within the specified range
-                    return { ...slot, primarySubject: newSubject }; // Assign new subject to primarySubject
+                    return { ...slot, collisions, primarySubject: newSubject }; // Assign new subject to primarySubject
                 }
                 return slot;
             });
 
-            return { ...daySchedule, slots: updatedSlots };
+            return { ...daySchedule, slots: updatedSlots, collisions };
         });
 
         setTimetable(updatedTimetable);
@@ -755,6 +755,39 @@ function TimetableMaker() {
     const isSubjectDone = (subjectName) => {
         return doneSubjects.some(subject => subject.name === subjectName);
     };
+    const removeSpecificSession = (day, sessionType, sessionId, collisions) => {
+        setTimetable(prevTimetable => prevTimetable.map(daySchedule => {
+            if (daySchedule.day !== day) return daySchedule; // Skip days that don't match
+
+            // Find the indices of slots to remove by checking if the slot's primary or secondary subject matches the session ID and type
+            const slotsToRemove = daySchedule.slots.reduce((indices, slot, index) => {
+                if ((slot.primarySubject && slot.primarySubject.id === sessionId && slot.primarySubject.type === sessionType) ||
+                    (slot.secondarySubject && slot.secondarySubject.id === sessionId && slot.secondarySubject.type === sessionType)) {
+                    indices.push(index);
+                }
+                return indices;
+            }, []);
+
+            if (slotsToRemove.length === 0) return daySchedule; // If no matching slots found, return the day schedule as is
+
+            // Map over slots to update them
+            return {
+                ...daySchedule,
+                slots: daySchedule.slots.map((slot, index) => {
+                    if (slotsToRemove.includes(index)) {
+                        // Clear the subject from the slot
+                        return {
+                            ...slot, collisions,
+                            primarySubject: slot.primarySubject && slot.primarySubject.id === sessionId ? null : slot.primarySubject,
+                            secondarySubject: slot.secondarySubject && slot.secondarySubject.id === sessionId ? null : slot.secondarySubject,
+                        };
+                    }
+                    return slot;
+                }),
+            };
+        }));
+    };
+
 
 
 
@@ -789,7 +822,8 @@ function TimetableMaker() {
                                             }}>
                                             {!isSubjectDone(slot.primarySubject.name) && (
                                                 <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                        onClick={() => deleteSubjectFromTimetable(slot.primarySubject)}>x
+                                                        onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
+                                                >x
                                                 </button>
                                             )}
                                             <div className="department-shortname">
@@ -815,7 +849,8 @@ function TimetableMaker() {
                                             <div className="slot-divider"></div>
                                             {!isSubjectDone(slot.secondarySubject.name) && (
                                                 <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                        onClick={() => deleteSubjectFromTimetable(slot.secondarySubject)}>x
+                                                        onClick={() =>  removeSpecificSession(daySchedule.day, slot.secondarySubject.type, slot.secondarySubject.id)}
+                                                >x
                                                 </button>
                                             )}
                                             <div className="department-shortname">
