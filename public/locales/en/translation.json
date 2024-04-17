@@ -39,7 +39,7 @@
     "SubjectAbbreviation": "Subject abbreviation: ",
     "Department": "Department: ",
     "LoadSubject": "Load Subject",
-    "SelectBoth": "You must select both a lecture and a tutorial if they are available.",
+    "SelectBoth": "You must select exactly one lecture and one tutorial, if available.",
     "BothSelected": "Both primary and secondary subjects are already set for this time slot.",
     "Yes": "YES",
     "No": "NO",

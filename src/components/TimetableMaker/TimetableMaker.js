@@ -58,8 +58,8 @@ function TimetableMaker() {
     const initialized = useRef(false);
     const [toConfirmSubject, setToConfirmSubject] = useState(null);
     const [doneSubjects, setDoneSubjects] = useState([]);
-    const [selectedLecture, setSelectedLecture] = useState(null);
-    const [selectedTutorial, setSelectedTutorial] = useState(null);
+    const [selectedLectures, setSelectedLectures] = useState([]);
+    const [selectedTutorials, setSelectedTutorials] = useState([]);
     const [showLoadingClock, setShowLoadingClock] = useState(false); // New state for clock symbol visibility
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
@@ -153,12 +153,12 @@ function TimetableMaker() {
                 if (index >= startIndex && index <= endIndex) {
                     // Logic to combine or add the subject to this slot
                     let updatedSlot = { ...slot };
-                    if (slot.primarySubject && (slot.primarySubject.weekType === 'S' || slot.primarySubject.weekType === 'L') && (weekType === 'S' || weekType === 'L')) {
+                    if (slot.primarySubject && (slot.primarySubject.weekType === 'S' || slot.primarySubject.weekType === 'L') && (weekType === 'S' || weekType === 'L') && slot.primarySubject.name === subject.name) {
                         updatedSlot.primarySubject = {
                             ...slot.primarySubject,
                             weekType: 'SL' // Combine week types
                         };
-                    } else if (slot.secondarySubject && (slot.secondarySubject.weekType === 'S' || slot.secondarySubject.weekType === 'L')){
+                    } else if (slot.secondarySubject && (slot.secondarySubject.weekType === 'S' || slot.secondarySubject.weekType === 'L') && slot.secondarySubject.name === subject.name){
                         updatedSlot.secondarySubject = {
                             ...slot.secondarySubject,
                             weekType: 'SL' // Combine week types
@@ -400,15 +400,29 @@ function TimetableMaker() {
     };
 
     const selectSessionForConfirmation = (session) => {
+        var exists=false;
         if (session.type === 'Lecture') {
-            setSelectedLecture((prevSelectedLecture) =>
-                prevSelectedLecture && prevSelectedLecture.id === session.id ? null : session
-            );
+            setSelectedLectures(prev => {
+                exists = prev.find(lecture => lecture.id === session.id);
+                if (exists) {
+                    return prev.filter(lecture => lecture.id !== session.id); // Remove if already selected
+                } else {
+                    addToTimetable(session.name, session.day, session.timeFrom, session.timeTo, session.type, session.department, session.shortName, session.building, session.room, session.teacher, session.weekType);
+                    return [...prev, session]; // Add if not already selected
+                }
+            });
         } else if (session.type === 'Tutorial') {
-            setSelectedTutorial((prevSelectedTutorial) =>
-                prevSelectedTutorial && prevSelectedTutorial.id === session.id ? null : session
-            );
+            setSelectedTutorials(prev => {
+                exists = prev.find(tutorial => tutorial.id === session.id);
+                if (exists) {
+                    return prev.filter(tutorial => tutorial.id !== session.id); // Remove if already selected
+                } else {
+                    addToTimetable(session.name, session.day, session.timeFrom, session.timeTo, session.type, session.department, session.shortName, session.building, session.room, session.teacher, session.weekType);
+                    return [...prev, session]; // Add if not already selected
+                }
+            });
         }
+        setTimetable(clearTimetable(session));
     };
 
 
@@ -435,8 +449,8 @@ function TimetableMaker() {
             }
             setSelectedSubject(subject);
             setSubjectSchedule(subject.details);
-            setSelectedLecture(null);
-            setSelectedTutorial(null);
+            setSelectedLectures([]);
+            setSelectedTutorials([]);
             confirmSubjectSelection(subject);
             setShowLectureColorPicker(false);
             setShowTutorialColorPicker(false);
@@ -451,11 +465,15 @@ function TimetableMaker() {
 
 
     const handleConfirm = () => {
-        // Make sure we have a selected lecture and/or tutorial if they are required
-        if (
-            (subjectSchedule.lectures.length > 0 && !selectedLecture) ||
-            (subjectSchedule.tutorials.length > 0 && !selectedTutorial)
-        ) {
+        // Check for required selections based on availability
+
+        const lectureRequiredAndSelectedOnce = subjectSchedule.lectures.length > 0 ? selectedLectures.length === 1 : true;
+
+        const tutorialRequiredAndSelectedOnce = subjectSchedule.tutorials.length > 0 ? selectedTutorials.length === 1 : true;
+
+        // If any of the required selections is not satisfied, show alert and return
+
+        if (!lectureRequiredAndSelectedOnce || !tutorialRequiredAndSelectedOnce) {
             alert(t('SelectBoth'));
             return;
         }
@@ -474,8 +492,8 @@ function TimetableMaker() {
         setSubjects(subjects.filter((subj) => subj.id !== updatedSubject.id));
         // Reset the selected subject and the selected sessions for confirmation
         setSelectedSubject(null);
-        setSelectedLecture(null);
-        setSelectedTutorial(null);
+        setSelectedLectures([]);
+        setSelectedTutorials([]);
         // Reset the confirmation subject
         setToConfirmSubject(null);
     };
@@ -484,8 +502,8 @@ function TimetableMaker() {
     const handleReject = () => {
         if (selectedSubject) {
             setTimetable(clearTimetable(selectedSubject));
-            setSelectedLecture(null);
-            setSelectedTutorial(null);
+            setSelectedLectures([]);
+            setSelectedTutorials([]);
         }
 
     };
@@ -501,8 +519,8 @@ function TimetableMaker() {
         // Reset the selected subject and its schedule if the deleted subject was the selected one
         if (selectedSubject && selectedSubject.id === subject.id) {
             setSelectedSubject(null);
-            setSelectedLecture(null);
-            setSelectedTutorial(null);
+            setSelectedLectures([]);
+            setSelectedTutorials([]);
             setDoneSubjects(null);
         }
     };
@@ -807,7 +825,7 @@ function TimetableMaker() {
                             {daySchedule.slots.slice(1).map((slot, timeIndex) => (
                                 <div key={timeIndex} className="time-slot"
                                      title={slot.collisions?.length > 0 ? `${t('CollisionWith')} ${[...new Set(slot.collisions)].join(', ')}` : ''}
-                                     >
+                                >
                                     {slot.collisions?.length > 0 && (
                                         <div className={`collision-indicator ${slot.primarySubject && slot.secondarySubject && slot.primarySubject !== slot.secondarySubject ? 'full-occupancy' : ''}`}>
                                             !
@@ -815,55 +833,55 @@ function TimetableMaker() {
                                     )}
                                     {slot.primarySubject && (
                                         <>
-                                        <div
-                                            style={{
-                                                backgroundColor: determineSlotColor(slot, "Primary"),
-                                                borderRadius: "3px"
-                                            }}>
-                                            {!isSubjectDone(slot.primarySubject.name) && (
-                                                <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                        onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
-                                                >x
-                                                </button>
-                                            )}
-                                            <div className="department-shortname">
-                                                {slot.primarySubject.department} / {slot.primarySubject.shortName}
+                                            <div
+                                                style={{
+                                                    backgroundColor: determineSlotColor(slot, "Primary"),
+                                                    borderRadius: "3px"
+                                                }}>
+                                                {!isSubjectDone(slot.primarySubject.name) && (
+                                                    <button className="remove-subject-button" title={t('RemoveSubject')}
+                                                            onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
+                                                    >x
+                                                    </button>
+                                                )}
+                                                <div className="department-shortname">
+                                                    {slot.primarySubject.department} / {slot.primarySubject.shortName}
+                                                </div>
+                                                <div className="building-room">
+                                                    {slot.primarySubject.building} - {slot.primarySubject.room}
+                                                </div>
+                                                <div className="teacher-name">
+                                                    {slot.primarySubject.teacher}
+                                                </div>
+                                                {slot.primarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.primarySubject.weekType)))}</div>}
                                             </div>
-                                            <div className="building-room">
-                                                {slot.primarySubject.building} - {slot.primarySubject.room}
-                                            </div>
-                                            <div className="teacher-name">
-                                                {slot.primarySubject.teacher}
-                                            </div>
-                                            {slot.primarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.primarySubject.weekType)))}</div>}
-                                        </div>
                                         </>
                                     )}
                                     {slot.secondarySubject && (
                                         <>
-                                        <div
-                                            style={{
-                                                backgroundColor: determineSlotColor(slot, "Secondary"),
-                                                borderRadius: "3px"
-                                            }}>
-                                            <div className="slot-divider"></div>
-                                            {!isSubjectDone(slot.secondarySubject.name) && (
-                                                <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                        onClick={() =>  removeSpecificSession(daySchedule.day, slot.secondarySubject.type, slot.secondarySubject.id)}
-                                                >x
-                                                </button>
-                                            )}
-                                            <div className="department-shortname">
-                                                {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
+                                            <div
+                                                style={{
+                                                    backgroundColor: determineSlotColor(slot, "Secondary"),
+                                                    borderRadius: "3px"
+                                                }}>
+                                                <div className="slot-divider"></div>
+                                                {!isSubjectDone(slot.secondarySubject.name) && (
+                                                    <button className="remove-subject-button" title={t('RemoveSubject')}
+                                                            onClick={() =>  removeSpecificSession(daySchedule.day, slot.secondarySubject.type, slot.secondarySubject.id)}
+                                                    >x
+                                                    </button>
+                                                )}
+                                                <div className="department-shortname">
+                                                    {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
+                                                </div>
+                                                <div className="building-room">
+                                                    {slot.secondarySubject.building} - {slot.secondarySubject.room}
+                                                </div>
+                                                <div className="teacher-name">
+                                                    {slot.secondarySubject.teacher}
+                                                </div>
+                                                {slot.secondarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.secondarySubject.weekType)))}</div>}
                                             </div>
-                                            <div className="building-room">
-                                                {slot.secondarySubject.building} - {slot.secondarySubject.room}
-                                            </div>
-                                            <div className="teacher-name">
-                                                {slot.secondarySubject.teacher}
-                                            </div>
-                                            {slot.secondarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.secondarySubject.weekType)))}</div>}
-                                        </div>
                                         </>
                                     )}
                                 </div>
@@ -875,7 +893,7 @@ function TimetableMaker() {
                     <div className="subject-selection">
                         <h4>{t('Subjects')}</h4>
                         {subjects.map(subject => (
-                            <div key={subject.id} className="subject-item">
+                            <div key={subject.id}  className={`subject-item ${selectedSubject && subject.id === selectedSubject.id ? 'selected-subject' : ''}`}>
                                 <button className='button' key={subject.id}
                                         onClick={() => handleSubjectSelect(subject.id)}>
                                     {subject.name}
@@ -953,11 +971,10 @@ function TimetableMaker() {
 
                             {uniqueSessions(subjectSchedule.lectures).map(lecture => (
                                 <button
-                                    className={`button ${selectedLecture && selectedLecture.id === lecture.id ? 'selected' : ''}`}
+                                    className={`button ${selectedLectures.some(l => l.id === lecture.id) ? 'selected' : ''}`}
                                     key={lecture.id}
                                     onClick={() => {
                                         selectSessionForConfirmation(lecture);
-                                        addToTimetable(lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType);
                                     }}
                                 >
                                     {t(dayKeys.find(key => key.includes(lecture.day)))} <br/>  {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
@@ -1004,11 +1021,10 @@ function TimetableMaker() {
 
                             {uniqueSessions(subjectSchedule.tutorials).map(tutorial => (
                                 <button
-                                    className={`button ${selectedTutorial && selectedTutorial.id === tutorial.id ? 'selected' : ''}`}
+                                    className={`button ${selectedTutorials.some(t => t.id === tutorial.id) ? 'selected' : ''}`}
                                     key={tutorial.id}
                                     onClick={() => {
                                         selectSessionForConfirmation(tutorial);
-                                        addToTimetable(tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType);
                                     }}
                                 >
                                     {t(dayKeys.find(key => key.includes(tutorial.day)))} <br/> {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}

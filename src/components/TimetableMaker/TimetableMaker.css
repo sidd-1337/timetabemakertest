@@ -314,3 +314,6 @@
   z-index: 10;
   /* Add any additional positioning or spacing styles here */
 }
+.selected-subject {
+  background-color: #055388; /* Example color, change it as needed */
+}
