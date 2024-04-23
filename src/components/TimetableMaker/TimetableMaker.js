@@ -15,6 +15,8 @@ import { Wheel } from '@uiw/react-color';
 import { hsvaToHex } from '@uiw/color-convert';
 import { IoColorPalette } from "react-icons/io5";
 import { Compact } from '@uiw/react-color';
+export const days = ['Po', 'Út', 'St', 'Čt', 'Pá'];
+export const dayKeys = days.map(day => `${day}`);
 
 function TimetableMaker() {
     const location = useLocation();
@@ -24,7 +26,7 @@ function TimetableMaker() {
     const weekTypeKeys = weekTypes.map(type => `weekType_${type}`);
 
     const days = ['Po', 'Út', 'St', 'Čt', 'Pá'];
-    const dayKeys = days.map(day => `day_${day}`); // Translation keys
+    const dayKeys = days.map(day => `${day}`); // Translation keys
     // Times can be an array of time slots, e.g., ['08:00', '09:00', ...]
     const times = [
         { from: '', to: '' },
@@ -531,7 +533,7 @@ function TimetableMaker() {
     // Call initializeTimetable when the component mounts
     useEffect(() => {
         initializeTimetable();
-    }, []);
+    }, []);+
 */
     const timeToMinutes = (time) => {
         if (typeof time !== 'string' || !time.match(/^\d{2}:\d{2}$/)) {
@@ -545,7 +547,7 @@ function TimetableMaker() {
 
 
     // Function to add a lecture/tutorial to the timetable
-    const addToTimetable = (subjectName, day, timeFrom, timeTo, type, department, shortName, building, room, teacher, weekType) => {
+    const addToTimetable = (subjectName, day, timeFrom, timeTo, type, department, shortName, building, room, teacher, weekType, isRestrictedTime = false) => {
         const daySchedule = timetable.find(d => d.day === day);
         if (!daySchedule) {
             console.error(`Day not found in timetable: ${day}`);
@@ -562,9 +564,9 @@ function TimetableMaker() {
             building,
             room,
             teacher,
-            weekType
+            weekType,
+            isRestrictedTime
         };
-
 
         const startMinutes = timeToMinutes(timeFrom);
         const endMinutes = timeToMinutes(timeTo);
@@ -585,7 +587,6 @@ function TimetableMaker() {
         });
 
         // Inside addToTimetable function
-        // Inside addToTimetable function
         if (slotIsOccupied) {
             // Assuming slotIsOccupied is a boolean indicating if the slot is already taken
             setAlertInfo({
@@ -597,15 +598,17 @@ function TimetableMaker() {
             return; // Stop the function to wait for user input from the modal
         }
 
-
-
         const updatedTimetable = timetable.map(daySchedule => {
-
             if (daySchedule.day !== day) return daySchedule;
 
             const updatedSlots = daySchedule.slots.map((slot, index) => {
                 if (index < startIndex || index > endIndex) return slot;
-                slot.type=type;
+
+                if (isRestrictedTime) {
+                    // Modify slot to indicate it's a restricted time
+                    return { ...slot, primarySubject: { ...subject, isRestrictedTime: true }, collisions };
+                }
+
                 // Find if there's an existing subject in the slot for 'S' or 'L' week types
                 let existingSLSubject = null;
 
@@ -636,14 +639,10 @@ function TimetableMaker() {
                     return slot; // No changes, the slot is full
                 }
             });
-            //updatedSlots.type=type;
             return { ...daySchedule, slots: updatedSlots };
         });
 
         setTimetable(updatedTimetable);
-
-
-
     };
 
 
@@ -827,16 +826,24 @@ function TimetableMaker() {
                                                 >x
                                                 </button>
                                             )}
-                                            <div className="department-shortname">
-                                                {slot.primarySubject.department} / {slot.primarySubject.shortName}
-                                            </div>
-                                            <div className="building-room">
-                                                {slot.primarySubject.building} - {slot.primarySubject.room}
-                                            </div>
-                                            <div className="teacher-name">
-                                                {slot.primarySubject.teacher}
-                                            </div>
-                                            {slot.primarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.primarySubject.weekType)))}</div>}
+                                            {slot.primarySubject.isRestrictedTime ? (
+                                                <div className="restricted-time-name">
+                                                    {slot.primarySubject.name}
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="department-shortname">
+                                                        {slot.primarySubject.department} / {slot.primarySubject.shortName}
+                                                    </div>
+                                                    <div className="building-room">
+                                                        {slot.primarySubject.building} - {slot.primarySubject.room}
+                                                    </div>
+                                                    <div className="teacher-name">
+                                                        {slot.primarySubject.teacher}
+                                                    </div>
+                                                    {slot.primarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.primarySubject.weekType)))}</div>}
+                                                </>
+                                            )}
                                         </div>
                                         </>
                                     )}
@@ -854,16 +861,24 @@ function TimetableMaker() {
                                                 >x
                                                 </button>
                                             )}
-                                            <div className="department-shortname">
-                                                {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
-                                            </div>
-                                            <div className="building-room">
-                                                {slot.secondarySubject.building} - {slot.secondarySubject.room}
-                                            </div>
-                                            <div className="teacher-name">
-                                                {slot.secondarySubject.teacher}
-                                            </div>
-                                            {slot.secondarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.secondarySubject.weekType)))}</div>}
+                                            {slot.secondarySubject.isRestrictedTime ? (
+                                                <div className="restricted-time-name">
+                                                    {slot.secondarySubject.name}
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <div className="department-shortname">
+                                                        {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
+                                                    </div>
+                                                    <div className="building-room">
+                                                        {slot.secondarySubject.building} - {slot.secondarySubject.room}
+                                                    </div>
+                                                    <div className="teacher-name">
+                                                        {slot.secondarySubject.teacher}
+                                                    </div>
+                                                    {slot.secondarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.secondarySubject.weekType)))}</div>}
+                                                </>
+                                            )}
                                         </div>
                                         </>
                                     )}
@@ -900,11 +915,9 @@ function TimetableMaker() {
                             <div key={restricted.id} className="subject-item">
                                 <button className='button'
                                         key={restricted.id}
-                                        onClick={() => addToTimetable(restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo)}>
-                                    {restricted.name} {restricted.day} {restricted.timeFrom} - {restricted.timeTo}
-
+                                        onClick={() => addToTimetable(restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo, restricted.type, restricted.department, restricted.shortName, restricted.building, restricted.room, restricted.teacher, restricted.weekType, true)}>
+                                    {restricted.name} {t(dayKeys.find(key => key.includes(restricted.day)))} {restricted.timeFrom} - {restricted.timeTo}
                                 </button>
-
 
                                 <button className="delete-button"
                                         onClick={() => deleteSubjectFromTimetable(restricted)}>❌
@@ -912,7 +925,7 @@ function TimetableMaker() {
                             </div>))}
                     </div>
 
-                    {selectedSubject && !isAlertOpen &&(
+                    {selectedSubject && !isAlertOpen && (
                         <div className="subject-details">
                             <h4>{t('SubjectDetails')}</h4>
                             {subjectSchedule.lectures.length > 0 && (
@@ -1062,7 +1075,7 @@ function TimetableMaker() {
                 </div>
                 <div className="form-group">
                     {showRestrictedLoader &&
-                        <RestrictedTimeForm days={days} times={times} onAddSubject={handleAddSubject}/>}
+                        <RestrictedTimeForm  times={times} onAddSubject={handleAddSubject} />}
                 </div>
             </div>
             <AlertModal

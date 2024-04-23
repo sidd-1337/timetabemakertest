@@ -56,16 +56,17 @@
     "LoadSubjectStag": "Načíst předmět ze STAGU",
     "TimeSlotOccupiedMessage": "Tento úsek je již obsazen. Jakou akce si přejete provést?",
     "ExportAsPDF": "Vygenerovat PDF",
-    "day_Po": "Pondělí",
-    "day_Út": "Úterý",
-    "day_St": "Středa",
-    "day_Čt": "Čtvrtek",
-    "day_Pá": "Pátek",
+    "Po": "Pondělí",
+    "Út": "Úterý",
+    "St": "Středa",
+    "Čt": "Čtvrtek",
+    "Pá": "Pátek",
     "Week": "Týden: ",
     "weekType_S": "Sudý",
     "weekType_L": "Lichý",
     "weekType_J": "Každý",
-    "weekType_SL": "Sudý/Lichý"
+    "weekType_SL": "Sudý/Lichý",
+    "TimeToTimeFrom": "Čas od nemůže být později než Čas do."
 }
 
 
