@@ -759,7 +759,7 @@ function TimetableMaker() {
         setTimetable(prevTimetable => prevTimetable.map(daySchedule => {
             if (daySchedule.day !== day) return daySchedule; // Skip days that don't match
 
-            // Find the indices of slots to remove by checking if the slot's primary or secondary subject matches the session name and type
+            // Find the indices of slots to remove by checking if the slot's primary or secondary subject matches the session NAME and type
             const slotsToRemove = daySchedule.slots.reduce((indices, slot, index) => {
                 if ((slot.primarySubject && slot.primarySubject.name === sessionName && slot.primarySubject.type === sessionType) ||
                     (slot.secondarySubject && slot.secondarySubject.name === sessionName && slot.secondarySubject.type === sessionType)) {
