@@ -70,6 +70,7 @@ function TimetableMaker() {
     const [showLectureColorPicker, setShowLectureColorPicker] = useState(false);
     const [showTutorialColorPicker, setShowTutorialColorPicker] = useState(false);
     const [showColorWheel, setShowColorWheel] = useState(false); // New state to toggle color wheel display
+    const [isEditingDoneSubject, setIsEditingDoneSubject] = useState(false);
 
     const determineSlotColor = (slot, order) => {
         console.log(`Determining color for type: ${slot.type}`); // Debugging log
@@ -421,66 +422,65 @@ function TimetableMaker() {
 
 
 
-    const handleSubjectSelect = subjectId => {
-        // If the selected subject is clicked again, deselect it
-        if (selectedSubject && selectedSubject.id === subjectId) {
-            setSelectedSubject(null);
-            setSubjectSchedule({ lectures: [], tutorials: [] }); // Reset subject schedule
-            setShowLectureColorPicker(false);
-            setShowTutorialColorPicker(false);
-        } else {
-            // Find and select the new subject
-            const subject = subjects.find(subj => subj.id === subjectId);
-            if (!subject) {
-                console.error('Subject not found:', subjectId);
-                return;
-            }
-            setSelectedSubject(subject);
-            setSubjectSchedule(subject.details);
-            setSelectedLecture(null);
-            setSelectedTutorial(null);
-            confirmSubjectSelection(subject);
-            setShowLectureColorPicker(false);
-            setShowTutorialColorPicker(false);
+    const handleSubjectSelect = (subjectId, fromDoneSubjects = false) => {
+        const subjectList = fromDoneSubjects ? doneSubjects : subjects;
 
-            // Check if the subject has predefined colors; if not, reset to default white
-            const subjectLectureColor = subject.colors?.lectureColor || { h: 0, s: 0, v: 100, a: 1 };
-            const subjectTutorialColor = subject.colors?.tutorialColor || { h: 0, s: 0, v: 100, a: 1 };
-            setLectureColor(subjectLectureColor);
-            setTutorialColor(subjectTutorialColor);
+        const subject = subjectList.find(subj => subj.id === subjectId);
+        if (!subject) {
+            console.error('Subject not found:', subjectId);
+            return;
         }
+
+        setIsEditingDoneSubject(fromDoneSubjects);
+        setSelectedSubject(subject);
+        setSubjectSchedule(subject.details);
+        setSelectedLecture(null);
+        setSelectedTutorial(null);
+        confirmSubjectSelection(subject);
+        setShowLectureColorPicker(false);
+        setShowTutorialColorPicker(false);
+
+        // Set colors
+        const subjectLectureColor = subject.colors?.lectureColor || { h: 0, s: 0, v: 100, a: 1 };
+        const subjectTutorialColor = subject.colors?.tutorialColor || { h: 0, s: 0, v: 100, a: 1 };
+        setLectureColor(subjectLectureColor);
+        setTutorialColor(subjectTutorialColor);
     };
 
 
+
+
     const handleConfirm = () => {
-        // Make sure we have a selected lecture and/or tutorial if they are required
-        if (
-            (subjectSchedule.lectures.length > 0 && !selectedLecture) ||
-            (subjectSchedule.tutorials.length > 0 && !selectedTutorial)
-        ) {
+        if ((subjectSchedule.lectures.length > 0 && !selectedLecture) ||
+            (subjectSchedule.tutorials.length > 0 && !selectedTutorial)) {
             alert(t('SelectBoth'));
             return;
         }
-        // Add subject to doneSubjects with its current color settings
+
+        // Update subject colors
         const updatedSubject = {
             ...selectedSubject,
-            // Include color data directly within the subject
             colors: {
                 lectureColor: lectureColor,
                 tutorialColor: tutorialColor
             }
         };
-        // Confirm the selection and add to doneSubjects
-        setDoneSubjects([...doneSubjects, updatedSubject]);
-        // Remove from current subjects list
-        setSubjects(subjects.filter((subj) => subj.id !== updatedSubject.id));
-        // Reset the selected subject and the selected sessions for confirmation
+
+        if (isEditingDoneSubject) {
+            setDoneSubjects(doneSubjects.map(subj => subj.id === updatedSubject.id ? updatedSubject : subj));
+        } else {
+            setDoneSubjects([...doneSubjects, updatedSubject]);
+            setSubjects(subjects.filter((subj) => subj.id !== updatedSubject.id));
+        }
+
+        // Reset selected states
         setSelectedSubject(null);
         setSelectedLecture(null);
         setSelectedTutorial(null);
-        // Reset the confirmation subject
         setToConfirmSubject(null);
+        setIsEditingDoneSubject(false);
     };
+
 
 
     const handleReject = () => {
@@ -758,27 +758,18 @@ function TimetableMaker() {
         setTimetable(prevTimetable => prevTimetable.map(daySchedule => {
             if (daySchedule.day !== day) return daySchedule; // Skip days that don't match
 
-            // Find the indices of slots to remove by checking if the slot's primary or secondary subject matches the session NAME and type
-            const slotsToRemove = daySchedule.slots.reduce((indices, slot, index) => {
-                if ((slot.primarySubject && slot.primarySubject.name === sessionName && slot.primarySubject.type === sessionType) ||
-                    (slot.secondarySubject && slot.secondarySubject.name === sessionName && slot.secondarySubject.type === sessionType)) {
-                    indices.push(index);
-                }
-                return indices;
-            }, []);
-
-            if (slotsToRemove.length === 0) return daySchedule; // If no matching slots found, return the day schedule as is
-
             // Map over slots to update them
             return {
                 ...daySchedule,
                 slots: daySchedule.slots.map((slot, index) => {
-                    if (slotsToRemove.includes(index)) {
+                    // Check if the slot's primary or secondary subject matches the session NAME and TYPE
+                    if ((slot.primarySubject && slot.primarySubject.name === sessionName && slot.primarySubject.type === sessionType) ||
+                        (slot.secondarySubject && slot.secondarySubject.name === sessionName && slot.secondarySubject.type === sessionType)) {
                         // Clear the subject from the slot
                         return {
                             ...slot, collisions,
-                            primarySubject: slot.primarySubject && slot.primarySubject.name === sessionName ? null : slot.primarySubject,
-                            secondarySubject: slot.secondarySubject && slot.secondarySubject.name === sessionName ? null : slot.secondarySubject,
+                            primarySubject: null,
+                            secondarySubject: null,
                         };
                     }
                     return slot;
@@ -786,6 +777,7 @@ function TimetableMaker() {
             };
         }));
     };
+
 
 
 
@@ -1047,7 +1039,7 @@ function TimetableMaker() {
                         <h4>{t('DoneSubjects')}</h4>
                         {doneSubjects.map(subject => (
                             <div key={subject.id} className="subject-item">
-                                <button className="button">
+                                <button className="button" onClick={() => handleSubjectSelect(subject.id, true)}>
                                     {subject.name}
                                 </button>
                                 <button className="undo-button" onClick={() => undoSubject(subject)}>
