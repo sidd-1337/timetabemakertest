@@ -547,7 +547,7 @@ function TimetableMaker() {
 
 
     // Function to add a lecture/tutorial to the timetable
-    const addToTimetable = (subjectName, day, timeFrom, timeTo, type, department, shortName, building, room, teacher, weekType, isRestrictedTime = false) => {
+    const addToTimetable = (id, subjectName, day, timeFrom, timeTo, type, department, shortName, building, room, teacher, weekType, isRestrictedTime = false) => {
         const daySchedule = timetable.find(d => d.day === day);
         if (!daySchedule) {
             console.error(`Day not found in timetable: ${day}`);
@@ -557,6 +557,7 @@ function TimetableMaker() {
         const collisions = checkForCollisions(subjectName, day, timeFrom, timeTo, weekType);
 
         const subject = {
+            id,
             name: subjectName,
             type,
             department,
@@ -754,7 +755,7 @@ function TimetableMaker() {
     const isSubjectDone = (subjectName) => {
         return doneSubjects.some(subject => subject.name === subjectName);
     };
-    const removeSpecificSession = (day, sessionType, sessionName, collisions) => {
+    const removeSpecificSession = (day, sessionType, id, collisions) => {
         setTimetable(prevTimetable => prevTimetable.map(daySchedule => {
             if (daySchedule.day !== day) return daySchedule; // Skip days that don't match
 
@@ -762,9 +763,9 @@ function TimetableMaker() {
             return {
                 ...daySchedule,
                 slots: daySchedule.slots.map((slot, index) => {
-                    // Check if the slot's primary or secondary subject matches the session NAME and TYPE
-                    if ((slot.primarySubject && slot.primarySubject.name === sessionName && slot.primarySubject.type === sessionType) ||
-                        (slot.secondarySubject && slot.secondarySubject.name === sessionName && slot.secondarySubject.type === sessionType)) {
+                    // Check if the slot's primary or secondary subject matches the session ID and TYPE
+                    if ((slot.primarySubject && slot.primarySubject.id === id && slot.primarySubject.type === sessionType) ||
+                        (slot.secondarySubject && slot.secondarySubject.id === id && slot.secondarySubject.type === sessionType)) {
                         // Clear the subject from the slot
                         return {
                             ...slot, collisions,
@@ -814,7 +815,7 @@ function TimetableMaker() {
                                             }}>
                                             {!isSubjectDone(slot.primarySubject.name) && (
                                                 <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                        onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.name)}
+                                                        onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
                                                 >x
                                                 </button>
                                             )}
@@ -849,7 +850,7 @@ function TimetableMaker() {
                                             <div className="slot-divider"></div>
                                             {!isSubjectDone(slot.secondarySubject.name) && (
                                                 <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                        onClick={() => removeSpecificSession(daySchedule.day, slot.secondarySubject.type, slot.secondarySubject.name)}
+                                                        onClick={() => removeSpecificSession(daySchedule.day, slot.secondarySubject.type, slot.secondarySubject.id)}
                                                 >x
                                                 </button>
                                             )}
@@ -907,7 +908,7 @@ function TimetableMaker() {
                             <div key={restricted.id} className="subject-item">
                                 <button className='button'
                                         key={restricted.id}
-                                        onClick={() => addToTimetable(restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo, restricted.type, restricted.department, restricted.shortName, restricted.building, restricted.room, restricted.teacher, restricted.weekType, true)}>
+                                        onClick={() => addToTimetable(restricted.id,restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo, restricted.type, restricted.department, restricted.shortName, restricted.building, restricted.room, restricted.teacher, restricted.weekType, true)}>
                                     {restricted.name} {t(dayKeys.find(key => key.includes(restricted.day)))} {restricted.timeFrom} - {restricted.timeTo}
                                 </button>
 
@@ -963,7 +964,7 @@ function TimetableMaker() {
                                     key={lecture.id}
                                     onClick={() => {
                                         selectSessionForConfirmation(lecture);
-                                        addToTimetable(lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType);
+                                        addToTimetable(lecture.id, lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType);
                                     }}
                                 >
                                     {t(dayKeys.find(key => key.includes(lecture.day)))} <br/>  {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
@@ -1014,7 +1015,7 @@ function TimetableMaker() {
                                     key={tutorial.id}
                                     onClick={() => {
                                         selectSessionForConfirmation(tutorial);
-                                        addToTimetable(tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType);
+                                        addToTimetable(tutorial.id, tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType);
                                     }}
                                 >
                                     {t(dayKeys.find(key => key.includes(tutorial.day)))} <br/> {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}
