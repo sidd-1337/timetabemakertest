@@ -29,7 +29,7 @@
     "TimeSlotOccupied": "Časový úsek je obsazený",
     "AddRestrictedTime": "Přidat vlastní vyhrazený úsek",
     "Name": "Název ",
-    "TimeTo": "Čas do",
+    "To": "do",
     "TimeFrom": "Čas od",
     "Day": "Den",
     "ChooseDay": "Vyber den",

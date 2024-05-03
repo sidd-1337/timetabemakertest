@@ -1,5 +1,4 @@
 import React, { useState, useEffect, startTransition } from 'react';
-import './TableGenius.css';
 import './TableGeniusNew.css';
 import { useTranslation } from 'react-i18next';
 import Header from '../Header';
@@ -129,7 +128,6 @@ function TableGenius() {
                 console.error('Error handling generation:', error);
             }
         };
-
      */
 
     // Function to handle form input changes
@@ -180,7 +178,6 @@ function TableGenius() {
         event.preventDefault();
         fetchData();
     };
-
      */
 
     const filteredProgrammes =  programme.length >= 2 && !programmesList.some(prog => prog.nazevCZ === programme)
@@ -286,8 +283,6 @@ function TableGenius() {
                 )}
             </div>
 
-
-
             <button type="button" className="front-btn-primary-back" onClick={handleBackStep}>{t('Back')}</button>
             <button type="button" className="front-btn-primary-next" onClick={handleImportSubjects}>{t('Import subjects')}</button>
             {showForm && (!programmesList.some(prog => prog.nazevCZ === programme) && programme.length>0) && (
@@ -302,7 +297,6 @@ function TableGenius() {
                     {t('You must fill in all the boxes')}
                 </div>
             )}
-
         </form>
     );
 
