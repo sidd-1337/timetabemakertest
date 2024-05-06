@@ -752,34 +752,57 @@ function TimetableMaker() {
         }));
     };
 
+    /* Function that removes "remove button" when subject is in "done subjects"
     const isSubjectDone = (subjectName) => {
         return doneSubjects.some(subject => subject.name === subjectName);
     };
-    const removeSpecificSession = (day, sessionType, id, collisions) => {
+    */
+    const removeSpecificSession = (day, sessionType, id) => {
         setTimetable(prevTimetable => prevTimetable.map(daySchedule => {
             if (daySchedule.day !== day) return daySchedule; // Skip days that don't match
 
-            // Map over slots to update them
             return {
                 ...daySchedule,
                 slots: daySchedule.slots.map((slot, index) => {
-                    // Check if the slot's primary or secondary subject matches the session ID and TYPE
-                    if ((slot.primarySubject && slot.primarySubject.id === id && slot.primarySubject.type === sessionType) ||
-                        (slot.secondarySubject && slot.secondarySubject.id === id && slot.secondarySubject.type === sessionType)) {
-                        // Clear the subject from the slot
-                        return {
-                            ...slot, collisions,
-                            primarySubject: null,
-                            secondarySubject: null,
-                        };
+                    let updatedSlot = { ...slot };
+
+                    if (updatedSlot.primarySubject && updatedSlot.primarySubject.id === id && updatedSlot.primarySubject.type === sessionType) {
+                        updatedSlot.primarySubject = null;
+                    } else if (updatedSlot.secondarySubject && updatedSlot.secondarySubject.id === id && updatedSlot.secondarySubject.type === sessionType) {
+                        updatedSlot.secondarySubject = null;
                     }
-                    return slot;
+
+                    // Update collisions after removing the subject
+                    updatedSlot.collisions = findCollisions(updatedSlot);
+
+                    return updatedSlot;
                 }),
             };
         }));
     };
 
+// Helper function to find collisions for a specific slot
+    const findCollisions = (slot) => {
+        let collisions = [];
 
+        if (slot.primarySubject) {
+            collisions = timetable.flatMap(daySchedule =>
+                daySchedule.slots.flatMap(slot =>
+                    [slot.primarySubject, slot.secondarySubject].filter(Boolean)
+                )
+            ).filter(subject => subject.id !== slot.primarySubject.id); // Exclude current subject
+        }
+
+        if (slot.secondarySubject) {
+            collisions = timetable.flatMap(daySchedule =>
+                daySchedule.slots.flatMap(slot =>
+                    [slot.primarySubject, slot.secondarySubject].filter(Boolean)
+                )
+            ).filter(subject => subject.id !== slot.secondarySubject.id); // Exclude current subject
+        }
+
+        return collisions.map(subject => subject.name);
+    };
 
 
 
@@ -813,7 +836,7 @@ function TimetableMaker() {
                                                 backgroundColor: determineSlotColor(slot, "Primary"),
                                                 borderRadius: "3px"
                                             }}>
-                                            {!isSubjectDone(slot.primarySubject.name) && (
+                                            {(slot.primarySubject.name) && (
                                                 <button className="remove-subject-button" title={t('RemoveSubject')}
                                                         onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
                                                 >x
@@ -848,7 +871,7 @@ function TimetableMaker() {
                                                 borderRadius: "3px"
                                             }}>
                                             <div className="slot-divider"></div>
-                                            {!isSubjectDone(slot.secondarySubject.name) && (
+                                            {(slot.secondarySubject.name) && (
                                                 <button className="remove-subject-button" title={t('RemoveSubject')}
                                                         onClick={() => removeSpecificSession(daySchedule.day, slot.secondarySubject.type, slot.secondarySubject.id)}
                                                 >x
