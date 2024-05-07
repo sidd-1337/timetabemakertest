@@ -62,6 +62,7 @@ p {
 
 label {
     margin-right: 20px;
+    color: white;
 }
 
 /*Section box*/
@@ -123,8 +124,8 @@ form input {
 
 .content-right {
     flex: 1;
-    padding-left: 2rem;
-    padding-top: 8rem;
+    /*padding-left: 2rem;*/
+    padding-top: 4rem;
 }
 
 .content-center {
@@ -421,11 +422,11 @@ input.check-toggle-round-flat:checked + label:after {
 }
 
 .custom-button:hover {
-    background-color: #07155d;
+    background-color: black;
 }
 
 .custom-button:active {
-    background-color: #07155d;
+    background-color: black;
 }
 
 .custom-button.clicked {
@@ -440,7 +441,7 @@ input.check-toggle-round-flat:checked + label:after {
 
 .buttons button {
     padding: 0.7rem 1.2rem;
-    border: 1px solid #184486;
+    border: 1px solid #102F52;
     border-radius: 4px;
     cursor: pointer;
     color: white;
@@ -448,7 +449,7 @@ input.check-toggle-round-flat:checked + label:after {
 }
 
 .btn-primary {
-    background-color: #184486;
+    background-color: #102F52;
     color: black;
     padding: 0.7rem 1.2rem;
     border: none;
@@ -457,7 +458,7 @@ input.check-toggle-round-flat:checked + label:after {
 }
 
 .buttons .btn-primary {
-    background-color: #184486;
+    background-color: #102F52;
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -466,12 +467,12 @@ input.check-toggle-round-flat:checked + label:after {
 }
 
 .buttons .btn-primary:hover {
-    background-color: #07155d;
+    background-color: black;
     border-radius: 5px;
 }
 
 .btn-primary-back{
-    background-color: #184486;
+    background-color: #102F52;
     color: black;
     padding: 0.7rem 1.2rem;
     border: black;
@@ -481,7 +482,7 @@ input.check-toggle-round-flat:checked + label:after {
 }
 
 .btn-primary-next {
-    background-color: #184486;
+    background-color: #102F52;
     color: black;
     padding: 0.7rem 1.2rem;
     border: black;

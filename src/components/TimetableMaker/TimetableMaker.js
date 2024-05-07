@@ -13,7 +13,6 @@ import './AlertModal.css';
 import { SketchPicker } from 'react-color';
 import { Wheel } from '@uiw/react-color';
 import { hsvaToHex } from '@uiw/color-convert';
-import { IoColorPalette } from "react-icons/io5";
 import { IoColorPaletteSharp } from "react-icons/io5";
 import { Compact } from '@uiw/react-color';
 
@@ -704,8 +703,8 @@ function TimetableMaker() {
     };
 
     const ConfirmSubjectSelection = ({ onConfirm, onReject, subject }) => (
+        /*<h5>{t('ConfirmSelectionFor')} {subject.name}</h5>*/
         <div>
-            <h5>{t('ConfirmSelectionFor')} {subject.name}</h5>
             <button className="btn btn-success" onClick={() => onConfirm(subject)}>DONE</button>
             <button className="btn btn-danger" onClick={() => onReject()}>RESET</button>
         </div>
@@ -811,7 +810,7 @@ function TimetableMaker() {
                                                 {!isSubjectDone(slot.primarySubject.name) && (
                                                     <button className="remove-subject-button" title={t('RemoveSubject')}
                                                             onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
-                                                    >x
+                                                    ><img src="/images/trash.svg"/>
                                                     </button>
                                                 )}
                                                 <div className="department-shortname">
@@ -838,7 +837,7 @@ function TimetableMaker() {
                                                 {!isSubjectDone(slot.secondarySubject.name) && (
                                                     <button type="button" className="btn btn-primary remove-subject-button" title={t('RemoveSubject')}
                                                             style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
-                                                        X
+                                                        <img src="/images/trash.svg"/>
                                                     </button>
                                                 )}
                                                 <div className="department-shortname">
@@ -870,7 +869,8 @@ function TimetableMaker() {
                                     {subject.name}
                                 </button>
                                 <button className="delete-button"
-                                        onClick={() => deleteSubjectFromTimetable(subject)}>x
+                                        onClick={() => deleteSubjectFromTimetable(subject)}><img
+                                    src="/images/trash.svg"/>
                                 </button>
                             </div>
                         ))}
@@ -882,6 +882,7 @@ function TimetableMaker() {
                                 {/* Text displayed under the clock */}
                             </div>
                         )}
+                        <hr/>
                         <div className="buttons buttons-left">
                             <button className="btn-primary" onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
                                 {showSubjectLoader ? t('HideForm') : t('LoadSubjectStag')}
@@ -890,6 +891,7 @@ function TimetableMaker() {
                         <div className="form-group">
                             {showSubjectLoader && <SubjectLoaderForm onSubjectAdded={handleSubjectAdded}/>}
                         </div>
+                        <hr/>
                         <h3>{t('RestrictedTimes')}</h3>
                         {uniqueSessions(restrictedTimes).map(restricted => (
                             <div key={restricted.id} className="subject-item">
@@ -901,7 +903,8 @@ function TimetableMaker() {
 
                                 <button className="delete-button"
                                         onClick={() => deleteSubjectFromTimetable(restricted)}>
-                                    <button className="delete-button" title={t('RemoveSubject')}>x</button>
+                                    <button className="delete-button" title={t('RemoveSubject')}><img
+                                        src="/images/trash.svg"/></button>
                                 </button>
                             </div>))}
 
@@ -923,12 +926,12 @@ function TimetableMaker() {
                                     <h4>{t('Lectures')}</h4>
                                     <div className="palette"> <IoColorPaletteSharp
                                         onClick={() => setShowLectureColorPicker(!showLectureColorPicker)}
-                                        style={{cursor: 'pointer'}}/></div>
+                                        style={{cursor: 'pointer',color:'white',transform: 'translateY(2px)'}}/></div>
                                     {showLectureColorPicker && (
                                         <div className="color-picker-combined-wrapper">
                                             <div className="compact-color-picker-wrapper" style={{
                                                 display: 'inline-block',
-                                                transform: 'scale(0.8)',
+                                                transform: 'scale(0.8) translateY(7px)',
                                                 transformOrigin: 'top left'
                                             }}>
                                                 <Compact
@@ -945,7 +948,8 @@ function TimetableMaker() {
                                             <div className="wheel-container" style={{
                                                 display: 'inline-block',
                                                 verticalAlign: 'top',
-                                                marginLeft: '-10px'
+                                                marginLeft: '-10px',
+                                                transform: 'translateY(7px)',
                                             }}>
                                                 <Wheel
                                                     key={`wheel-${selectedSubject.id}`}
@@ -981,14 +985,15 @@ function TimetableMaker() {
 
                             {subjectSchedule.tutorials.length > 0 && (
                                 <div className="tutorial-section">
-                                    <h4>{t('Tutorials')}<IoColorPaletteSharp
+                                    <h4>{t('Tutorials')}</h4>
+                                        <div className="palette"> <IoColorPaletteSharp
                                         onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)}
-                                        style={{cursor: 'pointer'}}/></h4>
+                                        style={{cursor: 'pointer', color:'white', transform: 'translateY(2px)'}}/></div>
                                     {showTutorialColorPicker && (
                                         <div className="color-picker-combined-wrapper">
                                             <div className="compact-color-picker-wrapper" style={{
                                                 display: 'inline-block',
-                                                transform: 'scale(0.8)',
+                                                transform: 'scale(0.8) translateY(7px)',
                                                 transformOrigin: 'top left'
                                             }}>
                                                 <Compact
@@ -1005,7 +1010,8 @@ function TimetableMaker() {
                                             <div className="wheel-container" style={{
                                                 display: 'inline-block',
                                                 verticalAlign: 'top',
-                                                marginLeft: '-10px'
+                                                marginLeft: '-10px',
+                                                transform: 'translateY(7px)',
                                             }}>
                                                 <Wheel
                                                     key={`wheel-${selectedSubject.id}`}

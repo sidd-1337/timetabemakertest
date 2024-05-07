@@ -64,12 +64,13 @@
 
 /*Subject selection box*/
 .subject-selection {
-    border: 2px solid #184486; /* Change color and thickness as needed */
+    border: 2px solid #102F52; /* Change color and thickness as needed */
     border-radius: 5px;
     padding: 10px;
     margin-top: 10px;
     margin-bottom: 25px;
-    background-color: lightslategray;
+    background-color: #5A8BB3;
+    width: 325px;
 }
   
 .subject-selection:before {
@@ -83,40 +84,40 @@
     padding: 0.7rem 1.2rem;
     display: block;
     margin: 5px 0;
-    border: 2px solid #184486;
+    border: 2px solid #102F52;
     border-radius: 5px;
     cursor: pointer;
     color: white;
-    background-color: steelblue;
+    background-color: #0871BA;
 }
 
 .subject-selection button:focus {
-    border: 2px solid #184486;
+    border: 2px solid #102F52;
     border-radius: 5px;
 }
 
 .subject-selection .button:hover {
-   background-color: #184486 ;
+   background-color: #102F52 ;
 }
 
 .selected-subject .button {
-    background-color: #184486; /* Example color, change it as needed */;
+    background-color: #102F52; /* Example color, change it as needed */;
 }
 
   /*Subject details*/
 .subject-details .button {
     display: inline;
     padding: 7.5px;
-    border: 2px solid #184486;
+    border: 2px solid #102F52;
     border-radius: 5px;
     cursor: pointer;
-    background-color: steelblue;
+    background-color: #0871BA;
     color:white;
     gap: 1rem;
 }
 
 .subject-details button:hover {
-    background-color: #184486;
+    background-color: #102F52;
 }
 
 /*Remove button*/
@@ -130,7 +131,7 @@
   transition: all .2s;
 }
 
-.remove-subject-button:hover, .delete-button:hover {
+.remove-subject-button:hover {
   transform: scale(1.5);
     background: red;
 }
@@ -146,7 +147,7 @@
 
 /*Subject details box */
 .subject-details {
-    border: 2px solid #184486; /* Change color and thickness as needed */
+    border: 2px solid #102F52; /* Change color and thickness as needed */
     border-radius: 5px;
     padding: 10px;
     margin-top: 10px;
@@ -154,7 +155,7 @@
     transform: translateX(-50%);
     position:absolute;
     left:50%;
-    background-color: lightslategray;
+    background-color: #5A8BB3;
 }
 
 .subject-details:before {
@@ -165,12 +166,12 @@
 
 /*Done subjects box*/
 .done-subjects {
-    border: 2px solid #184486; /* Change color and thickness as needed */
+    border: 2px solid #102F52; /* Change color and thickness as needed */
     border-radius: 5px;
     padding: 10px;
     margin-top: 10px;
     margin-left: auto;
-    background-color: lightslategray;
+    background-color: #5A8BB3;
 }
 
 .done-subjects:before {
@@ -256,11 +257,6 @@
   transition: all .2s;
   /* Adjust size, padding, and margins as needed */
 }
-
-.subject-item .delete-button:hover {
-  transform: scale(1.5);
-}
-
 
 .pdf-export .collision-indicator {
   display: none;
@@ -362,16 +358,19 @@
 h5 {
   margin-top: 30px;
   margin-bottom: 8px;
+    color:white;
 }
 
 h4 {
   margin-top: 10px;
   margin-bottom: 10px;
+    color:white;
 }
 
 h3 {
   margin-bottom: 5px;
   margin-top: 5px;
+    color:white;
 }
 
 .btn {
@@ -386,7 +385,8 @@ h3 {
 
 .btn-success {
     background-color: green;
-    border-color: #184486;
+    border-color: #102F52;
+    margin-top: 10px;
 }
 
 .btn-success:hover {
@@ -400,9 +400,20 @@ h3 {
 
 .btn-danger {
     background-color: darkred;
-    border-color: #184486;
+    border-color: #102F52;
+    margin-top: 10px;
 }
 
 button .btn-danger:hover {
     background-color: darkred;
+}
+
+color-picker-combined-wrapper {
+    position: relative;
+    top: -50px;
+}
+
+hr {
+    padding: 1px;
+    background-color: white;
 }
