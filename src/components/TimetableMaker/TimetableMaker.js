@@ -948,6 +948,7 @@ function TimetableMaker() {
                                 <div className="lecture-section">
                                     <h4>{t('Lectures')}<IoColorPalette onClick={() => setShowLectureColorPicker(!showLectureColorPicker)} style={{ cursor: 'pointer' }} /></h4>
                                     {showLectureColorPicker && (
+                                        <div className="color-picker-background">
                                         <div className="color-picker-combined-wrapper">
                                             <div className="compact-color-picker-wrapper" style={{ display: 'inline-block', transform: 'scale(0.8)', transformOrigin: 'top left' }}>
                                                 <Compact
@@ -977,6 +978,7 @@ function TimetableMaker() {
 
                                             </div>
                                         </div>
+                                        </div>
                                     )}
                                 </div>
                             )}
@@ -999,6 +1001,7 @@ function TimetableMaker() {
                                 <div className="tutorial-section">
                                     <h4>{t('Tutorials')}<IoColorPalette onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)} style={{ cursor: 'pointer' }} /></h4>
                                     {showTutorialColorPicker && (
+                                        <div className="color-picker-background">
                                         <div className="color-picker-combined-wrapper">
                                             <div className="compact-color-picker-wrapper" style={{ display: 'inline-block', transform: 'scale(0.8)', transformOrigin: 'top left' }}>
                                                 <Compact
@@ -1026,6 +1029,7 @@ function TimetableMaker() {
                                                     height={50}
                                                 />
 
+                                            </div>
                                             </div>
                                         </div>
                                     )}

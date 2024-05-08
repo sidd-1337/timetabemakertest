@@ -7,14 +7,36 @@
     padding: 1rem;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow-x: auto; /* Enables horizontal scrolling */
   }
+
+@media (max-width: 768px) {
+  .timetable-canvas {
+    grid-template-columns: 100px repeat(17, minmax(30px, 1fr)); /* Even smaller minimum width for very small screens */
+  }
+}
+
+.timetable-canvas::-webkit-scrollbar {
+  height: 10px;
+  background-color: #f9f9f9;
+  }
+
+.timetable-canvas::-webkit-scrollbar-thumb {
+  background-color: #b0bec5;
+  border-radius: 5px;
+  border: 2px solid #f9f9f9;
+}
+
+.timetable-canvas::-webkit-scrollbar-track {
+  background-color: #e0e0e0;
+  border-radius: 5px;
+}
   
   .time-header {
     padding: 4px;
     grid-column: 2 / -1; /* Time headers start from the second column */
     display: grid;
     grid-template-columns: repeat(17, 1fr);
-
   }
 
   .time-slot-header {
@@ -312,5 +334,21 @@
   display: inline-block; /* Allows the transform to apply correctly */
   position:relative;
   z-index: 10;
-  /* Add any additional positioning or spacing styles here */
 }
+
+@keyframes contentShow {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.color-picker-background {
+   background-color: #ffffff;  /* White background */
+   padding: 5px;              /* Padding around the color picker */
+   border-radius: 5px;         /* Optional: rounded corners */
+   box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: slight shadow for depth */
+   display: inline-block;      /* Keeps the wrapper tight around the content */
+   margin-bottom: 5px;        /* Spacing below the picker */
+   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+ }
+
+
