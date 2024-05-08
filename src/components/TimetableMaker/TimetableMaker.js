@@ -744,7 +744,7 @@ function TimetableMaker() {
 
     const ConfirmSubjectSelection = ({ onConfirm, onReject, subject }) => (
         <div>
-            <h3>{t('ConfirmSelectionFor')} {subject.name}</h3>
+
             <button onClick={() => onConfirm(subject)}>{t('Yes')}✅</button>
             <button onClick={() => onReject()}>{t('No')}❌</button>
         </div>
