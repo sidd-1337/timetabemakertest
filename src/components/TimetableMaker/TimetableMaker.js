@@ -505,7 +505,6 @@ function TimetableMaker() {
             setSelectedSubject(null);
             setSelectedLecture(null);
             setSelectedTutorial(null);
-            setDoneSubjects(null);
         }
     };
 
