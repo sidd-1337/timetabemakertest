@@ -39,10 +39,10 @@
     "SubjectAbbreviation": "Zkratka předmětu: ",
     "Department": "Katedra: ",
     "LoadSubject": "Načíst předmět",
-    "SelectBoth": "Je nutné vybrat přednášku i cvičení, pokud jsou k dispozici.",
+    "SelectBoth": "Je nutné vybrat právě jednu přednášku a cvičení, pokud jsou k dispozici.",
     "BothSelected": "Pro tento časový úsek jsou již nastaveny hlavní a vedlejší předměty.",
-    "Yes": "ANO",
-    "No": "NE",
+    "Yes": "Hotovo",
+    "No": "Resetovat",
     "CollisionWith": "Kolize s: ",
     "RemoveSubject": "Odebrat předmět",
     "DoneSubjects": "Hotové předměty",
@@ -66,7 +66,8 @@
     "weekType_L": "Lichý",
     "weekType_J": "Každý",
     "weekType_SL": "Sudý/Lichý",
-    "TimeToTimeFrom": "Čas od nemůže být později než Čas do."
+    "TimeToTimeFrom": "Čas od nemůže být později než Čas do.",
+    "Invalid action": "Neoprávněná akce"
 }
 
 

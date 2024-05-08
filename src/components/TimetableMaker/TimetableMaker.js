@@ -9,6 +9,7 @@ import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { useTranslation } from 'react-i18next';
 import AlertModal from "./AlertModal";
+import OKAlertModal from "./OKAlertModal";
 import './AlertModal.css';
 import { SketchPicker } from 'react-color';
 import { Wheel } from '@uiw/react-color';
@@ -60,8 +61,8 @@ function TimetableMaker() {
     const initialized = useRef(false);
     const [toConfirmSubject, setToConfirmSubject] = useState(null);
     const [doneSubjects, setDoneSubjects] = useState([]);
-    const [selectedLecture, setSelectedLecture] = useState(null);
-    const [selectedTutorial, setSelectedTutorial] = useState(null);
+    const [selectedLectures, setSelectedLectures] = useState([]);
+    const [selectedTutorials, setSelectedTutorials] = useState([]);
     const [showLoadingClock, setShowLoadingClock] = useState(false); // New state for clock symbol visibility
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
@@ -135,13 +136,20 @@ function TimetableMaker() {
         onCancel: () => {}
     });
 
+    const [OKalertInfo, setOKAlertInfo] = useState({
+        isOpen: false,
+        message: '',
+        title: '',
+        onCancel: () => {}
+    });
+
     useEffect(() => {
         // Whenever alertInfo.isOpen changes and if it's true, close the color pickers.
-        if (alertInfo.isOpen) {
+        if (alertInfo.isOpen || OKalertInfo.isOpen) {
             setShowLectureColorPicker(false);
             setShowTutorialColorPicker(false);
         }
-    }, [alertInfo.isOpen]);
+    }, [alertInfo.isOpen, OKalertInfo.isOpen]);
 
 
 
@@ -182,6 +190,7 @@ function TimetableMaker() {
 
         setTimetable(updatedTimetable);
         setAlertInfo({ ...alertInfo, isOpen: false }); // Close the modal
+        setOKAlertInfo({ ...OKalertInfo, isOpen: false });
     };
 
 
@@ -221,7 +230,8 @@ function TimetableMaker() {
         });
 
         setTimetable(updatedTimetable);
-        setAlertInfo({ isOpen: false }); // Assuming you want to close a modal or alert
+        setAlertInfo({ ...alertInfo, isOpen: false }); // Assuming you want to close a modal or alert
+        setOKAlertInfo({ ...OKalertInfo, isOpen: false });
     };
 
 
@@ -404,13 +414,23 @@ function TimetableMaker() {
 
     const selectSessionForConfirmation = (session) => {
         if (session.type === 'Lecture') {
-            setSelectedLecture((prevSelectedLecture) =>
-                prevSelectedLecture && prevSelectedLecture.id === session.id ? null : session
-            );
+            if (selectedLectures.some(sl => sl.id === session.id)) {
+                return false;
+            } else {
+                setSelectedLectures(prevSelectedLectures =>
+                    [...prevSelectedLectures, session]
+                );
+                return true;
+            }
         } else if (session.type === 'Tutorial') {
-            setSelectedTutorial((prevSelectedTutorial) =>
-                prevSelectedTutorial && prevSelectedTutorial.id === session.id ? null : session
-            );
+            if (selectedTutorials.some(st => st.id === session.id)) {
+                return false;
+            } else {
+                setSelectedTutorials(prevSelectedTutorials =>
+                    [...prevSelectedTutorials, session]
+                );
+                return true;
+            }
         }
     };
 
@@ -434,8 +454,8 @@ function TimetableMaker() {
         setIsEditingDoneSubject(fromDoneSubjects);
         setSelectedSubject(subject);
         setSubjectSchedule(subject.details);
-        setSelectedLecture(null);
-        setSelectedTutorial(null);
+        //setSelectedLectures([]);
+        //setSelectedTutorials([]);
         confirmSubjectSelection(subject);
         setShowLectureColorPicker(false);
         setShowTutorialColorPicker(false);
@@ -451,12 +471,23 @@ function TimetableMaker() {
 
 
     const handleConfirm = () => {
-        if ((subjectSchedule.lectures.length > 0 && !selectedLecture) ||
-            (subjectSchedule.tutorials.length > 0 && !selectedTutorial)) {
-            alert(t('SelectBoth'));
-            return;
-        }
+        // Check for required selections based on availability
 
+        const lectureRequiredAndSelectedOnce = subjectSchedule.lectures.length > 0 ? selectedLectures.length === 1 : true;
+
+        const tutorialRequiredAndSelectedOnce = subjectSchedule.tutorials.length > 0 ? selectedTutorials.length === 1 : true;
+
+        // If any of the required selections is not satisfied, show alert and return
+
+        if (!lectureRequiredAndSelectedOnce || !tutorialRequiredAndSelectedOnce) {
+            setOKAlertInfo({
+                isOpen: true,
+                message: t('SelectBoth'),
+                title: t('Invalid action')
+            });
+            return; // Stop the function to wait for user input from the modal
+
+        }
         // Update subject colors
         const updatedSubject = {
             ...selectedSubject,
@@ -475,8 +506,8 @@ function TimetableMaker() {
 
         // Reset selected states
         setSelectedSubject(null);
-        setSelectedLecture(null);
-        setSelectedTutorial(null);
+        setSelectedLectures([]);
+        setSelectedTutorials([]);
         setToConfirmSubject(null);
         setIsEditingDoneSubject(false);
     };
@@ -486,8 +517,8 @@ function TimetableMaker() {
     const handleReject = () => {
         if (selectedSubject) {
             setTimetable(clearTimetable(selectedSubject));
-            setSelectedLecture(null);
-            setSelectedTutorial(null);
+            setSelectedLectures([]);
+            setSelectedTutorials([]);
         }
 
     };
@@ -503,8 +534,8 @@ function TimetableMaker() {
         // Reset the selected subject and its schedule if the deleted subject was the selected one
         if (selectedSubject && selectedSubject.id === subject.id) {
             setSelectedSubject(null);
-            setSelectedLecture(null);
-            setSelectedTutorial(null);
+            setSelectedLectures([]);
+            setSelectedTutorials([]);
             setDoneSubjects(null);
         }
     };
@@ -758,6 +789,21 @@ function TimetableMaker() {
     };
     */
     const removeSpecificSession = (day, sessionType, id) => {
+        if (sessionType === 'Lecture') {
+            if (selectedLectures.some(sl => sl.id === id)) {
+                setSelectedLectures(prevSelectedLectures =>
+                    prevSelectedLectures.filter(sl => sl.id !== id)
+
+                );
+            }
+        } else if (sessionType === 'Tutorial') {
+            if (selectedTutorials.some(st => st.id === id)) {
+                setSelectedTutorials(prevSelectedTutorials =>
+                    prevSelectedTutorials.filter(st => st.id !== id)
+                );
+            }
+        }
+
         setTimetable(prevTimetable => prevTimetable.map(daySchedule => {
             if (daySchedule.day !== day) return daySchedule; // Skip days that don't match
 
@@ -779,6 +825,7 @@ function TimetableMaker() {
                 }),
             };
         }));
+
     };
 
 // Helper function to find collisions for a specific slot
@@ -908,7 +955,8 @@ function TimetableMaker() {
                         <h4>{t('Subjects')}</h4>
                         {subjects.map(subject => (
                             <div key={subject.id} className="subject-item">
-                                <button className='button' key={subject.id}
+                                <button className={`button ${selectedSubject?selectedSubject.id === subject.id ? 'selected' : '' : ""}`}
+                                        key={subject.id}
                                         onClick={() => handleSubjectSelect(subject.id)}>
                                     {subject.name}
                                 </button>
@@ -983,11 +1031,14 @@ function TimetableMaker() {
 
                             {uniqueSessions(subjectSchedule.lectures).map(lecture => (
                                 <button
-                                    className={`button ${selectedLecture && selectedLecture.id === lecture.id ? 'selected' : ''}`}
+                                    className={`button ${selectedLectures.some(l => l.id === lecture.id) ? 'selected' : ''}`}
                                     key={lecture.id}
                                     onClick={() => {
-                                        selectSessionForConfirmation(lecture);
-                                        addToTimetable(lecture.id, lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType);
+                                        if(selectSessionForConfirmation(lecture)) {
+                                            addToTimetable(lecture.id, lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType);
+                                        } else{
+                                            removeSpecificSession(lecture.day,lecture.type,lecture.id)
+                                        }
                                     }}
                                 >
                                     {t(dayKeys.find(key => key.includes(lecture.day)))} <br/>  {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
@@ -1034,11 +1085,15 @@ function TimetableMaker() {
 
                             {uniqueSessions(subjectSchedule.tutorials).map(tutorial => (
                                 <button
-                                    className={`button ${selectedTutorial && selectedTutorial.id === tutorial.id ? 'selected' : ''}`}
+                                    className={`button ${selectedTutorials.some(t => t.id === tutorial.id) ? 'selected' : ''}`}
                                     key={tutorial.id}
                                     onClick={() => {
-                                        selectSessionForConfirmation(tutorial);
-                                        addToTimetable(tutorial.id, tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType);
+                                        if(selectSessionForConfirmation(tutorial)) {
+                                            addToTimetable(tutorial.id, tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType);
+                                        }
+                                        else{
+                                            removeSpecificSession(tutorial.day,tutorial.type,tutorial.id)
+                                        }
                                     }}
                                 >
                                     {t(dayKeys.find(key => key.includes(tutorial.day)))} <br/> {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}
@@ -1100,6 +1155,12 @@ function TimetableMaker() {
                 onKeepBoth={alertInfo.onKeepBoth}
                 onOverwrite={alertInfo.onOverwrite}
                 onCancel={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+            />
+            <OKAlertModal
+                isOpen={OKalertInfo.isOpen}
+                message={OKalertInfo.message}
+                title={OKalertInfo.title}
+                onCancel={() => setOKAlertInfo({ ...OKalertInfo, isOpen: false })}
             />
         </>
 
