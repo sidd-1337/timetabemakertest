@@ -810,7 +810,7 @@ function TimetableMaker() {
                                                 {!isSubjectDone(slot.primarySubject.name) && (
                                                     <button className="remove-subject-button" title={t('RemoveSubject')}
                                                             onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
-                                                    ><img src="/images/trash.svg"/>
+                                                    ><img src="/images/whitecross.png"/>
                                                     </button>
                                                 )}
                                                 <div className="department-shortname">
@@ -837,7 +837,7 @@ function TimetableMaker() {
                                                 {!isSubjectDone(slot.secondarySubject.name) && (
                                                     <button type="button" className="btn btn-primary remove-subject-button" title={t('RemoveSubject')}
                                                             style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
-                                                        <img src="/images/trash.svg"/>
+                                                        <img src="/images/whitecross.png"/>
                                                     </button>
                                                 )}
                                                 <div className="department-shortname">
@@ -870,7 +870,7 @@ function TimetableMaker() {
                                 </button>
                                 <button className="delete-button"
                                         onClick={() => deleteSubjectFromTimetable(subject)}><img
-                                    src="/images/trash.svg"/>
+                                    src="/images/whitecross.png"/>
                                 </button>
                             </div>
                         ))}
@@ -904,7 +904,7 @@ function TimetableMaker() {
                                 <button className="delete-button"
                                         onClick={() => deleteSubjectFromTimetable(restricted)}>
                                     <button className="delete-button" title={t('RemoveSubject')}><img
-                                        src="/images/trash.svg"/></button>
+                                        src="/images/whitecross.png"/></button>
                                 </button>
                             </div>))}
 
