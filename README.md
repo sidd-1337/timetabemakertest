@@ -5,7 +5,7 @@ This repository is a frontend of our project "timetable-maker". For backend repo
 For running backend and frontend (main branches) it is necessary to install:
 node.js https://nodejs.org/en (recommended v20.13.1)
 mongodb https://www.mongodb.com/try/download/community (recommended v.7.0.9) and MongoDBCompass (recommended v.1.43.0)
-Details how to run the project can be found here: https://github.com/sidd-1337/rocnikovy-projekt/wiki/How-to-run-the-project%3F
+Details how to run the project can be found here: [Documentation](https://github.com/sidd-1337/rocnikovy-projekt/wiki/How-to-run-the-project%3F)
 
 ## Available Scripts
 
