@@ -4,6 +4,7 @@
 
 body {
     background-color: #9eb3c2;
+    /*overflow: hidden;*/
 }
 
 main {
@@ -63,6 +64,7 @@ p {
 label {
     margin-right: 20px;
     color: white;
+    text-align: left;
 }
 
 /*Section box*/
@@ -89,7 +91,7 @@ form select {
 }
 
 .form-group label {
-    width: 5rem;
+    width: 6.5rem;
 }
 
 form input {
@@ -207,7 +209,7 @@ form input {
     letter-spacing:5px;
     text-transform:uppercase;
     transition: all 300ms ease-in-out;
-    left:0;
+    left: 22px;
     top:0;
     color: white;
     padding: 0.7rem 1.2rem;
@@ -355,7 +357,7 @@ input.check-toggle-round-flat:checked + label:after {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
     z-index: 1000;
-    max-height: 300px;
+    max-height: 250px;
     overflow-y: auto; /* Allows scrolling */
     background-color: #ffffff;
     border: 1px solid #ddd;
@@ -509,6 +511,12 @@ input.check-toggle-round-flat:checked + label:after {
 .language-buttons button {
     margin-left: 10px;
 }
+
+#grade, #semester, #schoolYear, #programme{
+    position: relative;
+    left: 18px;
+}
+
 
 footer {
     text-align: center;

@@ -912,7 +912,7 @@ function TimetableMaker() {
                                 onClick={() => setShowRestrictedLoader(!showRestrictedLoader)}>
                             {showRestrictedLoader ? t('HideForm') : t('AddRestrictedTime')}
                         </button>
-                        <div className="form-group">
+                        <div className="form-group" id="restrictedtimes">
                             {showRestrictedLoader &&
                                 <RestrictedTimeForm days={days} times={times} onAddSubject={handleAddSubject}/>}
                         </div>

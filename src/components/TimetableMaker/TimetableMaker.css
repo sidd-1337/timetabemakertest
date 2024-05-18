@@ -131,6 +131,12 @@
   transition: all .2s;
 }
 
+.remove-subject-button img, .delete-button img {
+    width:15px;
+    position: relative;
+    top: 1px;
+}
+
 .remove-subject-button:hover {
   transform: scale(1.5);
     background: red;
@@ -156,6 +162,7 @@
     position:absolute;
     left:50%;
     background-color: #5A8BB3;
+    width: 411.7px;
 }
 
 .subject-details:before {
@@ -416,4 +423,9 @@ color-picker-combined-wrapper {
 hr {
     padding: 1px;
     background-color: white;
+}
+
+.form-group#restrictedtimes select, .form-group#restrictedtimes input {
+    position: relative;
+    left: -25px;
 }
