@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import '../TableGenius/TableGenius.css'; // Reusing your existing CSS file
+import '../TableGenius/TableGeniusNew.css'; // Reusing your existing CSS file
 import './TimetableMaker.css';
 import Header from '../Header';
 import {useLocation} from 'react-router-dom';
@@ -14,7 +14,7 @@ import './AlertModal.css';
 import { SketchPicker } from 'react-color';
 import { Wheel } from '@uiw/react-color';
 import { hsvaToHex } from '@uiw/color-convert';
-import { IoColorPalette } from "react-icons/io5";
+import { IoColorPaletteSharp} from "react-icons/io5";
 import { Compact } from '@uiw/react-color';
 export const days = ['Po', 'Út', 'St', 'Čt', 'Pá'];
 export const dayKeys = days.map(day => `${day}`);
@@ -744,9 +744,10 @@ function TimetableMaker() {
 
     const ConfirmSubjectSelection = ({ onConfirm, onReject, subject }) => (
         <div>
-
-            <button onClick={() => onConfirm(subject)}>{t('Yes')}✅</button>
-            <button onClick={() => onReject()}>{t('No')}❌</button>
+            <div>
+                <button className="btn btn-success" onClick={() => onConfirm(subject)}>DONE</button>
+                <button className="btn btn-danger" onClick={() => onReject()}>RESET</button>
+            </div>
         </div>
     );
     const undoSubject = (subject) => {
@@ -868,79 +869,84 @@ function TimetableMaker() {
                             {daySchedule.slots.slice(1).map((slot, timeIndex) => (
                                 <div key={timeIndex} className="time-slot"
                                      title={slot.collisions?.length > 0 ? `${t('CollisionWith')} ${[...new Set(slot.collisions)].join(', ')}` : ''}
-                                     >
+                                >
                                     {slot.collisions?.length > 0 && (
-                                        <div className={`collision-indicator ${slot.primarySubject && slot.secondarySubject && slot.primarySubject !== slot.secondarySubject ? 'full-occupancy' : ''}`}>
+                                        <div
+                                            className={`collision-indicator ${slot.primarySubject && slot.secondarySubject && slot.primarySubject !== slot.secondarySubject ? 'full-occupancy' : ''}`}>
                                             !
                                         </div>
                                     )}
                                     {slot.primarySubject && (
                                         <>
-                                        <div
-                                            style={{
-                                                backgroundColor: determineSlotColor(slot, "Primary"),
-                                                borderRadius: "3px"
-                                            }}>
-                                            {!isSubjectDone(slot.primarySubject.name) && (
-                                                <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                        onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
-                                                >x
-                                                </button>
-                                            )}
-                                            {slot.primarySubject.isRestrictedTime ? (
-                                                <div className="restricted-time-name">
-                                                    {slot.primarySubject.name}
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <div className="department-shortname">
-                                                        {slot.primarySubject.department} / {slot.primarySubject.shortName}
+                                            <div
+                                                style={{
+                                                    backgroundColor: determineSlotColor(slot, "Primary"),
+                                                    borderRadius: "3px"
+                                                }}>
+                                                {!isSubjectDone(slot.primarySubject.name) && (
+                                                    <button className="remove-subject-button" title={t('RemoveSubject')}
+                                                            onClick={() => removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
+                                                    ><img src="/images/whitecross.png"/>
+                                                    </button>
+                                                )}
+                                                {slot.primarySubject.isRestrictedTime ? (
+                                                    <div className="restricted-time-name">
+                                                        {slot.primarySubject.name}
                                                     </div>
-                                                    <div className="building-room">
-                                                        {slot.primarySubject.building} - {slot.primarySubject.room}
-                                                    </div>
-                                                    <div className="teacher-name">
-                                                        {slot.primarySubject.teacher}
-                                                    </div>
-                                                    {slot.primarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.primarySubject.weekType)))}</div>}
-                                                </>
-                                            )}
-                                        </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="department-shortname">
+                                                            {slot.primarySubject.department} / {slot.primarySubject.shortName}
+                                                        </div>
+                                                        <div className="building-room">
+                                                            {slot.primarySubject.building} - {slot.primarySubject.room}
+                                                        </div>
+                                                        <div className="teacher-name">
+                                                            {slot.primarySubject.teacher}
+                                                        </div>
+                                                        {slot.primarySubject.weekType && <div
+                                                            className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.primarySubject.weekType)))}</div>}
+                                                    </>
+                                                )}
+                                            </div>
                                         </>
                                     )}
                                     {slot.secondarySubject && (
                                         <>
-                                        <div
-                                            style={{
-                                                backgroundColor: determineSlotColor(slot, "Secondary"),
-                                                borderRadius: "3px"
-                                            }}>
-                                            <div className="slot-divider"></div>
-                                            {!isSubjectDone(slot.secondarySubject.name) && (
-                                                <button className="remove-subject-button" title={t('RemoveSubject')}
-                                                        onClick={() => removeSpecificSession(daySchedule.day, slot.secondarySubject.type, slot.secondarySubject.id)}
-                                                >x
-                                                </button>
-                                            )}
-                                            {slot.secondarySubject.isRestrictedTime ? (
-                                                <div className="restricted-time-name">
-                                                    {slot.secondarySubject.name}
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <div className="department-shortname">
-                                                        {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
+                                            <div
+                                                style={{
+                                                    backgroundColor: determineSlotColor(slot, "Secondary"),
+                                                    borderRadius: "3px"
+                                                }}>
+                                                <div className="slot-divider"></div>
+                                                {!isSubjectDone(slot.secondarySubject.name) && (
+                                                    <button type="button"
+                                                            className="btn btn-primary remove-subject-button"
+                                                            title={t('RemoveSubject')}
+                                                            style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
+                                                        <img src="/images/whitecross.png"/>
+                                                    </button>
+                                                )}
+                                                {slot.secondarySubject.isRestrictedTime ? (
+                                                    <div className="restricted-time-name">
+                                                        {slot.secondarySubject.name}
                                                     </div>
-                                                    <div className="building-room">
-                                                        {slot.secondarySubject.building} - {slot.secondarySubject.room}
-                                                    </div>
-                                                    <div className="teacher-name">
-                                                        {slot.secondarySubject.teacher}
-                                                    </div>
-                                                    {slot.secondarySubject.weekType && <div className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.secondarySubject.weekType)))}</div>}
-                                                </>
-                                            )}
-                                        </div>
+                                                ) : (
+                                                    <>
+                                                        <div className="department-shortname">
+                                                            {slot.secondarySubject.department} / {slot.secondarySubject.shortName}
+                                                        </div>
+                                                        <div className="building-room">
+                                                            {slot.secondarySubject.building} - {slot.secondarySubject.room}
+                                                        </div>
+                                                        <div className="teacher-name">
+                                                            {slot.secondarySubject.teacher}
+                                                        </div>
+                                                        {slot.secondarySubject.weekType && <div
+                                                            className="week-type">{t('Week')} {t(weekTypeKeys.find(key => key.includes(slot.secondarySubject.weekType)))}</div>}
+                                                    </>
+                                                )}
+                                            </div>
                                         </>
                                     )}
                                 </div>
@@ -950,16 +956,18 @@ function TimetableMaker() {
                 </div>
                 <div className="right-section">
                     <div className="subject-selection">
-                        <h4>{t('Subjects')}</h4>
+                        <h3>{t('Subjects')}</h3>
                         {subjects.map(subject => (
                             <div key={subject.id} className="subject-item">
-                                <button className={`button ${selectedSubject?selectedSubject.id === subject.id ? 'selected' : '' : ""}`}
-                                        key={subject.id}
-                                        onClick={() => handleSubjectSelect(subject.id)}>
+                                <button
+                                    className={`button ${selectedSubject ? selectedSubject.id === subject.id ? 'selected' : '' : ""}`}
+                                    key={subject.id}
+                                    onClick={() => handleSubjectSelect(subject.id)}>
                                     {subject.name}
                                 </button>
                                 <button className="delete-button"
-                                        onClick={() => deleteSubjectFromTimetable(subject)}>❌
+                                        onClick={() => deleteSubjectFromTimetable(subject)}><img
+                                    src="/images/whitecross.png"/>
                                 </button>
 
                             </div>
@@ -972,58 +980,76 @@ function TimetableMaker() {
                                 {/* Text displayed under the clock */}
                             </div>
                         )}
+                        <div className="buttons buttons-left">
+                            <button className="custom-button" onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
+                                {showSubjectLoader ? t('HideForm') : t('LoadSubjectStag')}
+                            </button>
+                        </div>
+                        <div className="form-group">
+                            {showSubjectLoader && <SubjectLoaderForm onSubjectAdded={handleSubjectAdded}/>}
+                        </div>
                         <h3>{t('RestrictedTimes')}</h3>
-                        {uniqueSessions(restrictedTimes).map(restricted => (
-                            <div key={restricted.id} className="subject-item">
-                                <button className='button'
-                                        key={restricted.id}
-                                        onClick={() => addToTimetable(restricted.id,restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo, restricted.type, restricted.department, restricted.shortName, restricted.building, restricted.room, restricted.teacher, restricted.weekType, true)}>
-                                    {restricted.name} {t(dayKeys.find(key => key.includes(restricted.day)))} {restricted.timeFrom} - {restricted.timeTo}
-                                </button>
-
-                                <button className="delete-button"
-                                        onClick={() => deleteSubjectFromTimetable(restricted)}>❌
-                                </button>
-                            </div>))}
+                        <div className="buttons buttons-left">
+                            <button className="custom-button"
+                                    onClick={() => setShowRestrictedLoader(!showRestrictedLoader)}>
+                                {showRestrictedLoader ? t('HideForm') : t('AddRestrictedTime')}
+                            </button>
+                        </div>
+                        <div className="form-group">
+                            {showRestrictedLoader &&
+                                <RestrictedTimeForm times={times} onAddSubject={handleAddSubject}/>}
+                        </div>
                     </div>
 
                     {selectedSubject && !isAlertOpen && (
                         <div className="subject-details">
-                            <h4>{t('SubjectDetails')}</h4>
+                            <h3>{t('SubjectDetails')}</h3>
                             {subjectSchedule.lectures.length > 0 && (
                                 <div className="lecture-section">
-                                    <h4>{t('Lectures')}<IoColorPalette onClick={() => setShowLectureColorPicker(!showLectureColorPicker)} style={{ cursor: 'pointer' }} /></h4>
+                                    <h4>{t('Lectures')}</h4>
+                                    <div className="palette"><IoColorPaletteSharp
+                                        onClick={() => setShowLectureColorPicker(!showLectureColorPicker)}
+                                        style={{cursor: 'pointer', color: 'white', transform: 'translateY(2px)'}}/>
+                                    </div>
                                     {showLectureColorPicker && (
-                                        <div className="color-picker-background">
                                         <div className="color-picker-combined-wrapper">
-                                            <div className="compact-color-picker-wrapper" style={{ display: 'inline-block', transform: 'scale(0.8)', transformOrigin: 'top left' }}>
-                                                <Compact
-                                                    key={`compact-${selectedSubject.id}`}
-                                                    color={lectureColor}
-                                                    colors={['#FFFFFF', '#CCCCCC', '#ff7373','#ff4040', '#ffff66', '#fcea17', '#B8E986', '#96c961', '#b6fafc', '#73D8FF', '#FDA1FF','#f768e9', '#AEA1FF', '#7B64FF','#e6b795','#947259']}
-                                                    onChange={(color) => {
-                                                        const hexColor = hsvaToHex(color.hsva); // Convert HSV to Hex
-                                                        setLectureColor(hexColor); // Update state with Hex color
-                                                        updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Lecture')
-                                                    }}
-                                                />
+                                            <div className="color-picker-combined-wrapper">
+                                                <div className="compact-color-picker-wrapper" style={{
+                                                    display: 'inline-block',
+                                                    transform: 'scale(0.8), translateY(7px)',
+                                                    transformOrigin: 'top left'
+                                                }}>
+                                                    <Compact
+                                                        key={`compact-${selectedSubject.id}`}
+                                                        color={lectureColor}
+                                                        colors={['#FFFFFF', '#CCCCCC', '#ff7373', '#ff4040', '#ffff66', '#fcea17', '#B8E986', '#96c961', '#b6fafc', '#73D8FF', '#FDA1FF', '#f768e9', '#AEA1FF', '#7B64FF', '#e6b795', '#947259']}
+                                                        onChange={(color) => {
+                                                            const hexColor = hsvaToHex(color.hsva); // Convert HSV to Hex
+                                                            setLectureColor(hexColor); // Update state with Hex color
+                                                            updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Lecture')
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className="wheel-container" style={{
+                                                    display: 'inline-block',
+                                                    verticalAlign: 'top',
+                                                    marginLeft: '10px',
+                                                    transform: 'translateY(7px)'
+                                                }}>
+                                                    <Wheel
+                                                        key={`wheel-${selectedSubject.id}`}
+                                                        color={lectureColor}
+                                                        onChange={(color) => {
+                                                            setLectureColor(color.hsva);
+                                                            if (selectedSubject) {
+                                                                updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Lecture');
+                                                            }
+                                                        }}
+                                                        width={50} // Adjust the size as needed
+                                                        height={50}
+                                                    />
+                                                </div>
                                             </div>
-                                            <div className="wheel-container" style={{ display: 'inline-block', verticalAlign: 'top',marginLeft:'-10px' }}>
-                                                <Wheel
-                                                    key={`wheel-${selectedSubject.id}`}
-                                                    color={lectureColor}
-                                                    onChange={(color) => {
-                                                        setLectureColor(color.hsva);
-                                                        if(selectedSubject) {
-                                                            updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Lecture');
-                                                        }
-                                                    }}
-                                                    width={50} // Adjust the size as needed
-                                                    height={50}
-                                                />
-
-                                            </div>
-                                        </div>
                                         </div>
                                     )}
                                 </div>
@@ -1034,29 +1060,37 @@ function TimetableMaker() {
                                     className={`button ${selectedLectures.some(l => l.id === lecture.id) ? 'selected' : ''}`}
                                     key={lecture.id}
                                     onClick={() => {
-                                        if(selectSessionForConfirmation(lecture)) {
+                                        if (selectSessionForConfirmation(lecture)) {
                                             addToTimetable(lecture.id, lecture.name, lecture.day, lecture.timeFrom, lecture.timeTo, lecture.type, lecture.department, lecture.shortName, lecture.building, lecture.room, lecture.teacher, lecture.weekType);
-                                        } else{
-                                            removeSpecificSession(lecture.day,lecture.type,lecture.id)
+                                        } else {
+                                            removeSpecificSession(lecture.day, lecture.type, lecture.id)
                                         }
                                     }}
                                 >
-                                    {t(dayKeys.find(key => key.includes(lecture.day)))} <br/>  {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
+                                    {t(dayKeys.find(key => key.includes(lecture.day)))}
+                                    <br/> {lecture.timeFrom} - {lecture.timeTo} <br/> {lecture.teacher}
                                     <br/> {t('Week')} {t(weekTypeKeys.find(key => key.includes(lecture.weekType)))}
                                 </button>
                             ))}
 
                             {subjectSchedule.tutorials.length > 0 && (
                                 <div className="tutorial-section">
-                                    <h4>{t('Tutorials')}<IoColorPalette onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)} style={{ cursor: 'pointer' }} /></h4>
+                                    <h4>{t('Tutorials')}</h4>
+                                    <div className="palette"><IoColorPaletteSharp
+                                        onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)}
+                                        style={{cursor: 'pointer', color: 'white', transform: 'translateY(2px)'}}/>
+                                    </div>
                                     {showTutorialColorPicker && (
-                                        <div className="color-picker-background">
                                         <div className="color-picker-combined-wrapper">
-                                            <div className="compact-color-picker-wrapper" style={{ display: 'inline-block', transform: 'scale(0.8)', transformOrigin: 'top left' }}>
+                                            <div className="compact-color-picker-wrapper" style={{
+                                                display: 'inline-block',
+                                                transform: 'scale(0.8), translateY(7px)',
+                                                transformOrigin: 'top left'
+                                            }}>
                                                 <Compact
                                                     key={`compact-${selectedSubject.id}`}
                                                     color={tutorialColor}
-                                                    colors={['#FFFFFF', '#CCCCCC', '#ff7373','#ff4040', '#ffff66', '#fcea17', '#B8E986', '#96c961', '#b6fafc', '#73D8FF', '#FDA1FF','#f768e9', '#AEA1FF', '#7B64FF','#e6b795','#947259']}
+                                                    colors={['#FFFFFF', '#CCCCCC', '#ff7373', '#ff4040', '#ffff66', '#fcea17', '#B8E986', '#96c961', '#b6fafc', '#73D8FF', '#FDA1FF', '#f768e9', '#AEA1FF', '#7B64FF', '#e6b795', '#947259']}
                                                     onChange={(color) => {
                                                         const hexColor = hsvaToHex(color.hsva); // Convert HSV to Hex
                                                         setTutorialColor(hexColor); // Update state with Hex color
@@ -1064,21 +1098,24 @@ function TimetableMaker() {
                                                     }}
                                                 />
                                             </div>
-                                            <div className="wheel-container" style={{ display: 'inline-block', verticalAlign: 'top',marginLeft:'-10px' }}>
+                                            <div className="wheel-container" style={{
+                                                display: 'inline-block',
+                                                verticalAlign: 'top',
+                                                marginLeft: '10px',
+                                                transform: 'translateY(7px)'
+                                            }}>
                                                 <Wheel
                                                     key={`wheel-${selectedSubject.id}`}
                                                     color={tutorialColor}
                                                     onChange={(color) => {
                                                         setTutorialColor(color.hsva);
-                                                        if(selectedSubject) {
+                                                        if (selectedSubject) {
                                                             updateSubjectColorHSV(selectedSubject.id, color.hsva, 'Tutorial');
                                                         }
                                                     }}
                                                     width={50} // Adjust the size as needed
                                                     height={50}
                                                 />
-
-                                            </div>
                                             </div>
                                         </div>
                                     )}
@@ -1090,15 +1127,15 @@ function TimetableMaker() {
                                     className={`button ${selectedTutorials.some(t => t.id === tutorial.id) ? 'selected' : ''}`}
                                     key={tutorial.id}
                                     onClick={() => {
-                                        if(selectSessionForConfirmation(tutorial)) {
+                                        if (selectSessionForConfirmation(tutorial)) {
                                             addToTimetable(tutorial.id, tutorial.name, tutorial.day, tutorial.timeFrom, tutorial.timeTo, tutorial.type, tutorial.department, tutorial.shortName, tutorial.building, tutorial.room, tutorial.teacher, tutorial.weekType);
-                                        }
-                                        else{
-                                            removeSpecificSession(tutorial.day,tutorial.type,tutorial.id)
+                                        } else {
+                                            removeSpecificSession(tutorial.day, tutorial.type, tutorial.id)
                                         }
                                     }}
                                 >
-                                    {t(dayKeys.find(key => key.includes(tutorial.day)))} <br/> {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}
+                                    {t(dayKeys.find(key => key.includes(tutorial.day)))}
+                                    <br/> {tutorial.timeFrom} - {tutorial.timeTo} <br/> {tutorial.teacher}
                                     <br/> {t('Week')} {t(weekTypeKeys.find(key => key.includes(tutorial.weekType)))}
                                 </button>
                             ))}
@@ -1117,10 +1154,10 @@ function TimetableMaker() {
                     )}
 
                     <div className="done-subjects">
-                        <h4>{t('DoneSubjects')}</h4>
+                        <h3>{t('DoneSubjects')}</h3>
                         {doneSubjects.map(subject => (
                             <div key={subject.id} className="subject-item">
-                                <button className="button" >
+                                <button className="button">
                                     {subject.name}
                                 </button>
                                 <button className="undo-button" onClick={() => undoSubject(subject)}>
@@ -1128,28 +1165,25 @@ function TimetableMaker() {
                                 </button>
                             </div>
                         ))}
+                        <div className="buttons buttons-left">
+                            <button onClick={exportPDF} className="btn-primary">{t('ExportAsPDF')}</button>
+                        </div>
                     </div>
                 </div>
+                {uniqueSessions(restrictedTimes).map(restricted => (
+                    <div key={restricted.id} className="subject-item">
+                    <button className='button'
+                                key={restricted.id}
+                                onClick={() => addToTimetable(restricted.id, restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo, restricted.type, restricted.department, restricted.shortName, restricted.building, restricted.room, restricted.teacher, restricted.weekType, true)}>
+                            {restricted.name} {t(dayKeys.find(key => key.includes(restricted.day)))} {restricted.timeFrom} - {restricted.timeTo}
+                        </button>
 
-
-                <div className="buttons buttons-left">
-                    <button className="custom-button" onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
-                        {showSubjectLoader ? t('HideForm') : t('LoadSubjectStag')}
-                    </button>
-                </div>
-                <div className="form-group">
-                    {showSubjectLoader && <SubjectLoaderForm onSubjectAdded={handleSubjectAdded}/>}
-                </div>
-                <div className="buttons buttons-left">
-                    <button className="custom-button" onClick={() => setShowRestrictedLoader(!showRestrictedLoader)}>
-                        {showRestrictedLoader ? t('HideForm') : t('AddRestrictedTime')}
-                    </button>
-                    <button onClick={exportPDF} className="custom-button">{t('ExportAsPDF')}</button>
-                </div>
-                <div className="form-group">
-                    {showRestrictedLoader &&
-                        <RestrictedTimeForm  times={times} onAddSubject={handleAddSubject} />}
-                </div>
+                        <button className="delete-button"
+                                onClick={() => deleteSubjectFromTimetable(restricted)}>
+                            <button className="delete-button" title={t('RemoveSubject')}>
+                                <img src="/images/whitecross.png"/></button>
+                        </button>
+                    </div>))}
             </div>
             <AlertModal
                 isOpen={alertInfo.isOpen}
