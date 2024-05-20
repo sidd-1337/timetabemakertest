@@ -782,11 +782,11 @@ function TimetableMaker() {
         }));
     };
 
-    /* Function that removes "remove button" when subject is in "done subjects"
+   // Function that removes "remove button" when subject is in "done subjects"
     const isSubjectDone = (subjectName) => {
         return doneSubjects.some(subject => subject.name === subjectName);
     };
-    */
+
     const removeSpecificSession = (day, sessionType, id) => {
         if (sessionType === 'Lecture') {
             if (selectedLectures.some(sl => sl.id === id)) {
@@ -881,7 +881,7 @@ function TimetableMaker() {
                                                 backgroundColor: determineSlotColor(slot, "Primary"),
                                                 borderRadius: "3px"
                                             }}>
-                                            {(slot.primarySubject.name) && (
+                                            {!isSubjectDone(slot.primarySubject.name) && (
                                                 <button className="remove-subject-button" title={t('RemoveSubject')}
                                                         onClick={() =>  removeSpecificSession(daySchedule.day, slot.primarySubject.type, slot.primarySubject.id)}
                                                 >x
@@ -916,7 +916,7 @@ function TimetableMaker() {
                                                 borderRadius: "3px"
                                             }}>
                                             <div className="slot-divider"></div>
-                                            {(slot.secondarySubject.name) && (
+                                            {!isSubjectDone(slot.secondarySubject.name) && (
                                                 <button className="remove-subject-button" title={t('RemoveSubject')}
                                                         onClick={() => removeSpecificSession(daySchedule.day, slot.secondarySubject.type, slot.secondarySubject.id)}
                                                 >x
@@ -1120,7 +1120,7 @@ function TimetableMaker() {
                         <h4>{t('DoneSubjects')}</h4>
                         {doneSubjects.map(subject => (
                             <div key={subject.id} className="subject-item">
-                                <button className="button" onClick={() => handleSubjectSelect(subject.id, true)}>
+                                <button className="button" >
                                     {subject.name}
                                 </button>
                                 <button className="undo-button" onClick={() => undoSubject(subject)}>
