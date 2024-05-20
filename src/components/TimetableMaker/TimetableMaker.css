@@ -94,6 +94,10 @@
   background-color: #5A8BB3;
   width: 325px;
 }
+
+.subject-selection label {
+    color:white;
+}
   
 .subject-selection:before {
     font-weight: bold;
@@ -184,7 +188,7 @@
   position:absolute;
   left:50%;
   background-color: #5A8BB3;
-  width: 411.7px;
+  width: 480px;
 }
 
 .subject-details:before {

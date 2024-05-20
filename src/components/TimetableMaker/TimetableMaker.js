@@ -1007,7 +1007,7 @@ function TimetableMaker() {
                             {subjectSchedule.lectures.length > 0 && (
                                 <div className="lecture-section">
                                     <h4>{t('Lectures')}</h4>
-                                    <div className="palette"><IoColorPaletteSharp
+                                    <div className="palette" style={{marginRight: 20 + 'px', marginLeft: 20 + 'px'}}><IoColorPaletteSharp
                                         onClick={() => setShowLectureColorPicker(!showLectureColorPicker)}
                                         style={{cursor: 'pointer', color: 'white', transform: 'translateY(2px)'}}/>
                                     </div>
@@ -1076,7 +1076,7 @@ function TimetableMaker() {
                             {subjectSchedule.tutorials.length > 0 && (
                                 <div className="tutorial-section">
                                     <h4>{t('Tutorials')}</h4>
-                                    <div className="palette"><IoColorPaletteSharp
+                                    <div className="palette" style={{marginRight: 20 + 'px', marginLeft: 20 + 'px'}}><IoColorPaletteSharp
                                         onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)}
                                         style={{cursor: 'pointer', color: 'white', transform: 'translateY(2px)'}}/>
                                     </div>
