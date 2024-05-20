@@ -57,7 +57,7 @@ p {
 
 label {
     margin-right: 20px;
-    color: white;
+    color: black;
     text-align: left;
 }
 
@@ -120,8 +120,6 @@ form input {
 
 .content-right {
     flex: 1;
-    /*padding-left: 2rem;*/
-    padding-top: 4rem;
 }
 
 .content-center {
