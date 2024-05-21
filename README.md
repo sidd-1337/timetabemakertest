@@ -14,6 +14,16 @@ To run the backend and frontend (main branches), you need to install:
 
 ---
 
+### How to run the project
+
+Details how to run the project can be found here: [Documentation](https://github.com/sidd-1337/rocnikovy-projekt/wiki/How-to-run-the-project%3F)
+
+---
+
+#### Creators
+Siddharth Shukla, Nela Bulavová, Matyáš Grendysa
+
+
 ## Available Scripts
 
 In the project directory, you can run:
