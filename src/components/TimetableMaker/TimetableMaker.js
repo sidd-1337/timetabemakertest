@@ -288,7 +288,12 @@ function TimetableMaker() {
             pdf.addImage(imgData, 'PNG', xPosition, yPosition, scaledWidth, scaledHeight);
             pdf.save('timetable.pdf');
         }).catch(err => {
-            console.error('Error exporting PDF:', err);
+            /*console.error('Error exporting PDF:', err);*/
+            setOKAlertInfo({
+                isOpen: true,
+                message: t('ErrorExportingPDF', err),
+                title: t('Invalid action')
+            });
             body.classList.remove('pdf-export'); // Ensure the class is removed even if there's an error
         });
     };
@@ -363,7 +368,12 @@ function TimetableMaker() {
             clearTimeout(timer);
             setIsDataFetched(true);
             setShowLoadingClock(false);
-            console.error('Error fetching subject data:', error);
+            /*console.error('Error fetching subject data:', error);*/
+            setOKAlertInfo({
+                isOpen: true,
+                message: t('ErrorFetchingSubjectData', error),
+                title: t('Invalid action')
+            });
             const retry = window.confirm("Server Off. Would you like to retry?");
             if (retry) {
                 fetchSubjectData();
@@ -447,7 +457,12 @@ function TimetableMaker() {
 
         const subject = subjectList.find(subj => subj.id === subjectId);
         if (!subject) {
-            console.error('Subject not found:', subjectId);
+            /*console.error('Subject not found:', subjectId);*/
+            setOKAlertInfo({
+                isOpen: true,
+                message: t('SubjectNotFound', subjectId),
+                title: t('Invalid action')
+            });
             return;
         }
 
@@ -567,7 +582,13 @@ function TimetableMaker() {
 */
     const timeToMinutes = (time) => {
         if (typeof time !== 'string' || !time.match(/^\d{2}:\d{2}$/)) {
-            console.error(`Invalid time format: ${time}`);
+            /*console.error(`Invalid time format: ${time}`);*/
+            setOKAlertInfo({
+                isOpen: true,
+                message: t('InvalidTimeFormat ${time}'),
+                title: t('Invalid action')
+            });
+
             return 0; // Return a default value or consider throwing an error
         }
 
@@ -581,6 +602,11 @@ function TimetableMaker() {
         const daySchedule = timetable.find(d => d.day === day);
         if (!daySchedule) {
             console.error(`Day not found in timetable: ${day}`);
+            /*SetOKAlertInfo({
+                isOpen: true,
+                message: t('DayNotFound ${day}'),
+                title: t('Invalid action')
+            })*/
             return;
         }
 
@@ -606,7 +632,12 @@ function TimetableMaker() {
         const endIndex = daySchedule.slots.findIndex(slot => timeToMinutes(slot.timeTo) === endMinutes);
 
         if (startIndex === -1 || endIndex === -1 || startIndex > endIndex) {
-            alert('Invalid time range for the lecture/tutorial');
+            /*alert('Invalid time range for the lecture/tutorial');*/
+            setOKAlertInfo({
+                isOpen: true,
+                message: t('InvalidTimeRange'),
+                title: t('Invalid action')
+            });
             return;
         }
 
@@ -666,7 +697,12 @@ function TimetableMaker() {
                 } else if (!slot.secondarySubject) {
                     return { ...slot, secondarySubject: subject, collisions };
                 } else {
-                    alert(t('BothSelected'));
+                    /*alert(t('BothSelected'));*/
+                    setOKAlertInfo({
+                        isOpen: true,
+                        message: t('BothSelected'),
+                        title: t('Invalid action')
+                    });
                     return slot; // No changes, the slot is full
                 }
             });

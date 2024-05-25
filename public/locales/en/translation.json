@@ -67,7 +67,15 @@
     "weekType_J": "Every",
     "weekType_SL": "Even/Odd",
     "TimeToTimeFrom": "The Time from must be earlier than the Time to. Please adjust your selection.",
-    "Invalid action": "Invalid action"
+    "Invalid action": "Invalid action",
+    "InvalidTimeRange": "Invalid time range for the lecture/tutorial",
+    "ErrorExportingPDF": "Error exporting PDF:",
+    "SubjectNotFound": "Subject not found:",
+    "InvalidTimeFormat": "Invalid time format:",
+    "ErrorFetchingSubjectData": "Error fetching subject data:",
+    "ErrorFetchingData": "Error fetching data:",
+    "FailedToLoadSubject": "Failed to load subject: No data returned",
+    "DayNotFound": "Day not found in timetable:"
 }
 
 

@@ -3,6 +3,11 @@ import './TableGeniusNew.css';
 import { useTranslation } from 'react-i18next';
 import Header from '../Header';
 import { useNavigate } from 'react-router-dom';
+import '../TimetableMaker/AlertModal.css';
+import '../TimetableMaker/AlertModal';
+import '../TimetableMaker/OKAlertModal';
+import AlertModal from "../TimetableMaker/AlertModal";
+import OKAlertModal from "../TimetableMaker/OKAlertModal";
 
 function TableGenius() {
     const [showForm, setShowForm] = useState(false);
@@ -13,6 +18,7 @@ function TableGenius() {
     const [displayedProgramName, setDisplayedProgramName] = useState('');
     const [showFormValidationAlert, setShowFormValidationAlert] = useState(false);
     const [showImportSubjectsAlert, setShowImportSubjectsAlert] = useState(false);
+
 
     const handleShowFormClick = () => {
         handleShowForm();
@@ -41,6 +47,21 @@ function TableGenius() {
         setStep(step + 1);
         fetchData();
     };
+
+    const [alertInfo, setAlertInfo] = useState({
+        isOpen: false,
+        message: '',
+        onKeepBoth: () => {},
+        onOverwrite: () => {},
+        onCancel: () => {}
+    });
+
+    const [OKalertInfo, setOKAlertInfo] = useState({
+        isOpen: false,
+        message: '',
+        title: '',
+        onCancel: () => {}
+    });
 
     const handleImportSubjects = () => {
 
@@ -95,7 +116,12 @@ function TableGenius() {
             const data = await response.json();
             setProgrammesList(data);
         } catch (error) {
-            console.error('Error fetching data:', error);
+            /*console.error('Error fetching data:', error);*/
+            setOKAlertInfo({
+                isOpen: true,
+                message: t('ErrorFetchingData', error),
+                title: t('Invalid action')
+            });
             alert('Server off');
         }
     };
@@ -330,6 +356,19 @@ function TableGenius() {
                         //)
                     }
                 </div>
+                <AlertModal
+                    isOpen={alertInfo.isOpen}
+                    message={alertInfo.message}
+                    onKeepBoth={alertInfo.onKeepBoth}
+                    onOverwrite={alertInfo.onOverwrite}
+                    onCancel={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+                />
+                <OKAlertModal
+                    isOpen={OKalertInfo.isOpen}
+                    message={OKalertInfo.message}
+                    title={OKalertInfo.title}
+                    onCancel={() => setOKAlertInfo({ ...OKalertInfo, isOpen: false })}
+                />
             </main>
             <footer>
                 © 2023 Nela Bulavová, Matyáš Grendysa, Siddharth Shukla

@@ -67,7 +67,15 @@
     "weekType_J": "Každý",
     "weekType_SL": "Sudý/Lichý",
     "TimeToTimeFrom": "Čas od nemůže být později než Čas do.",
-    "Invalid action": "Neoprávněná akce"
+    "Invalid action": "Neoprávněná akce",
+    "InvalidTimeRange": "Neplatný časový rozsah pro přednášku/cvičení",
+    "ErrorExportingPDF": "Chyba při generaci PDF:",
+    "SubjectNotFound": "Předmět nebyl nalezen:",
+    "Invalid time format": "Neplatný časový formát:",
+    "ErrorFetchingSubjectData": "Chyba při načítání údajů o předmětu:",
+    "ErrorFetchingData": "Chyba při načítání dat:",
+    "FailedToLoadSubject": "Nelze načíst předmět: Nebyla vrácena žádná data",
+    "DayNotFound": "Den nenalezen v rozvrhu:"
 }
 
 
