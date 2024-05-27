@@ -1016,6 +1016,7 @@ function TimetableMaker() {
                                 {/* Text displayed under the clock */}
                             </div>
                         )}
+                        <hr/>
                         <div className="buttons buttons-left">
                             <button className="custom-button" onClick={() => setShowSubjectLoader(!showSubjectLoader)}>
                                 {showSubjectLoader ? t('HideForm') : t('LoadSubjectStag')}
@@ -1024,6 +1025,7 @@ function TimetableMaker() {
                         <div className="form-group">
                             {showSubjectLoader && <SubjectLoaderForm onSubjectAdded={handleSubjectAdded}/>}
                         </div>
+                        <hr/>
                         <h3>{t('RestrictedTimes')}</h3>
                         <div className="buttons buttons-left">
                             <button className="custom-button"
