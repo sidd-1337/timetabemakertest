@@ -116,13 +116,13 @@ function TableGenius() {
             const data = await response.json();
             setProgrammesList(data);
         } catch (error) {
-            /*console.error('Error fetching data:', error);*/
-            setOKAlertInfo({
+            console.error('Error fetching data:', error);
+            /*setOKAlertInfo({
                 isOpen: true,
                 message: t('ErrorFetchingData', error),
                 title: t('Invalid action')
-            });
-            /*alert('Server off');*/
+            });*/
+            alert('Server off');
         }
     };
     /*

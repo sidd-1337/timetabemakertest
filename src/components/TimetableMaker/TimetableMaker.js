@@ -288,12 +288,12 @@ function TimetableMaker() {
             pdf.addImage(imgData, 'PNG', xPosition, yPosition, scaledWidth, scaledHeight);
             pdf.save('timetable.pdf');
         }).catch(err => {
-            /*console.error('Error exporting PDF:', err);*/
-            setOKAlertInfo({
+            console.error('Error exporting PDF:', err);
+            /*setOKAlertInfo({
                 isOpen: true,
-                message: t('ErrorExportingPDF', err),
+                message: t('ErrorExportingPDF'),
                 title: t('Invalid action')
-            });
+            });*/
             body.classList.remove('pdf-export'); // Ensure the class is removed even if there's an error
         });
     };
@@ -368,12 +368,12 @@ function TimetableMaker() {
             clearTimeout(timer);
             setIsDataFetched(true);
             setShowLoadingClock(false);
-            /*console.error('Error fetching subject data:', error);*/
-            setOKAlertInfo({
+            console.error('Error fetching subject data:', error);
+            /*setOKAlertInfo({
                 isOpen: true,
                 message: t('ErrorFetchingSubjectData', error),
                 title: t('Invalid action')
-            });
+            });*/
             const retry = window.confirm("Server Off. Would you like to retry?");
             if (retry) {
                 fetchSubjectData();
@@ -457,12 +457,12 @@ function TimetableMaker() {
 
         const subject = subjectList.find(subj => subj.id === subjectId);
         if (!subject) {
-            /*console.error('Subject not found:', subjectId);*/
-            setOKAlertInfo({
+            console.error('Subject not found:', subjectId);
+            /*setOKAlertInfo({
                 isOpen: true,
                 message: t('SubjectNotFound', subjectId),
                 title: t('Invalid action')
-            });
+            });*/
             return;
         }
 
@@ -582,12 +582,12 @@ function TimetableMaker() {
 */
     const timeToMinutes = (time) => {
         if (typeof time !== 'string' || !time.match(/^\d{2}:\d{2}$/)) {
-            /*console.error(`Invalid time format: ${time}`);*/
-            setOKAlertInfo({
+            console.error(`Invalid time format: ${time}`);
+            /*setOKAlertInfo({
                 isOpen: true,
                 message: t('InvalidTimeFormat ${time}'),
                 title: t('Invalid action')
-            });
+            });*/
 
             return 0; // Return a default value or consider throwing an error
         }
@@ -1135,7 +1135,7 @@ function TimetableMaker() {
                                             <div className="compact-color-picker-wrapper" style={{
                                                 display: 'inline-block',
                                                 transform: 'scale(0.8), translateY(7px)',
-                                                transformOrigin: 'top left'
+                                                transformOrigin: 'top left',
                                             }}>
                                                 <Compact
                                                     key={`compact-${selectedSubject.id}`}
