@@ -474,3 +474,7 @@ hr {
 .restricted-time-name {
     text-align: center;
 }
+
+input#department, input#subjectAbbreviation {
+    width:180px;
+}

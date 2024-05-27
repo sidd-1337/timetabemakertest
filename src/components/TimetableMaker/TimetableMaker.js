@@ -1065,11 +1065,12 @@ function TimetableMaker() {
                                     </div>
                                     {showLectureColorPicker && (
                                         <div className="color-picker-combined-wrapper">
-                                            <div className="color-picker-combined-wrapper">
+                                            <div className="color-picker-combined-wrapper" style={{backgroundColor:"white", padding:10+"px", borderRadius:5+"px"}}>
                                                 <div className="compact-color-picker-wrapper" style={{
                                                     display: 'inline-block',
                                                     transform: 'scale(0.8), translateY(7px)',
-                                                    transformOrigin: 'top left'
+                                                    transformOrigin: 'top left',
+
                                                 }}>
                                                     <Compact
                                                         key={`compact-${selectedSubject.id}`}
@@ -1133,7 +1134,7 @@ function TimetableMaker() {
                                         style={{cursor: 'pointer', color: 'white', transform: 'translateY(2px)'}}/>
                                     </div>
                                     {showTutorialColorPicker && (
-                                        <div className="color-picker-combined-wrapper">
+                                        <div className="color-picker-combined-wrapper" style={{backgroundColor:"white", padding:10+"px", borderRadius:5+"px"}}>
                                             <div className="compact-color-picker-wrapper" style={{
                                                 display: 'inline-block',
                                                 transform: 'scale(0.8), translateY(7px)',

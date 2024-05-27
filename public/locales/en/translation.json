@@ -61,7 +61,7 @@
     "St": "Wednesday",
     "Čt": "Thursday",
     "Pá": "Friday",
-    "Week": "Week: ",
+    "Week": "",
     "weekType_S": "Even",
     "weekType_L": "Odd",
     "weekType_J": "Every",
