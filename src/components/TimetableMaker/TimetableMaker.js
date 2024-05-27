@@ -781,8 +781,8 @@ function TimetableMaker() {
     const ConfirmSubjectSelection = ({ onConfirm, onReject, subject }) => (
         <div>
             <div>
-                <button className="btn btn-success" onClick={() => onConfirm(subject)}>DONE</button>
-                <button className="btn btn-danger" onClick={() => onReject()}>RESET</button>
+                <button className="btn btn-success" onClick={() => onConfirm(subject)}>{t('Done')}</button>
+                <button className="btn btn-danger" onClick={() => onReject()}>{t('Reset')}</button>
             </div>
         </div>
     );
@@ -1035,6 +1035,20 @@ function TimetableMaker() {
                             {showRestrictedLoader &&
                                 <RestrictedTimeForm times={times} onAddSubject={handleAddSubject}/>}
                         </div>
+                        {uniqueSessions(restrictedTimes).map(restricted => (
+                            <div key={restricted.id} className="subject-item">
+                                <button className='button'
+                                        key={restricted.id}
+                                        onClick={() => addToTimetable(restricted.id, restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo, restricted.type, restricted.department, restricted.shortName, restricted.building, restricted.room, restricted.teacher, restricted.weekType, true)}>
+                                    {restricted.name} {t(dayKeys.find(key => key.includes(restricted.day)))} {restricted.timeFrom} - {restricted.timeTo}
+                                </button>
+
+                                <button className="delete-button"
+                                        onClick={() => deleteSubjectFromTimetable(restricted)}>
+                                    <button className="delete-button" title={t('RemoveSubject')}>
+                                        <img src="/images/whitecross.png"/></button>
+                                </button>
+                            </div>))}
                     </div>
 
                     {selectedSubject && !isAlertOpen && (
@@ -1184,7 +1198,6 @@ function TimetableMaker() {
                                 />
                             )}
 
-
                         </div>
 
                     )}
@@ -1206,20 +1219,7 @@ function TimetableMaker() {
                         </div>
                     </div>
                 </div>
-                {uniqueSessions(restrictedTimes).map(restricted => (
-                    <div key={restricted.id} className="subject-item">
-                    <button className='button'
-                                key={restricted.id}
-                                onClick={() => addToTimetable(restricted.id, restricted.name, restricted.day, restricted.timeFrom, restricted.timeTo, restricted.type, restricted.department, restricted.shortName, restricted.building, restricted.room, restricted.teacher, restricted.weekType, true)}>
-                            {restricted.name} {t(dayKeys.find(key => key.includes(restricted.day)))} {restricted.timeFrom} - {restricted.timeTo}
-                        </button>
 
-                        <button className="delete-button"
-                                onClick={() => deleteSubjectFromTimetable(restricted)}>
-                            <button className="delete-button" title={t('RemoveSubject')}>
-                                <img src="/images/whitecross.png"/></button>
-                        </button>
-                    </div>))}
             </div>
             <AlertModal
                 isOpen={alertInfo.isOpen}

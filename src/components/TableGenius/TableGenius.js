@@ -122,7 +122,7 @@ function TableGenius() {
                 message: t('ErrorFetchingData', error),
                 title: t('Invalid action')
             });
-            alert('Server off');
+            /*alert('Server off');*/
         }
     };
     /*

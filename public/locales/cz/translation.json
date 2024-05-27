@@ -72,10 +72,12 @@
     "ErrorExportingPDF": "Chyba při generaci PDF:",
     "SubjectNotFound": "Předmět nebyl nalezen:",
     "Invalid time format": "Neplatný časový formát:",
-    "ErrorFetchingSubjectData": "Chyba při načítání údajů o předmětu:",
-    "ErrorFetchingData": "Chyba při načítání dat:",
+    "ErrorFetchingSubjectData": "Chyba při načítání údajů o předmět.",
+    "ErrorFetchingData": "Chyba při načítání dat.",
     "FailedToLoadSubject": "Nelze načíst předmět: Nebyla vrácena žádná data",
-    "DayNotFound": "Den nenalezen v rozvrhu:"
+    "DayNotFound": "Den nenalezen v rozvrhu:",
+    "Done": "Hotovo",
+    "Reset": "Resetovat"
 }
 
 
