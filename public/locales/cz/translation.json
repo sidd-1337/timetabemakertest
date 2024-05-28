@@ -67,7 +67,9 @@
     "weekType_J": "Každý",
     "weekType_SL": "Sudý/Lichý",
     "TimeToTimeFrom": "Čas od nemůže být později než Čas do.",
-    "Invalid action": "Neoprávněná akce"
+    "Invalid action": "Neoprávněná akce",
+    "ServerOffline": "Nepodařilo se připojit k serveru.",
+    "NoDataReturned": "Předmět nebyl naleze. Prosím, zkontrolujte zkratku předmětu a katedru."
 }
 
 

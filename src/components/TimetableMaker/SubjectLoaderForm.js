@@ -19,23 +19,38 @@ function SubjectLoaderForm({ onSubjectAdded }) {
     const [subjectAbbreviation, setSubjectAbbreviation] = useState('');
     const [department, setDepartment] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const { t,i18n  } = useTranslation();
+    const [errorMessage, setErrorMessage] = useState(''); // State for error message
+    const [errorMessageServerOff, setErrorMessageServerOff] = useState(''); // State for error message
+    const { t, i18n } = useTranslation();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
+        setErrorMessage(''); // Clear previous error message
+        setErrorMessageServerOff(''); // Clear previous error message
 
-
-        const subjectData = await loadSubject(subjectAbbreviation, department);
-        // Process the subject data here as needed before adding it
-        onSubjectAdded(subjectData); // Assuming onSubjectAdded is a prop function to handle the addition
-        setIsLoading(false);
-        if (Object.keys(subjectData).length === 0) {
-            // Handle the empty object case here
-            alert('Failed to load subject: No data returned');
+        try {
+            const subjectData = await loadSubject(subjectAbbreviation, department);
+            // Process the subject data here as needed before adding it
+            onSubjectAdded(subjectData); // Assuming onSubjectAdded is a prop function to handle the addition
+            setIsLoading(false);
+            if (Object.keys(subjectData).length === 0) {
+                // Handle the empty object case here
+                setErrorMessage(t('NoDataReturned'));
+                setIsLoading(false);
+            }
+        } catch (error) {
+            setErrorMessageServerOff(t('ServerOffline'));
             setIsLoading(false);
         }
+    };
 
+    const handleAbbreviationChange = (e) => {
+        setSubjectAbbreviation(e.target.value.toUpperCase());
+    };
+
+    const handleDepartmentChange = (e) => {
+        setDepartment(e.target.value.toUpperCase());
     };
 
     return (
@@ -46,7 +61,7 @@ function SubjectLoaderForm({ onSubjectAdded }) {
                     id="subjectAbbreviation"
                     type="text"
                     value={subjectAbbreviation}
-                    onChange={(e) => setSubjectAbbreviation(e.target.value)}
+                    onChange={handleAbbreviationChange}
                     className="your-input-class"
                     required
                 />
@@ -57,7 +72,7 @@ function SubjectLoaderForm({ onSubjectAdded }) {
                     id="department"
                     type="text"
                     value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
+                    onChange={handleDepartmentChange}
                     className="your-input-class"
                     required
                 />
@@ -65,9 +80,16 @@ function SubjectLoaderForm({ onSubjectAdded }) {
             <div className="buttons buttons-left">
                 <button type="submit" className="btn-primary">{t('LoadSubject')}</button>
             </div>
+            {errorMessage && <div className="alert-simple">
+                <div className="icon-simple"></div>
+                {(t('NoDataReturned'))}
+            </div>}
+            {errorMessageServerOff && <div className="alert-simple">
+                <div className="icon-simple"></div>
+                {(t('ServerOffline'))}
+            </div>}
         </form>
     );
 }
 
 export default SubjectLoaderForm;
-
