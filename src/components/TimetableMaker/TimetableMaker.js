@@ -252,13 +252,13 @@ function TimetableMaker() {
     };
     const exportPDF = () => {
         const body = document.body;
-        body.classList.add('pdf-export'); // Add class to hide collision indicators
+        body.classList.add('pdf-export','pdf-hide-buttons'); // Add class to hide collision indicators
 
         const input = document.querySelector('.timetable-canvas'); // The element to capture
         if (!input) return;
 
         html2canvas(input, { scale: 2 }).then(originalCanvas => {
-            body.classList.remove('pdf-export'); // Remove class after capturing
+            body.classList.remove('pdf-export','pdf-hide-buttons'); // Remove class after capturing
 
             // Your existing PDF generation logic...
             const originalWidth = originalCanvas.width;

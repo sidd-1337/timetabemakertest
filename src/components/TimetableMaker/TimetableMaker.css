@@ -249,7 +249,9 @@
 .pdf-export .collision-indicator {
   display: none;
 }
-
+.pdf-hide-buttons .remove-subject-button {
+  display: none;
+}
 
 /* Pure CSS Loading Clock Using a Single Div */
 .loading-clock {
