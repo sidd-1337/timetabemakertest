@@ -69,7 +69,7 @@
     "TimeToTimeFrom": "Čas od nemůže být později než Čas do.",
     "Invalid action": "Neoprávněná akce",
     "ServerOffline": "Nepodařilo se připojit k serveru.",
-    "NoDataReturned": "Předmět nebyl naleze. Prosím, zkontrolujte zkratku předmětu a katedru."
+    "NoDataReturned": "Předmět nebyl nalezen. Prosím, zkontrolujte zkratku předmětu a katedru."
 }
 
 
