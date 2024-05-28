@@ -196,41 +196,46 @@ function TimetableMaker() {
 
 
 
-    const handleOverwrite = (newSubject, day, startIndex, endIndex, collisions) => {
-        // Assuming `newSubject` has a unique identifier like `newSubject.id`
-        // Step 1: Remove all instances of the subject from the timetable
+    const handleOverwrite = (newSubject, day, startIndex, endIndex) => {
+        const subjectId = newSubject.id;
+
+        //Remove all instances of the subject from the timetable
         const cleanedTimetable = timetable.map(daySchedule => ({
             ...daySchedule,
             slots: daySchedule.slots.map(slot => {
-
-                if (slot.primarySubject && slot.primarySubject.id === newSubject.id) {
-                    // If the current slot's primarySubject is the one to be overwritten, clear it
-                    return { ...slot, collisions, primarySubject: null };
-                } else if (slot.secondarySubject && slot.secondarySubject.id === newSubject.id) {
-                    // Same for secondarySubject
-                    return { ...slot, collisions, secondarySubject: null};
+                if (slot.primarySubject && slot.primarySubject.id === subjectId) {
+                    // Clear primary subject
+                    return { ...slot, primarySubject: null, collisions: [] };
+                } else if (slot.secondarySubject && slot.secondarySubject.id === subjectId) {
+                    // Clear secondary subject
+                    return { ...slot, secondarySubject: null, collisions: [] };
                 }
-                return slot; // Return slot unchanged if it does not contain the subject to be overwritten
+                return slot;
             })
         }));
 
-        // Step 2: Insert the new subject into the specific day and slot range
+        //Insert the new subject into the specific day and slot range
         const updatedTimetable = cleanedTimetable.map(daySchedule => {
             if (daySchedule.day !== day) return daySchedule; // Skip days not affected
 
             const updatedSlots = daySchedule.slots.map((slot, index) => {
                 if (index >= startIndex && index <= endIndex) {
                     // Only update slots within the specified range
-                    return { ...slot, collisions, primarySubject: newSubject }; // Assign new subject to primarySubject
+                    let updatedSlot = { ...slot, primarySubject: newSubject };
+
+                    // Check for collisions in the slot
+                    updatedSlot.collisions = checkForCollisions(newSubject.name, day, updatedSlot.timeFrom, updatedSlot.timeTo, newSubject.weekType);
+
+                    return updatedSlot;
                 }
                 return slot;
             });
 
-            return { ...daySchedule, slots: updatedSlots, collisions };
+            return { ...daySchedule, slots: updatedSlots };
         });
 
         setTimetable(updatedTimetable);
-        setAlertInfo({ ...alertInfo, isOpen: false }); // Assuming you want to close a modal or alert
+        setAlertInfo({ ...alertInfo, isOpen: false }); // Close the alert
         setOKAlertInfo({ ...OKalertInfo, isOpen: false });
     };
 
