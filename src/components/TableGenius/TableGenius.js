@@ -1,9 +1,13 @@
 import React, { useState, useEffect, startTransition } from 'react';
-import './TableGenius.css';
 import './TableGeniusNew.css';
 import { useTranslation } from 'react-i18next';
 import Header from '../Header';
 import { useNavigate } from 'react-router-dom';
+import '../TimetableMaker/AlertModal.css';
+import '../TimetableMaker/AlertModal';
+import '../TimetableMaker/OKAlertModal';
+import AlertModal from "../TimetableMaker/AlertModal";
+import OKAlertModal from "../TimetableMaker/OKAlertModal";
 
 function TableGenius() {
     const [showForm, setShowForm] = useState(false);
@@ -14,6 +18,7 @@ function TableGenius() {
     const [displayedProgramName, setDisplayedProgramName] = useState('');
     const [showFormValidationAlert, setShowFormValidationAlert] = useState(false);
     const [showImportSubjectsAlert, setShowImportSubjectsAlert] = useState(false);
+
 
     const handleShowFormClick = () => {
         handleShowForm();
@@ -42,6 +47,21 @@ function TableGenius() {
         setStep(step + 1);
         fetchData();
     };
+
+    const [alertInfo, setAlertInfo] = useState({
+        isOpen: false,
+        message: '',
+        onKeepBoth: () => {},
+        onOverwrite: () => {},
+        onCancel: () => {}
+    });
+
+    const [OKalertInfo, setOKAlertInfo] = useState({
+        isOpen: false,
+        message: '',
+        title: '',
+        onCancel: () => {}
+    });
 
     const handleImportSubjects = () => {
 
@@ -97,6 +117,11 @@ function TableGenius() {
             setProgrammesList(data);
         } catch (error) {
             console.error('Error fetching data:', error);
+            /*setOKAlertInfo({
+                isOpen: true,
+                message: t('ErrorFetchingData', error),
+                title: t('Invalid action')
+            });*/
             alert('Server off');
         }
     };
@@ -128,8 +153,7 @@ function TableGenius() {
             } catch (error) {
                 console.error('Error handling generation:', error);
             }
-        };
-
+        };\r\n
      */
 
     // Function to handle form input changes
@@ -179,8 +203,7 @@ function TableGenius() {
     const handleSubmit = (event) => {
         event.preventDefault();
         fetchData();
-    };
-
+     };\r\n
      */
 
     const filteredProgrammes =  programme.length >= 2 && !programmesList.some(prog => prog.nazevCZ === programme)
@@ -286,8 +309,6 @@ function TableGenius() {
                 )}
             </div>
 
-
-
             <button type="button" className="front-btn-primary-back" onClick={handleBackStep}>{t('Back')}</button>
             <button type="button" className="front-btn-primary-next" onClick={handleImportSubjects}>{t('Import subjects')}</button>
             {showForm && (!programmesList.some(prog => prog.nazevCZ === programme) && programme.length>0) && (
@@ -302,7 +323,6 @@ function TableGenius() {
                     {t('You must fill in all the boxes')}
                 </div>
             )}
-
         </form>
     );
 
@@ -336,6 +356,19 @@ function TableGenius() {
                         //)
                     }
                 </div>
+                <AlertModal
+                    isOpen={alertInfo.isOpen}
+                    message={alertInfo.message}
+                    onKeepBoth={alertInfo.onKeepBoth}
+                    onOverwrite={alertInfo.onOverwrite}
+                    onCancel={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+                />
+                <OKAlertModal
+                    isOpen={OKalertInfo.isOpen}
+                    message={OKalertInfo.message}
+                    title={OKalertInfo.title}
+                    onCancel={() => setOKAlertInfo({ ...OKalertInfo, isOpen: false })}
+                />
             </main>
             <footer>
                 © 2023 Nela Bulavová, Matyáš Grendysa, Siddharth Shukla
@@ -345,3 +378,4 @@ function TableGenius() {
 }
 
 export default TableGenius;
+

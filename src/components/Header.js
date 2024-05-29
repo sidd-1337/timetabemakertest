@@ -1,5 +1,5 @@
 import React, { useState, startTransition } from 'react';
-import './TableGenius/TableGenius.css';
+import './TableGenius/TableGeniusNew.css';
 import { useTranslation } from 'react-i18next';
 
 function Header() {

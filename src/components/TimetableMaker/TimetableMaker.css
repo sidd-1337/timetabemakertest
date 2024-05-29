@@ -32,27 +32,27 @@
   border-radius: 5px;
 }
   
-  .time-header {
+.time-header {
     padding: 4px;
     grid-column: 2 / -1; /* Time headers start from the second column */
     display: grid;
     grid-template-columns: repeat(17, 1fr);
-  }
+}
 
-  .time-slot-header {
+.time-slot-header {
     font-size: small;
-    padding: 4px;
+    padding: 3px;
     background-color: #e9f0f6;
     text-align: center;
     border: 1px solid #ddd;
     border-radius: 8px;
-  }
+}
   
-  .day-row {
+.day-row {
     display: contents;
-  }
+}
   
-  .day-header {
+.day-header {
     grid-row: auto;
     grid-column: 1;
     padding: 5px;
@@ -60,13 +60,12 @@
     text-align: center;
     border: 1px solid #ddd;
     border-radius: 8px;
-  }
-
-.button.selected {
-  background:#055388;
-  color: white;
 }
 
+.button.selected {
+  background: #102F52;  /*#055388*/
+  color: white;
+}
 
 .time-slot {
     position: relative;
@@ -76,7 +75,7 @@
     border: 1px solid #ddd;
     border-radius: 8px;
     overflow: hidden;
-  }
+}
 
 .time-slot .department-shortname,
 .time-slot .building-room,
@@ -85,54 +84,89 @@
   text-align: center;
 }
 
-  .subject-selection {
-    border: 1px solid #007BFF; /* Change color and thickness as needed */
-    padding: 10px;
-    margin: 10px 0;
-    margin-bottom: 20px;
-  }
+/*Subject selection box*/
+.subject-selection {
+  border: 2px solid #102F52; /* Change color and thickness as needed */
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 25px;
+  background-color: #5A8BB3;
+  width: 325px;
+}
+
+.subject-selection label {
+    color:white;
+}
   
-  .subject-selection:before {
+.subject-selection:before {
     font-weight: bold;
     display: block;
     margin-bottom: 10px;
-  }
+}
   
-  .subject-selection button {
+.subject-selection button {
     /* Apply language button styles */
     padding: 0.7rem 1.2rem;
     display: block;
     margin: 5px 0;
-    border: 1px solid #007BFF;
-    border-radius: 4px;
+    border: 2px solid #102F52;
+    border-radius: 5px;
     cursor: pointer;
-    background-color: transparent;
-  }
+    color: white;
+    background-color: #0871BA;
+}
 
-  .subject-details button {
-    display: inline;
-    padding: 10px;
-    margin-left: 5px;
-    border: 1px solid #007BFF;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: transparent;
-    gap: 1rem;
-  }
+.subject-selection button:focus {
+  border: 2px solid #102F52;
+  border-radius: 5px;
+}
 
-.remove-subject-button {
-  color: #000000; /* White text for contrast */
-  background: none;
-  border: none; /* Remove default border */
-  border-radius: 50%; /* Circular shape */
+.subject-selection .button:hover {
+  background-color: #102F52 ;
+}
+
+.selected-subject .button {
+  background-color: #102F52; /* Example color, change it as needed */;
+}
+
+/*Subject details*/
+.subject-details .button {
+  display: inline;
+  padding: 7.5px;
+  border: 2px solid #102F52;
+  border-radius: 5px;
   cursor: pointer;
+  background-color: #0871BA;
+  color:white;
+  gap: 1rem;
 }
 
-/* Optional: Change appearance on hover for better user feedback */
+.subject-details button:hover {
+  background-color: #102F52;
+}
+
+/*Remove button*/
+.remove-subject-button, .delete-button {
+  cursor: pointer;
+  border: none;
+  background: red;
+  color: white;
+  margin-bottom: 0.1rem;
+  border-radius: 3px;
+  transition: all .2s;
+}
+
+.remove-subject-button img, .delete-button img {
+  width:15px;
+  position: relative;
+  top: 1px;
+}
+
 .remove-subject-button:hover {
-  background-color: #868484; /* Slightly darker shade of red on hover */
+  transform: scale(1.5);
+  background: red;
 }
-
 
 .right-section {
     display: flex;
@@ -142,33 +176,46 @@
     gap: 20px; /* Adds some space between the two sections */
     width: 100%; /* Adjust the width as necessary */
   }
-  
-  .subject-details {
-    border: 1px solid #007BFF; /* Change color and thickness as needed */
-    padding: 10px;
-    margin: 10px 0;
-    margin-bottom: 20px;
-  }
 
-  .subject-details:before {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 10px;
-  }
+/*Subject details box */
+.subject-details {
+  border: 2px solid #102F52; /* Change color and thickness as needed */
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  transform: translateX(-50%);
+  position:absolute;
+  left:50%;
+  background-color: #5A8BB3;
+  width: 480px;
+}
 
-  .done-subjects {
-    border: 1px solid #007BFF; /* Change color and thickness as needed */
-    padding: 10px;
-    margin: 10px 0;
-    margin-left: auto;
-  }
+.subject-details:before {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.button.button.selected {
+    background-color: #102F52;
+}
+
+/*Done subjects box*/
+.done-subjects {
+  border: 2px solid #102F52; /* Change color and thickness as needed */
+  border-radius: 5px;
+  padding: 10px;
+  margin-top: 10px;
+  margin-left: auto;
+  background-color: #5A8BB3;
+}
 
 .done-subjects:before {
   font-weight: bold;
   display: block;
   margin-bottom: 10px;
 }
-
 
 .collision-indicator {
   position: absolute;
@@ -191,44 +238,43 @@
   background-color: #ff4d4d; /* Red color for full occupancy */
 }
 
-
-
 .buttons-left {
   display: flex;
   justify-content: start; /* Aligns items to the start of the container */
   gap: 1rem;
-  margin-bottom: 2rem;
 }
 
 .subject-item {
   position: relative; /* Make this a positioning context */
 }
 
-
 .subject-item .button {
   width: 100%; /* Adjust size as needed */
-  /* Additional styling */
 }
 
 .done-subjects button{
-  padding: 0.7rem 1.2rem;
+  padding: 0.7rem 2rem;
   display: block;
-  margin: 5px 0;
-  border: 1px solid #007BFF;
+  margin: 7.5px 0;
+  border: 1px solid black;
   border-radius: 4px;
   cursor: pointer;
-  background-color: transparent;
+  background-color: #0871BA;
+    color:white;
+
 }
 
 .done-subjects .undo-button {
-  position: absolute;
-  top: 0; /* Adjust as needed for exact positioning */
+  position: absolute ;
+  top: 4.5px; /* Adjust as needed for exact positioning */
   right: 0; /* Adjust as needed */
   z-index: 1; /* Ensure it's above the subject button */
   padding: 0; /* Adjust padding as needed */
   margin: 0;
+  margin-right: 3px;
   border: none;
-  font-size: 12px;
+  font-size: 20px;
+  float: right;
   /* Adjust size, padding, and margins as needed */
 }
 
@@ -237,12 +283,15 @@
   top: 0; /* Adjust as needed for exact positioning */
   left: 0; /* Adjust as needed */
   z-index: 1; /* Ensure it's above the subject button */
-  padding: 0; /* Adjust padding as needed */
+  padding: 2.5px; /* Adjust padding as needed */
+  padding-right: 5px;
+  padding-left: 5px;
   margin: 0;
-  border: none;
-  font-size: 12px;
-  padding-left: 2px;
-  padding-right: 2px;
+  border:none;
+  border-radius: 3px;
+  font-size: 15px;
+  background-color: red;
+  transition: all .2s;
   /* Adjust size, padding, and margins as needed */
 }
 
@@ -286,56 +335,57 @@
 }
 /* Little hand */
 .loading-clock:after {
-  top: 11px;
-  height: 14px; /* top + height for little hand must = top + height for big hand */
-  transform-origin: 1px 9px;
-  animation: rotate 4.2s infinite linear; /* time should be big-hand time * 12 */
+    top: 11px;
+    height: 14px; /* top + height for little hand must = top + height for big hand */
+    transform-origin: 1px 9px;
+    animation: rotate 4.2s infinite linear; /* time should be big-hand time * 12 */
 }
 
 .loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
+
 .loading-text {
-  margin-bottom: 5px; /* Adjust this value as needed to move the text closer or further from the clock */
+    margin-bottom: 5px; /* Adjust this value as needed to move the text closer or further from the clock */
 }
 
 .slot-divider {
-  height: 2px; /* Thickness of the divider */
-  background-color: #888888; /* Color of the divider */
-  width: 90%; /* Width relative to its parent */
-  margin: 5px auto; /* Center the divider and add some space above and below */
-  border-radius: 1px; /* Optional: slightly round the edges of the divider */
+    height: 2px; /* Thickness of the divider */
+    background-color: #888888; /* Color of the divider */
+    width: 90%; /* Width relative to its parent */
+    margin: 5px auto; /* Center the divider and add some space above and below */
+    border-radius: 1px; /* Optional: slightly round the edges of the divider */
 }
 
 .color-selection {
-  display: flex;
-  align-items: center; /* Aligns the title and color wheel vertically */
-  margin-bottom: 20px; /* Adds some space below each section */
+    display: flex;
+    align-items: center; /* Aligns the title and color wheel vertically */
+    margin-bottom: 20px; /* Adds some space below each section */
 }
 
 .color-wheel-container {
-  margin-left: 10px; /* Adds some space between the title and the wheel */
+    margin-left: 10px; /* Adds some space between the title and the wheel */
 }
 .lecture-section, .tutorial-section {
-  display: flex;
-  align-items: center; /* Center items vertically */
-  gap: 10px; /* Add some space between the title and the color wheel */
-  padding-top: 20px;
+    display: flex;
+    align-items: center; /* Center items vertically */
+    gap: 10px; /* Add some space between the title and the color wheel */
+    padding-top: 20px;
 }
 
 .wheel-container {
-  display: inline-block;
-  vertical-align: top;
-  flex-shrink: 0;
-  margin-left: 0px; /* Space between the Compact picker and the Wheel */
+    display: inline-block;
+    vertical-align: top;
+    flex-shrink: 0;
+    margin-left: 0px; /* Space between the Compact picker and the Wheel */
 }
 .compact-color-picker-wrapper {
-  display: inline-block; /* Allows the transform to apply correctly */
-  position:relative;
-  z-index: 10;
+    display: inline-block; /* Allows the transform to apply correctly */
+    position:relative;
+    z-index: 10;
 }
 
 @keyframes contentShow {
@@ -344,13 +394,93 @@
 }
 
 .color-picker-background {
-   background-color: #ffffff;  /* White background */
-   padding: 5px;              /* Padding around the color picker */
-   border-radius: 5px;         /* Optional: rounded corners */
-   box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: slight shadow for depth */
-   display: inline-block;      /* Keeps the wrapper tight around the content */
-   margin-bottom: 5px;        /* Spacing below the picker */
-   animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    background-color: #ffffff;  /* White background */
+    padding: 5px;              /* Padding around the color picker */
+    border-radius: 5px;         /* Optional: rounded corners */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: slight shadow for depth */
+    display: inline-block;      /* Keeps the wrapper tight around the content */
+    margin-bottom: 5px;        /* Spacing below the picker */
+    animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
  }
 
+.label-to {
+    margin-right: -70px;
+    margin-left: 5px;
+    width: 2rem;
+}
 
+h5 {
+    margin-top: 30px;
+    margin-bottom: 8px;
+    color:white;
+}
+
+h4 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color:white;
+}
+
+h3 {
+    margin-bottom: 5px;
+    margin-top: 5px;
+    color:white;
+}
+
+.btn {
+    border-style: solid;
+    border-width: 2px;
+    border-radius: 5px;
+    color: white;
+    padding: 10px;
+    margin-right: 15px;
+    cursor: pointer;
+}
+
+.btn-success {
+    background-color: green;
+    border-color: #102F52;
+    margin-top: 10px;
+}
+
+.btn-success:hover {
+    background-color: green;
+}
+
+.btn:hover {
+    border-width: 2px;
+    border-color: black;
+}
+
+.btn-danger {
+    background-color: darkred;
+    border-color: #102F52;
+    margin-top: 10px;
+}
+
+button .btn-danger:hover {
+    background-color: darkred;
+}
+
+color-picker-combined-wrapper {
+    position: relative;
+    top: -50px;
+}
+
+hr {
+    padding: 1px;
+    background-color: white;
+}
+
+.form-group#restrictedtimes select, .form-group#restrictedtimes input {
+    position: relative;
+    left: -25px;
+}
+
+.restricted-time-name {
+    text-align: center;
+}
+
+input#department, input#subjectAbbreviation {
+    width:180px;
+}
