@@ -1,9 +1,13 @@
 import React, { useState, useEffect, startTransition } from 'react';
-import './TableGenius.css';
 import './TableGeniusNew.css';
 import { useTranslation } from 'react-i18next';
 import Header from '../Header';
 import { useNavigate } from 'react-router-dom';
+import '../TimetableMaker/AlertModal.css';
+import '../TimetableMaker/AlertModal';
+import '../TimetableMaker/OKAlertModal';
+import AlertModal from "../TimetableMaker/AlertModal";
+import OKAlertModal from "../TimetableMaker/OKAlertModal";
 
 function TableGenius() {
     const [showForm, setShowForm] = useState(false);
@@ -14,6 +18,7 @@ function TableGenius() {
     const [displayedProgramName, setDisplayedProgramName] = useState('');
     const [showFormValidationAlert, setShowFormValidationAlert] = useState(false);
     const [showImportSubjectsAlert, setShowImportSubjectsAlert] = useState(false);
+
 
     const handleShowFormClick = () => {
         handleShowForm();
@@ -42,6 +47,21 @@ function TableGenius() {
         setStep(step + 1);
         fetchData();
     };
+
+    const [alertInfo, setAlertInfo] = useState({
+        isOpen: false,
+        message: '',
+        onKeepBoth: () => {},
+        onOverwrite: () => {},
+        onCancel: () => {}
+    });
+
+    const [OKalertInfo, setOKAlertInfo] = useState({
+        isOpen: false,
+        message: '',
+        title: '',
+        onCancel: () => {}
+    });
 
     const handleImportSubjects = () => {
 
@@ -97,6 +117,11 @@ function TableGenius() {
             setProgrammesList(data);
         } catch (error) {
             console.error('Error fetching data:', error);
+            /*setOKAlertInfo({
+                isOpen: true,
+                message: t('ErrorFetchingData', error),
+                title: t('Invalid action')
+            });*/
             alert('Server off');
         }
     };
@@ -128,8 +153,7 @@ function TableGenius() {
             } catch (error) {
                 console.error('Error handling generation:', error);
             }
-        };
-
+        };\r\n
      */
 
     // Function to handle form input changes
@@ -179,8 +203,7 @@ function TableGenius() {
     const handleSubmit = (event) => {
         event.preventDefault();
         fetchData();
-    };
-
+     };\r\n
      */
 
     const filteredProgrammes =  programme.length >= 2 && !programmesList.some(prog => prog.nazevCZ === programme)
@@ -194,7 +217,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="faculty">{t('faculty')}</label>
                 <select id="faculty" name="faculty" value={faculty} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="FAU">FAU</option>
                     <option value="FFI">FFI</option>
                     <option value="FPD">FPD</option>
@@ -206,7 +229,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="typeOfStudy">{t('typeOfStudy')}</label>
                 <select id="typeOfStudy" name="typeOfStudy" value={typeOfStudy} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="Bakalářský">{t('Bachelor')}</option>
                     <option value="Navazující magisterský">{t('Postgraduate master')}</option>
                     <option value="Magisterský">{t('Undergraduate master')}</option>
@@ -215,7 +238,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="formOfStudy">{t('formOfStudy')}</label>
                 <select id="formOfStudy" name="formOfStudy" value={formOfStudy} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="Prezenční">{t('Full-time')}</option>
                     <option value="Kombinovaná">{t('Part-time')}</option>
                     <option value="Distanční">{t('Distant')}</option>
@@ -240,7 +263,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="grade">{t('grade')}</label>
                 <select id="grade" name="grade" value={grade} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -251,7 +274,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="semester">{t('Semester')}</label>
                 <select id="semester" name="semester" value={semester} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="LS">{t('Summer')}</option>
                     <option value="ZS">{t('Winter')}</option>
                 </select>
@@ -259,7 +282,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="schoolYear">{t('schoolYear')}</label>
                 <select id="schoolYear" name="schoolYear" value={schoolYear} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="2023-2024">2023/2024</option>
                 </select>
             </div>
@@ -286,8 +309,6 @@ function TableGenius() {
                 )}
             </div>
 
-
-
             <button type="button" className="front-btn-primary-back" onClick={handleBackStep}>{t('Back')}</button>
             <button type="button" className="front-btn-primary-next" onClick={handleImportSubjects}>{t('Import subjects')}</button>
             {showForm && (!programmesList.some(prog => prog.nazevCZ === programme) && programme.length>0) && (
@@ -302,7 +323,6 @@ function TableGenius() {
                     {t('You must fill in all the boxes')}
                 </div>
             )}
-
         </form>
     );
 
@@ -336,12 +356,26 @@ function TableGenius() {
                         //)
                     }
                 </div>
+                <AlertModal
+                    isOpen={alertInfo.isOpen}
+                    message={alertInfo.message}
+                    onKeepBoth={alertInfo.onKeepBoth}
+                    onOverwrite={alertInfo.onOverwrite}
+                    onCancel={() => setAlertInfo({ ...alertInfo, isOpen: false })}
+                />
+                <OKAlertModal
+                    isOpen={OKalertInfo.isOpen}
+                    message={OKalertInfo.message}
+                    title={OKalertInfo.title}
+                    onCancel={() => setOKAlertInfo({ ...OKalertInfo, isOpen: false })}
+                />
             </main>
             <footer>
-                © 2023 Nela Bulavová, Matyáš Grendysa, Siddharth Shukla
+                2024 Nela Bulavová, Matyáš Grendysa, Siddharth Shukla
             </footer>
         </div>
     );
 }
 
 export default TableGenius;
+
