@@ -67,7 +67,9 @@
     "weekType_J": "Every",
     "weekType_SL": "Even/Odd",
     "TimeToTimeFrom": "The Time from must be earlier than the Time to. Please adjust your selection.",
-    "Invalid action": "Invalid action"
+    "Invalid action": "Invalid action",
+    "ServerOffline": "The connection to the server is lost.",
+    "NoDataReturned": "No data was returned from the server. Please check your input or try again later."
 }
 
 
