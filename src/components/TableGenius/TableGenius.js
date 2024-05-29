@@ -194,7 +194,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="faculty">{t('faculty')}</label>
                 <select id="faculty" name="faculty" value={faculty} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="FAU">FAU</option>
                     <option value="FFI">FFI</option>
                     <option value="FPD">FPD</option>
@@ -206,7 +206,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="typeOfStudy">{t('typeOfStudy')}</label>
                 <select id="typeOfStudy" name="typeOfStudy" value={typeOfStudy} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="Bakalářský">{t('Bachelor')}</option>
                     <option value="Navazující magisterský">{t('Postgraduate master')}</option>
                     <option value="Magisterský">{t('Undergraduate master')}</option>
@@ -215,7 +215,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="formOfStudy">{t('formOfStudy')}</label>
                 <select id="formOfStudy" name="formOfStudy" value={formOfStudy} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="Prezenční">{t('Full-time')}</option>
                     <option value="Kombinovaná">{t('Part-time')}</option>
                     <option value="Distanční">{t('Distant')}</option>
@@ -251,7 +251,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="semester">{t('Semester')}</label>
                 <select id="semester" name="semester" value={semester} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="LS">{t('Summer')}</option>
                     <option value="ZS">{t('Winter')}</option>
                 </select>
@@ -259,7 +259,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="schoolYear">{t('schoolYear')}</label>
                 <select id="schoolYear" name="schoolYear" value={schoolYear} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="2023-2024">2023/2024</option>
                 </select>
             </div>
