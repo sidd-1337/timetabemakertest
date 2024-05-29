@@ -50,7 +50,7 @@ function RestrictedTimeForm({ times, onAddSubject }) {
                         <option key={from} value={from}>{from}</option>
                     ))}
                 </select>
-                <label className="label-to">{t('To')}</label>
+                <label className="label-to">{t('TimeTo')}</label>
                 <select value={timeTo} onChange={(e) => setTimeTo(e.target.value)} required>
                     {times.map(({to}) => (
                         <option key={to} value={to}>{to}</option>

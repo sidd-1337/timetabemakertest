@@ -73,8 +73,8 @@ label {
 .form-group {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
-    margin-top: 10px;
+    margin-bottom: 25px;
+    margin-top: 20px;
 }
 
 form select {
