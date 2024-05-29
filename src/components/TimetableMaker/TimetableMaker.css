@@ -63,7 +63,7 @@
 }
 
 .button.selected {
-  background:#055388;
+  background: #102F52;  /*#055388*/
   color: white;
 }
 
@@ -195,6 +195,10 @@
   font-weight: bold;
   display: block;
   margin-bottom: 10px;
+}
+
+.button.button.selected {
+    background-color: #102F52;
 }
 
 /*Done subjects box*/
