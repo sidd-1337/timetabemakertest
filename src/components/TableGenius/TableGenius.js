@@ -263,7 +263,7 @@ function TableGenius() {
             <div className="form-group">
                 <label htmlFor="grade">{t('grade')}</label>
                 <select id="grade" name="grade" value={grade} onChange={handleInputChange}>
-                    <option value="empty">/</option>
+                    <option value="empty"></option>
                     <option value="1">1</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -371,7 +371,7 @@ function TableGenius() {
                 />
             </main>
             <footer>
-                © 2023 Nela Bulavová, Matyáš Grendysa, Siddharth Shukla
+                2024 Nela Bulavová, Matyáš Grendysa, Siddharth Shukla
             </footer>
         </div>
     );

@@ -30,7 +30,7 @@
     "AddRestrictedTime": "Add restricted time",
     "Name": "Name",
     "TimeTo": "to",
-    "TimeFrom": "from",
+    "TimeFrom": "Time from",
     "Day": "Day",
     "ChooseDay": "Choose day",
     "KeepBoth": "Keep both",
@@ -39,7 +39,7 @@
     "SubjectAbbreviation": "Subject abbreviation: ",
     "Department": "Department: ",
     "LoadSubject": "Load Subject",
-    "SelectBoth": "You must select exactly one lecture and one tutorial, if available.",
+    "SelectBoth": "You must select at least one lecture and one tutorial, if available.",
     "BothSelected": "Both primary and secondary subjects are already set for this time slot.",
     "Yes": "Done",
     "No": "Reset",
@@ -77,10 +77,9 @@
     "FailedToLoadSubject": "Failed to load subject: No data returned",
     "DayNotFound": "Day not found in timetable:",
     "Done": "Done",
-    "Reset": "Reset"
-    "Invalid action": "Invalid action",
+    "Reset": "Reset",
     "ServerOffline": "The connection to the server is lost.",
-    "NoDataReturned": "No data was returned from the server. Please check your input or try again later."
+    "NoDataReturned": "Subject not found."
 }
 
 

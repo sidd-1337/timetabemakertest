@@ -30,7 +30,7 @@
     "AddRestrictedTime": "Přidat vlastní vyhrazený úsek",
     "Name": "Název ",
     "TimeTo": "do",
-    "TimeFrom": "od",
+    "TimeFrom": "Čas od",
     "Day": "Den",
     "ChooseDay": "Vyber den",
     "KeepBoth": "Ponechat obě",
@@ -39,7 +39,7 @@
     "SubjectAbbreviation": "Zkratka předmětu: ",
     "Department": "Katedra: ",
     "LoadSubject": "Načíst předmět",
-    "SelectBoth": "Je nutné vybrat právě jednu přednášku a cvičení, pokud jsou k dispozici.",
+    "SelectBoth": "Je nutné vybrat alespoň jednu přednášku a cvičení, pokud jsou k dispozici.",
     "BothSelected": "Pro tento časový úsek jsou již nastaveny hlavní a vedlejší předměty.",
     "Yes": "Hotovo",
     "No": "Resetovat",
@@ -77,10 +77,9 @@
     "FailedToLoadSubject": "Nelze načíst předmět: Nebyla vrácena žádná data",
     "DayNotFound": "Den nenalezen v rozvrhu:",
     "Done": "Hotovo",
-    "Reset": "Resetovat"
-    "Invalid action": "Neoprávněná akce",
+    "Reset": "Resetovat",
     "ServerOffline": "Nepodařilo se připojit k serveru.",
-    "NoDataReturned": "Předmět nebyl nalezen. Prosím, zkontrolujte zkratku předmětu a katedru."
+    "NoDataReturned": "Předmět nebyl nalezen."
 }
 
 

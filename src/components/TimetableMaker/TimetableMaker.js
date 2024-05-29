@@ -21,8 +21,8 @@ export const dayKeys = days.map(day => `${day}`);
 
 function TimetableMaker() {
     const location = useLocation();
-    const { t,i18n  } = useTranslation();
-    const { programme, faculty, typeOfStudy, formOfStudy, grade, semester } = location.state || {};
+    const {t, i18n} = useTranslation();
+    const {programme, faculty, typeOfStudy, formOfStudy, grade, semester} = location.state || {};
     const weekTypes = ['S', 'L', 'J', 'SL'];
     const weekTypeKeys = weekTypes.map(type => `weekType_${type}`);
 
@@ -30,28 +30,28 @@ function TimetableMaker() {
     const dayKeys = days.map(day => `${day}`); // Translation keys
     // Times can be an array of time slots, e.g., ['08:00', '09:00', ...]
     const times = [
-        { from: '', to: '' },
-        { from: '06:30', to: '07:15' },
-        { from: '07:30', to: '08:15' },
-        { from: '08:20', to: '09:05' },
-        { from: '09:10', to: '09:55' },
-        { from: '10:00', to: '10:45' },
-        { from: '10:50', to: '11:35' },
-        { from: '11:40', to: '12:25' },
-        { from: '12:30', to: '13:15' },
-        { from: '13:20', to: '14:05' },
-        { from: '14:10', to: '14:55' },
-        { from: '15:00', to: '15:45' },
-        { from: '15:50', to: '16:35' },
-        { from: '16:40', to: '17:25' },
-        { from: '17:30', to: '18:15' },
-        { from: '18:20', to: '19:05' },
-        { from: '19:10', to: '19:55' },
-        { from: '20:00', to: '20:45' },
+        {from: '', to: ''},
+        {from: '06:30', to: '07:15'},
+        {from: '07:30', to: '08:15'},
+        {from: '08:20', to: '09:05'},
+        {from: '09:10', to: '09:55'},
+        {from: '10:00', to: '10:45'},
+        {from: '10:50', to: '11:35'},
+        {from: '11:40', to: '12:25'},
+        {from: '12:30', to: '13:15'},
+        {from: '13:20', to: '14:05'},
+        {from: '14:10', to: '14:55'},
+        {from: '15:00', to: '15:45'},
+        {from: '15:50', to: '16:35'},
+        {from: '16:40', to: '17:25'},
+        {from: '17:30', to: '18:15'},
+        {from: '18:20', to: '19:05'},
+        {from: '19:10', to: '19:55'},
+        {from: '20:00', to: '20:45'},
     ];
 
     const [selectedSubject, setSelectedSubject] = useState(null);
-    const [subjectSchedule, setSubjectSchedule] = useState({ lectures: [], tutorials: [], });
+    const [subjectSchedule, setSubjectSchedule] = useState({lectures: [], tutorials: [],});
     const [timetable, setTimetable] = useState([]);
     const [subjects, setSubjects] = useState([]);
     const [showSubjectLoader, setShowSubjectLoader] = useState(false);
@@ -66,8 +66,8 @@ function TimetableMaker() {
     const [showLoadingClock, setShowLoadingClock] = useState(false); // New state for clock symbol visibility
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [alertMessage, setAlertMessage] = useState('');
-    const [lectureColor, setLectureColor] = useState({ h: 0, s: 0, v: 100, a: 1 }); // Initial color for lectures
-    const [tutorialColor, setTutorialColor] = useState({ h: 0, s: 0, v: 100, a: 1 }); // Initial color for tutorials
+    const [lectureColor, setLectureColor] = useState({h: 0, s: 0, v: 100, a: 1}); // Initial color for lectures
+    const [tutorialColor, setTutorialColor] = useState({h: 0, s: 0, v: 100, a: 1}); // Initial color for tutorials
     const [showLectureColorPicker, setShowLectureColorPicker] = useState(false);
     const [showTutorialColorPicker, setShowTutorialColorPicker] = useState(false);
     const [showColorWheel, setShowColorWheel] = useState(false); // New state to toggle color wheel display
@@ -89,11 +89,11 @@ function TimetableMaker() {
         );
 
         if (!subject) return 'transparent'; // Return transparent if no subject is found
-        var color="#FFFFFF";
+        var color = "#FFFFFF";
         // Determine color based on the slot type (Lecture/Tutorial)
         if (order === "Primary")
             color = slot.primarySubject.type === 'Lecture' ? subject.colors.lectureColor : subject.colors.tutorialColor;
-        else if(order === "Secondary")
+        else if (order === "Secondary")
             color = slot.secondarySubject.type === 'Lecture' ? subject.colors.lectureColor : subject.colors.tutorialColor;
         console.log(`Applied color: ${color}`); // Debugging log
         return color;
@@ -115,13 +115,13 @@ function TimetableMaker() {
         console.log(`Changing ${type} color: ${color}`);
         setSubjects(subjects => subjects.map(subj => {
             if (subj.id === subjectId) {
-                const updatedColors = { ...subj.colors };
+                const updatedColors = {...subj.colors};
                 if (type === 'Lecture') {
                     updatedColors.lectureColor = color;
                 } else if (type === 'Tutorial') {
                     updatedColors.tutorialColor = color;
                 }
-                return { ...subj, colors: updatedColors };
+                return {...subj, colors: updatedColors};
             }
             return subj;
         }));
@@ -131,16 +131,20 @@ function TimetableMaker() {
     const [alertInfo, setAlertInfo] = useState({
         isOpen: false,
         message: '',
-        onKeepBoth: () => {},
-        onOverwrite: () => {},
-        onCancel: () => {}
+        onKeepBoth: () => {
+        },
+        onOverwrite: () => {
+        },
+        onCancel: () => {
+        }
     });
 
     const [OKalertInfo, setOKAlertInfo] = useState({
         isOpen: false,
         message: '',
         title: '',
-        onCancel: () => {}
+        onCancel: () => {
+        }
     });
 
     useEffect(() => {
@@ -150,7 +154,6 @@ function TimetableMaker() {
             setShowTutorialColorPicker(false);
         }
     }, [alertInfo.isOpen, OKalertInfo.isOpen]);
-
 
 
     const handleKeepBoth = (subject, day, startIndex, endIndex, weekType) => {
@@ -163,19 +166,18 @@ function TimetableMaker() {
                 // Check if the slot overlaps with the subject's time
                 if (index >= startIndex && index <= endIndex) {
                     // Logic to combine or add the subject to this slot
-                    let updatedSlot = { ...slot };
+                    let updatedSlot = {...slot};
                     if (slot.primarySubject && (slot.primarySubject.weekType === 'S' || slot.primarySubject.weekType === 'L') && (weekType === 'S' || weekType === 'L') && slot.primarySubject.name === subject.name) {
                         updatedSlot.primarySubject = {
                             ...slot.primarySubject,
                             weekType: 'SL' // Combine week types
                         };
-                    } else if (slot.secondarySubject && (slot.secondarySubject.weekType === 'S' || slot.secondarySubject.weekType === 'L') && slot.secondarySubject.name === subject.name){
+                    } else if (slot.secondarySubject && (slot.secondarySubject.weekType === 'S' || slot.secondarySubject.weekType === 'L') && slot.secondarySubject.name === subject.name) {
                         updatedSlot.secondarySubject = {
                             ...slot.secondarySubject,
                             weekType: 'SL' // Combine week types
                         };
-                    }
-                    else if (!slot.primarySubject) {
+                    } else if (!slot.primarySubject) {
                         updatedSlot.primarySubject = subject; // Add as primary if empty
                     } else if (!slot.secondarySubject) {
                         updatedSlot.secondarySubject = subject; // Add as secondary if primary is filled
@@ -185,15 +187,13 @@ function TimetableMaker() {
                 return slot;
             }));
 
-            return { ...daySchedule, slots: updatedSlots };
+            return {...daySchedule, slots: updatedSlots};
         });
 
         setTimetable(updatedTimetable);
-        setAlertInfo({ ...alertInfo, isOpen: false }); // Close the modal
-        setOKAlertInfo({ ...OKalertInfo, isOpen: false });
+        setAlertInfo({...alertInfo, isOpen: false}); // Close the modal
+        setOKAlertInfo({...OKalertInfo, isOpen: false});
     };
-
-
 
 
     const handleOverwrite = (newSubject, day, startIndex, endIndex) => {
@@ -205,10 +205,10 @@ function TimetableMaker() {
             slots: daySchedule.slots.map(slot => {
                 if (slot.primarySubject && slot.primarySubject.id === subjectId) {
                     // Clear primary subject
-                    return { ...slot, primarySubject: null, collisions: [] };
+                    return {...slot, primarySubject: null, collisions: []};
                 } else if (slot.secondarySubject && slot.secondarySubject.id === subjectId) {
                     // Clear secondary subject
-                    return { ...slot, secondarySubject: null, collisions: [] };
+                    return {...slot, secondarySubject: null, collisions: []};
                 }
                 return slot;
             })
@@ -221,7 +221,7 @@ function TimetableMaker() {
             const updatedSlots = daySchedule.slots.map((slot, index) => {
                 if (index >= startIndex && index <= endIndex) {
                     // Only update slots within the specified range
-                    let updatedSlot = { ...slot, primarySubject: newSubject };
+                    let updatedSlot = {...slot, primarySubject: newSubject};
 
                     // Check for collisions in the slot
                     updatedSlot.collisions = checkForCollisions(newSubject.name, day, updatedSlot.timeFrom, updatedSlot.timeTo, newSubject.weekType);
@@ -231,14 +231,15 @@ function TimetableMaker() {
                 return slot;
             });
 
-            return { ...daySchedule, slots: updatedSlots };
+            return {...daySchedule, slots: updatedSlots};
         });
 
         setTimetable(updatedTimetable);
-        setAlertInfo({ ...alertInfo, isOpen: false }); // Close the alert
-        setOKAlertInfo({ ...OKalertInfo, isOpen: false });
+        setSelectedLectures([newSubject]);
+        setSelectedTutorials([newSubject]);
+        setAlertInfo({...alertInfo, isOpen: false}); // Close the alert
+        setOKAlertInfo({...OKalertInfo, isOpen: false});
     };
-
 
 
     const uniqueSessions = (sessions) => {
@@ -252,13 +253,13 @@ function TimetableMaker() {
     };
     const exportPDF = () => {
         const body = document.body;
-        body.classList.add('pdf-export','pdf-hide-buttons'); // Add class to hide collision indicators
+        body.classList.add('pdf-export', 'pdf-hide-buttons'); // Add class to hide collision indicators
 
         const input = document.querySelector('.timetable-canvas'); // The element to capture
         if (!input) return;
 
-        html2canvas(input, { scale: 2 }).then(originalCanvas => {
-            body.classList.remove('pdf-export','pdf-hide-buttons'); // Remove class after capturing
+        html2canvas(input, {scale: 2}).then(originalCanvas => {
+            body.classList.remove('pdf-export', 'pdf-hide-buttons'); // Remove class after capturing
 
             // Your existing PDF generation logic...
             const originalWidth = originalCanvas.width;
@@ -315,7 +316,7 @@ function TimetableMaker() {
 
 
         console.log('Fetching data...');
-        if(programme==="null" || faculty==="null" || typeOfStudy==="null" || formOfStudy==="null" || grade==="null" || semester==="null"){
+        if (programme === "null" || faculty === "null" || typeOfStudy === "null" || formOfStudy === "null" || grade === "null" || semester === "null") {
             setIsDataFetched(true);
             setShowLoadingClock(false);
             clearTimeout(timer);
@@ -340,8 +341,8 @@ function TimetableMaker() {
                     subject = {
                         id: item.id,
                         name: item.nazev,
-                        details: { lectures: [], tutorials: [] },
-                        colors: { lectureColor: "#FFFFFF", tutorialColor: "#FFFFFF" }
+                        details: {lectures: [], tutorials: []},
+                        colors: {lectureColor: "#FFFFFF", tutorialColor: "#FFFFFF"}
                     };
                     subjectsMap.set(item.nazev, subject);
                 }
@@ -452,9 +453,8 @@ function TimetableMaker() {
 
     // Function to select a lecture/tutorial for confirmation
     const confirmSubjectSelection = (subject, sessionType) => {
-        setToConfirmSubject({ ...subject, sessionType });
+        setToConfirmSubject({...subject, sessionType});
     };
-
 
 
     const handleSubjectSelect = (subjectId, fromDoneSubjects = false) => {
@@ -481,21 +481,19 @@ function TimetableMaker() {
         setShowTutorialColorPicker(false);
 
         // Set colors
-        const subjectLectureColor = subject.colors?.lectureColor || { h: 0, s: 0, v: 100, a: 1 };
-        const subjectTutorialColor = subject.colors?.tutorialColor || { h: 0, s: 0, v: 100, a: 1 };
+        const subjectLectureColor = subject.colors?.lectureColor || {h: 0, s: 0, v: 100, a: 1};
+        const subjectTutorialColor = subject.colors?.tutorialColor || {h: 0, s: 0, v: 100, a: 1};
         setLectureColor(subjectLectureColor);
         setTutorialColor(subjectTutorialColor);
     };
 
 
-
-
     const handleConfirm = () => {
         // Check for required selections based on availability
 
-        const lectureRequiredAndSelectedOnce = subjectSchedule.lectures.length > 0 ? selectedLectures.length === 1 : true;
+        const lectureRequiredAndSelectedOnce = subjectSchedule.lectures.length > 0 ? selectedLectures.length >= 1 : true;
 
-        const tutorialRequiredAndSelectedOnce = subjectSchedule.tutorials.length > 0 ? selectedTutorials.length === 1 : true;
+        const tutorialRequiredAndSelectedOnce = subjectSchedule.tutorials.length > 0 ? selectedTutorials.length >= 1 : true;
 
         // If any of the required selections is not satisfied, show alert and return
 
@@ -526,12 +524,11 @@ function TimetableMaker() {
 
         // Reset selected states
         setSelectedSubject(null);
-        setSelectedLectures([]);
-        setSelectedTutorials([]);
+        /* setSelectedLectures([]);
+        setSelectedTutorials([]); */
         setToConfirmSubject(null);
         setIsEditingDoneSubject(false);
     };
-
 
 
     const handleReject = () => {
@@ -560,7 +557,6 @@ function TimetableMaker() {
     };
 
 
-
     const initializeTimetable = () => {
         const initialTimetable = days.map(day => ({
             day,
@@ -570,7 +566,7 @@ function TimetableMaker() {
                 subjectEvenWeek: null,
                 subjectOddWeek: null,
                 subjectBothWeeks: null,
-                restricted:null,
+                restricted: null,
                 primarySubject: null, // Initialize as null instead of an array
                 secondarySubject: null, // Initialize as null instead of an array
             }))
@@ -673,7 +669,7 @@ function TimetableMaker() {
 
                 if (isRestrictedTime) {
                     // Modify slot to indicate it's a restricted time
-                    return { ...slot, primarySubject: { ...subject, isRestrictedTime: true }, collisions };
+                    return {...slot, primarySubject: {...subject, isRestrictedTime: true}, collisions};
                 }
 
                 // Find if there's an existing subject in the slot for 'S' or 'L' week types
@@ -688,19 +684,19 @@ function TimetableMaker() {
                 // If adding 'S' or 'L' and the opposite week type is already present, combine them
                 if ((weekType === 'S' || weekType === 'L') && existingSLSubject) {
                     const newWeekType = 'SL';
-                    const updatedSubject = { ...existingSLSubject, weekType: newWeekType };
+                    const updatedSubject = {...existingSLSubject, weekType: newWeekType};
                     if (slot.primarySubject === existingSLSubject) {
-                        return { ...slot, primarySubject: updatedSubject, collisions };
+                        return {...slot, primarySubject: updatedSubject, collisions};
                     } else {
-                        return { ...slot, secondarySubject: updatedSubject, collisions };
+                        return {...slot, secondarySubject: updatedSubject, collisions};
                     }
                 }
 
                 // For adding any new subject, the existing logic applies
                 if (!slot.primarySubject) {
-                    return { ...slot, primarySubject: subject, collisions };
+                    return {...slot, primarySubject: subject, collisions};
                 } else if (!slot.secondarySubject) {
-                    return { ...slot, secondarySubject: subject, collisions };
+                    return {...slot, secondarySubject: subject, collisions};
                 } else {
                     /*alert(t('BothSelected'));*/
                     setOKAlertInfo({
@@ -711,12 +707,11 @@ function TimetableMaker() {
                     return slot; // No changes, the slot is full
                 }
             });
-            return { ...daySchedule, slots: updatedSlots };
+            return {...daySchedule, slots: updatedSlots};
         });
 
         setTimetable(updatedTimetable);
     };
-
 
 
     const handleSubjectAdded = (subjectData) => {
@@ -732,8 +727,8 @@ function TimetableMaker() {
                 subject = {
                     id: item.id,
                     name: item.nazev,
-                    details: { lectures: [], tutorials: [], },
-                    colors: { lectureColor: "#FFFFFF", tutorialColor: "#FFFFFF" }
+                    details: {lectures: [], tutorials: [],},
+                    colors: {lectureColor: "#FFFFFF", tutorialColor: "#FFFFFF"}
                 };
                 subjectsMap.set(item.nazev, subject);
             }
@@ -778,12 +773,12 @@ function TimetableMaker() {
         console.log("Adding restricted time with ID:", subjectData.name);
         setRestrictedTimes(currentTimes => [
             ...currentTimes,
-            { ...subjectData, id }// Adding an ID for uniqueness
+            {...subjectData, id}// Adding an ID for uniqueness
         ]);
     };
 
 
-    const ConfirmSubjectSelection = ({ onConfirm, onReject, subject }) => (
+    const ConfirmSubjectSelection = ({onConfirm, onReject, subject}) => (
         <div>
             <div>
                 <button className="btn btn-success" onClick={() => onConfirm(subject)}>{t('Done')}</button>
@@ -793,6 +788,8 @@ function TimetableMaker() {
     );
     const undoSubject = (subject) => {
         // Remove from doneSubjects and add back to subjects
+        setSelectedTutorials([]);
+        setSelectedLectures([]);
         setDoneSubjects(doneSubjects.filter(sub => sub.id !== subject.id));
         setSubjects([...subjects, subject]);
         setTimetable(clearTimetable(subject));
@@ -824,7 +821,7 @@ function TimetableMaker() {
         }));
     };
 
-   // Function that removes "remove button" when subject is in "done subjects"
+    // Function that removes "remove button" when subject is in "done subjects"
     const isSubjectDone = (subjectName) => {
         return doneSubjects.some(subject => subject.name === subjectName);
     };
@@ -834,7 +831,6 @@ function TimetableMaker() {
             if (selectedLectures.some(sl => sl.id === id)) {
                 setSelectedLectures(prevSelectedLectures =>
                     prevSelectedLectures.filter(sl => sl.id !== id)
-
                 );
             }
         } else if (sessionType === 'Tutorial') {
@@ -851,7 +847,7 @@ function TimetableMaker() {
             return {
                 ...daySchedule,
                 slots: daySchedule.slots.map((slot, index) => {
-                    let updatedSlot = { ...slot };
+                    let updatedSlot = {...slot};
 
                     if (updatedSlot.primarySubject && updatedSlot.primarySubject.id === id && updatedSlot.primarySubject.type === sessionType) {
                         updatedSlot.primarySubject = null;
@@ -890,8 +886,6 @@ function TimetableMaker() {
 
         return collisions.map(subject => subject.name);
     };
-
-
 
 
     return (
@@ -961,11 +955,9 @@ function TimetableMaker() {
                                                 }}>
                                                 <div className="slot-divider"></div>
                                                 {!isSubjectDone(slot.secondarySubject.name) && (
-                                                    <button type="button"
-                                                            className="btn btn-primary remove-subject-button"
-                                                            title={t('RemoveSubject')}
-                                                            style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;">
-                                                        <img src="/images/whitecross.png"/>
+                                                    <button className="remove-subject-button" title={t('RemoveSubject')}
+                                                            onClick={() => removeSpecificSession(daySchedule.day, slot.secondarySubject.type, slot.secondarySubject.id)}
+                                                    ><img src="/images/whitecross.png"/>
                                                     </button>
                                                 )}
                                                 {slot.secondarySubject.isRestrictedTime ? (
@@ -1064,13 +1056,18 @@ function TimetableMaker() {
                             {subjectSchedule.lectures.length > 0 && (
                                 <div className="lecture-section">
                                     <h4>{t('Lectures')}</h4>
-                                    <div className="palette" style={{marginRight: 20 + 'px', marginLeft: 20 + 'px'}}><IoColorPaletteSharp
-                                        onClick={() => setShowLectureColorPicker(!showLectureColorPicker)}
-                                        style={{cursor: 'pointer', color: 'white', transform: 'translateY(2px)'}}/>
+                                    <div className="palette" style={{marginRight: 20 + 'px', marginLeft: 20 + 'px'}}>
+                                        <IoColorPaletteSharp
+                                            onClick={() => setShowLectureColorPicker(!showLectureColorPicker)}
+                                            style={{cursor: 'pointer', color: 'white', transform: 'translateY(2px)'}}/>
                                     </div>
                                     {showLectureColorPicker && (
                                         <div className="color-picker-combined-wrapper">
-                                            <div className="color-picker-combined-wrapper" style={{backgroundColor:"white", padding:10+"px", borderRadius:5+"px"}}>
+                                            <div className="color-picker-combined-wrapper" style={{
+                                                backgroundColor: "white",
+                                                padding: 10 + "px",
+                                                borderRadius: 5 + "px"
+                                            }}>
                                                 <div className="compact-color-picker-wrapper" style={{
                                                     display: 'inline-block',
                                                     transform: 'scale(0.8), translateY(7px)',
@@ -1134,12 +1131,17 @@ function TimetableMaker() {
                             {subjectSchedule.tutorials.length > 0 && (
                                 <div className="tutorial-section">
                                     <h4>{t('Tutorials')}</h4>
-                                    <div className="palette" style={{marginRight: 20 + 'px', marginLeft: 20 + 'px'}}><IoColorPaletteSharp
-                                        onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)}
-                                        style={{cursor: 'pointer', color: 'white', transform: 'translateY(2px)'}}/>
+                                    <div className="palette" style={{marginRight: 20 + 'px', marginLeft: 20 + 'px'}}>
+                                        <IoColorPaletteSharp
+                                            onClick={() => setShowTutorialColorPicker(!showTutorialColorPicker)}
+                                            style={{cursor: 'pointer', color: 'white', transform: 'translateY(2px)'}}/>
                                     </div>
                                     {showTutorialColorPicker && (
-                                        <div className="color-picker-combined-wrapper" style={{backgroundColor:"white", padding:10+"px", borderRadius:5+"px"}}>
+                                        <div className="color-picker-combined-wrapper" style={{
+                                            backgroundColor: "white",
+                                            padding: 10 + "px",
+                                            borderRadius: 5 + "px"
+                                        }}>
                                             <div className="compact-color-picker-wrapper" style={{
                                                 display: 'inline-block',
                                                 transform: 'scale(0.8), translateY(7px)',
